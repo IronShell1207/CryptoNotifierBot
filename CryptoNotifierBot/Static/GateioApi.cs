@@ -36,12 +36,22 @@ namespace CryptoApi.Static
             };
         }
 
-        public static SymbolTimedExInfo GetExchangeInfo()
+        public static List<GateIOData> GetTickerFullData()
         {
             RestResponse response = RestRequester.GetRequest(new Uri(ExchangesApiLinks.GateIOSpotTicker)).Result;
-            JsonSerializer serializer = new JsonSerializer();
-            var pairsSerialized = serializer.Deserialize<List<GateIOData>>(new JsonTextReader(new StringReader(response.Content)));
-            var pairs = PairsListConverter(pairsSerialized);
+            if (response.IsSuccessful)
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                return serializer.Deserialize<List<GateIOData>>(new JsonTextReader(new StringReader(response.Content)));
+            }
+
+            return new List<GateIOData>()
+            {
+            };
+        }
+        public static SymbolTimedExInfo GetExchangeInfo()
+        {
+            var pairs = PairsListConverter(GetTickerFullData());
             return new SymbolTimedExInfo()
             {
                 CreationTime = DateTime.Now,

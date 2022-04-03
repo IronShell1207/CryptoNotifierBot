@@ -36,23 +36,28 @@ namespace CryptoApi.Static
             };
         }
 
-        public static SymbolTimedExInfo GetExchangeInfo()
+        public static OkxData GetTickerFullData()
         {
             RestResponse response = RestRequester.GetRequest(new Uri(ExchangesApiLinks.OkxSpotTicker)).Result;
-            
             if (response.IsSuccessful)
             {
                 JsonSerializer serializer = new JsonSerializer();
-                var pairsSerialized =
-                    serializer.Deserialize<OkxData>(new JsonTextReader(new StringReader(response.Content)));
-                var pairs = PairsListConverter(pairsSerialized.data.ToList());
-                return new SymbolTimedExInfo()
-                {
-                    CreationTime = DateTime.Now,
-                    Pairs = pairs
-                };
+                return serializer.Deserialize<OkxData>(new JsonTextReader(new StringReader(response.Content)));
             }
-            else return new SymbolTimedExInfo() { };
+
+            return new OkxData()
+            {
+            };
+        }
+
+        public static SymbolTimedExInfo GetExchangeInfo()
+        {
+            var pairs = PairsListConverter(GetTickerFullData().data.ToList());
+            return new SymbolTimedExInfo()
+            {
+                CreationTime = DateTime.Now,
+                Pairs = pairs
+            };
 
         }
 
