@@ -9,7 +9,7 @@ namespace TelegramBot.Objects
     public class UserConfig
     {
         public int Id { get; set; }
-        public int TelegramId { get; set; }
+        public long TelegramId { get; set; }
         /// <summary>
         /// Notifications delay in seconds
         /// </summary>

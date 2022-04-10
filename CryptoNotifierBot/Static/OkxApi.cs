@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Net;
 using CryptoApi.Constants;
 using CryptoApi.Objects;
 using CryptoApi.Objects.ExchangesPairs;
@@ -19,27 +18,34 @@ namespace CryptoApi.Static
             var listReturner = new List<CryptoExchangePairInfo>();
             foreach (OkxPairsInfo pair in list)
             {
-                listReturner.Add(new CryptoExchangePairInfo(SplitSymbolConverter(pair.instId), double.Parse(pair.last)));
+                var pairSymbol = SplitSymbolConverter(pair.instId);
+                if (pairSymbol != null)
+                    listReturner.Add(new CryptoExchangePairInfo(pairSymbol, double.Parse(pair.last)));
+               // listReturner.Add(new CryptoExchangePairInfo(SplitSymbolConverter(pair.instId), double.Parse(pair.last)));
             }
 
             return listReturner;
         }
 
-        public static CryptoPair SplitSymbolConverter(string symbol)
+        public static TradingPair SplitSymbolConverter(string symbol)
         {
             var name = symbol.Split("-").FirstOrDefault();
             var quote = symbol.Split("-").LastOrDefault();
-            return new CryptoPair()
+            if (Diff.AllowedQuotes.Contains(quote))
             {
-                Name = name,
-                Quote = quote
-            };
+                return new TradingPair()
+                {
+                    Name = name,
+                    Quote = quote
+                };
+            }
+            return null;
         }
 
         public static OkxData GetTickerFullData()
         {
             RestResponse response = RestRequester.GetRequest(new Uri(ExchangesApiLinks.OkxSpotTicker)).Result;
-            if (response.IsSuccessful)
+            if (response?.StatusCode == HttpStatusCode.OK)
             {
                 JsonSerializer serializer = new JsonSerializer();
                 return serializer.Deserialize<OkxData>(new JsonTextReader(new StringReader(response.Content)));
@@ -50,13 +56,14 @@ namespace CryptoApi.Static
             };
         }
 
-        public static SymbolTimedExInfo GetExchangeInfo()
+        public static SymbolTimedExInfo GetExchangeData()
         {
             var pairs = PairsListConverter(GetTickerFullData().data.ToList());
             return new SymbolTimedExInfo()
             {
                 CreationTime = DateTime.Now,
-                Pairs = pairs
+                Pairs = pairs,
+                Exchange = Exchanges.Okx
             };
 
         }

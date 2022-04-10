@@ -13,17 +13,17 @@ using RestSharp;
 
 namespace CryptoApi.Static
 {
-    public class GateioApi
+    public class KucoinAPI
     {
-        public static List<CryptoExchangePairInfo> PairsListConverter(List<GateIOData> list)
+        public static List<CryptoExchangePairInfo> PairsListConverter(List<KucoinData.Ticker> list)
         {
             var listReturner = new List<CryptoExchangePairInfo>();
-            foreach (GateIOData pair in list)
+            foreach (KucoinData.Ticker pair in list)
             {
-                var pairSymbol = SplitSymbolConverter(pair.currency_pair);
+                var pairSymbol = SplitSymbolConverter(pair.symbol);
                 if (pairSymbol != null)
                     listReturner.Add(new CryptoExchangePairInfo(pairSymbol, double.Parse(pair.last)));
-                //listReturner.Add(new CryptoExchangePairInfo(SplitSymbolConverter(pair.currency_pair), double.Parse(pair.last)));
+               // listReturner.Add(new CryptoExchangePairInfo(SplitSymbolConverter(pair.symbol), double.Parse(pair.last)));
             }
 
             return listReturner;
@@ -31,8 +31,8 @@ namespace CryptoApi.Static
 
         public static TradingPair SplitSymbolConverter(string symbol)
         {
-            var name = symbol.Split("_").FirstOrDefault();
-            var quote = symbol.Split("_").LastOrDefault();
+            var name = symbol.Split("-").FirstOrDefault();
+            var quote = symbol.Split("-").LastOrDefault();
             if (Diff.AllowedQuotes.Contains(quote))
             {
                 return new TradingPair()
@@ -44,16 +44,17 @@ namespace CryptoApi.Static
             return null;
         }
 
-        public  static List<GateIOData> GetTickerFullData()
+        public static List<KucoinData.Ticker> GetTickerFullData()
         {
-            RestResponse response = RestRequester.GetRequest(new Uri(ExchangesApiLinks.GateIOSpotTicker)).Result;
+            RestResponse response = RestRequester.GetRequest(new Uri(ExchangesApiLinks.KucoinSpotTicker)).Result;
             if (response?.StatusCode == HttpStatusCode.OK)
             {
                 JsonSerializer serializer = new JsonSerializer();
-                return serializer.Deserialize<List<GateIOData>>(new JsonTextReader(new StringReader(response.Content)));
+                var kudata = serializer.Deserialize<KucoinData.Rootobject>(new JsonTextReader(new StringReader(response.Content)));
+                return kudata.data.ticker.ToList();
             }
 
-            return new List<GateIOData>()
+            return new List<KucoinData.Ticker>()
             {
             };
         }
@@ -64,7 +65,7 @@ namespace CryptoApi.Static
             {
                 CreationTime = DateTime.Now,
                 Pairs = pairs,
-                Exchange = Exchanges.GateIO
+                Exchange = Exchanges.Kucoin
             };
 
         }

@@ -9,6 +9,7 @@ namespace CryptoApi.Objects
     public class SymbolTimedExInfo
     {
         public List<CryptoExchangePairInfo> Pairs { get; set; } = new List<CryptoExchangePairInfo>();
+        public String Exchange { get; set; } = "Binance";
         public DateTime CreationTime { get; set; } =DateTime.Now;
     }
 }

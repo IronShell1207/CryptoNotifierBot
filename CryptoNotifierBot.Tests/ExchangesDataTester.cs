@@ -22,19 +22,19 @@ namespace CryptoApi.Tests
             {
                 var sdata = data.symbols?[new Random(2).Next(0, data.symbols.Length-1)]; 
                 bool isValid = string.IsNullOrEmpty(sdata.baseAsset) && string.IsNullOrEmpty(sdata.symbol);
-                if (!isValid) Assert.Pass();
+                if (!isValid) Assert.Pass($"{sdata.symbol} {sdata.baseAsset}");
             }
             Assert.Fail();
         }
         [Test]
         public void BinanceApiExGetter()
         {
-            var data = BinanceApi.GetExchangeInfo();
+            var data = BinanceApi.GetExchangeData();
             if (data is SymbolTimedExInfo)
             {
                 var sdata = data.Pairs[new Random(23).Next(0,data.Pairs.Count-1)];
                 bool isValid = string.IsNullOrEmpty(sdata.Symbol.Name) && string.IsNullOrEmpty(sdata.Symbol.Quote);
-                if (!isValid) Assert.Pass();
+                if (!isValid) Assert.Pass($"{sdata.Symbol.ToString()} {sdata.Price.ToString()}");
             }
             Assert.Fail();
         }
@@ -42,12 +42,12 @@ namespace CryptoApi.Tests
         [Test]
         public void OkxApiTester()
         {
-            var data = OkxApi.GetExchangeInfo();
+            var data = OkxApi.GetExchangeData();
             if (data is SymbolTimedExInfo && data.Pairs.Any())
             {
                 var bitcoinprice = data.Pairs.Find(x => x.Symbol.Name == "BTC" && x.Symbol.Quote == "USDT");
                 if (bitcoinprice.Price != 0)
-                    Assert.Pass();
+                    Assert.Pass($"{bitcoinprice.Symbol.ToString()} {bitcoinprice.Price.ToString()}");
 
             }
 
@@ -56,15 +56,28 @@ namespace CryptoApi.Tests
         [Test]
         public void GateioApiTester()
         {
-            var data = GateioApi.GetExchangeInfo();
+            var data = GateioApi.GetExchangeData();
             if (data is SymbolTimedExInfo)
             {
                 var bitcoinprice = data.Pairs.Find(x => x.Symbol.Name == "BTC" && x.Symbol.Quote == "USDT");
                 if (bitcoinprice.Price != 0)
-                    Assert.Pass();
+                    Assert.Pass($"{bitcoinprice.Symbol.ToString()} {bitcoinprice.Price.ToString()}");
 
             }
 
+            Assert.Fail();
+        }
+
+        [Test]
+        public void KucoinApiTester()
+        {
+            var data = KucoinAPI.GetExchangeData();
+            if (data is SymbolTimedExInfo)
+            {
+                var BTCPrice = data.Pairs.Find(x => x.Symbol.ToString() == "BTC/USDT");
+                if (BTCPrice.Price != 0)
+                    Assert.Pass($"{BTCPrice.Symbol.ToString()} {BTCPrice.Price.ToString()}");
+            }
             Assert.Fail();
         }
 

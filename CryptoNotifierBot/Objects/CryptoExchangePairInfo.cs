@@ -8,13 +8,15 @@ namespace CryptoApi.Objects
 {
     public class CryptoExchangePairInfo 
     {
-        public CryptoPair Symbol { get; set; }
+        public TradingPair Symbol { get; set; }
         public double? Price { get; set; }
+       
 
-        public CryptoExchangePairInfo(CryptoPair symbol, double? price)
+        public CryptoExchangePairInfo(TradingPair symbol, double? price)
         {
             Symbol = symbol;
             Price = price;
+       
         }
     }
 }

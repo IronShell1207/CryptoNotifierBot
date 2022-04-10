@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TelegramBot.Constants
+namespace TelegramBot.Static
 {
-    public class Commands
+    internal class PositionManager
     {
-
     }
 }

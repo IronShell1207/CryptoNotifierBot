@@ -9,15 +9,15 @@ namespace CryptoApi
     {
         static void Main(string[] args)
         {
-            var data = OkxApi.GetExchangeInfo();
-            Task.Run(()=>
-            {
-                while (true) ExchangeDataKeeper.DataUpdater();
-            });
-            while (true)
-            {
-                Console.ReadLine();
-            }
+            var data = OkxApi.GetExchangeData();
+            //Task.Run(()=>
+            //{
+            //    while (true) ExchangeDataKeeper.DataUpdater();
+            //});
+            //while (true)
+            //{
+            //    Console.ReadLine();
+            //}
         }
     }
 }

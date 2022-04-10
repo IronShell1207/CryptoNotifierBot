@@ -6,7 +6,8 @@ using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+    using System.Threading;
+    using System.Threading.Tasks;
 using CryptoApi.Constants;
 using CryptoApi.Objects;
 using CryptoApi.Objects.ExchangesPairs;
@@ -17,41 +18,59 @@ namespace CryptoApi.Static
 {
     public class BinanceApi
     {
-        public static List<CryptoExchangePairInfo> BinanceExchangePairsListConverter(List<BinancePair> list)
+
+        public static List<CryptoExchangePairInfo> ExchangePairsConverter(List<BinancePair> list)
         {
             var listReturner = new List<CryptoExchangePairInfo>();
+            //var listbi = list as List<BinancePair>;
             foreach (var pair in list)
             {
-                listReturner.Add(new CryptoExchangePairInfo(SplitSymbolConverter(pair.symbol), pair.price));
+                var pairSymbol = SplitSymbolConverter(pair.symbol);
+                if (pairSymbol != null)
+                    listReturner.Add(new CryptoExchangePairInfo(pairSymbol, pair.price));
             }
 
             return listReturner;
         }
 
-        public static CryptoPair SplitSymbolConverter(string symbol)
+        public static TradingPair SplitSymbolConverter(string symbol)
         {
-            var crp = new CryptoPair();
+            var crp = new TradingPair();
             
             var match = ExchangesRegexCombins.cryptoSymbol.Match(symbol);
             if (match.Success)
             {
                 crp.Name = match.Groups["name"].Value;
                 crp.Quote = match.Groups["quote"].Value;
+                if (Diff.AllowedQuotes.Contains(crp.Quote))
+                    return crp;
             }
-            return crp;
+            return null;
+
         }
-        public static SymbolTimedExInfo GetExchangeInfo()
+        public static SymbolTimedExInfo GetExchangeData()
         {
             RestResponse responce = RestRequester.GetRequest(new Uri(ExchangesApiLinks.BinanceClearTicker)).Result;
             JsonSerializer serializer = new JsonSerializer();
-
-            var pairsSerialized = serializer.Deserialize<List<BinancePair>>(new JsonTextReader(new StringReader(responce.Content)));
-            var pairs = BinanceExchangePairsListConverter(pairsSerialized);
-            return new SymbolTimedExInfo()
+            if (responce?.StatusCode == HttpStatusCode.OK)
             {
-                CreationTime = DateTime.Now,
-                Pairs = pairs
-            };
+                
+            
+                var pairsSerialized = serializer.Deserialize<List<BinancePair>>(new JsonTextReader(new StringReader(responce.Content)));
+                var pairs = ExchangePairsConverter(pairsSerialized);
+                return new SymbolTimedExInfo()
+                {
+                    CreationTime = DateTime.Now,
+                    Pairs = pairs,
+                    Exchange = Exchanges.Binance
+                };
+            }
+            else
+            {
+                Console.WriteLine($"[{DateTime.Now.ToString()}] Binance api request failed. Status code: {responce.StatusCode}, {responce.ErrorMessage}");
+                Thread.Sleep(4000);
+                return GetExchangeData();
+            }
         }
 
         public static BinanceSymbolsData GetFullData()
@@ -62,5 +81,7 @@ namespace CryptoApi.Static
                 serializer.Deserialize<BinanceSymbolsData>(new JsonTextReader(new StringReader(response.Content)));
             return pairsSetialized;
         }
+
+        
     }
 }

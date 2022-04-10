@@ -17,16 +17,23 @@ namespace CryptoApi.Static
     {
         public async static Task<RestResponse> GetRequest(Uri Link)
         {
-            var request = new RestRequest(Link);
-            request.Method = Method.Get;
-            request.Timeout = 6000;
+            try
+            {
+                var request = new RestRequest(Link);
+                request.Method = Method.Get;
+                request.Timeout = 6000;
 
-            var client = new RestClient();
-            var result = await client.ExecuteAsync(request);
-            if (!result.IsSuccessful)
-                client = new RestClient(ProxyClient(Link));
+                var client = new RestClient();
+                var result = await client.ExecuteAsync(request);
+                if (!result.IsSuccessful)
+                    client = new RestClient(ProxyClient(Link));
                 result = await client.ExecuteAsync(request);
-            return result;
+                return result;
+            }
+            catch (Exception ex)
+            {
+                return null;
+            }
         }
 
         private static HttpClient ProxyClient(Uri link)

@@ -7,13 +7,17 @@ using System.Threading.Tasks;
 
 namespace CryptoApi.Objects
 {
-    public class CryptoPair
+    public class TradingPair
     {
         public string Name { get; set; }
         public string Quote { get; set; }
 
-        public CryptoPair(){}
-        public CryptoPair(string name, string quote)
+        public override string ToString()
+        {
+            return $"{Name}/{Quote}";
+        }
+        public TradingPair(){}
+        public TradingPair(string name, string quote)
         {
             this.Name = name;
             this.Quote = quote;

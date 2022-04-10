@@ -6,7 +6,13 @@ using System.Threading.Tasks;
 
 namespace TelegramBot.Constants
 {
-    internal class Messages
+    public class Messages
     {
+        public class CommandsResponses
+        {
+            public static string SuscribeToBreakoutBot = "";
+            public static string TimingsSubscribeBreakouts = "";
+        }
+        
     }
 }
