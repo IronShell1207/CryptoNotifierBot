@@ -15,6 +15,7 @@ using CryptoApi.Constants;
 using Telegram.Bot;
 using TelegramBot.Constants;
 using TelegramBot.Objects;
+using TelegramBot.Static.MessageHandlers;
 
 namespace TelegramBot.Static
 {
@@ -48,43 +49,93 @@ namespace TelegramBot.Static
 
         public static async Task UpdateHandler(ITelegramBotClient bot, Update update, CancellationToken canceltoken)
         {
+            if (!string.IsNullOrWhiteSpace(update.Message?.ReplyToMessage?.Text))
+            {
+                RepliedMsgHandlerAsync(bot, update, canceltoken);
+            }
             if (update.Type == UpdateType.Message)
             {
                 var user = GetUserSettings(update.Message.Chat.Id);
                 if (CommandsRegex.CreatePair.IsMatch(update.Message.Text))
                 {
-                    using (BotMessageHandler msghandler = new BotMessageHandler())
+                    using (CryptoPairsMsgHandler msghandler = new CryptoPairsMsgHandler())
                     {
-                        msghandler.AddCryptoPair(update);
+                        msghandler.NewCP(update);
                     }
                 }
-               // else if (update.Message.ReplyToMessage.Text == "")
-              //  {
+                else if (CommandsRegex.AddToBlackList.IsMatch(update.Message.Text))
+                {
                     
-              //  }
+                }
+                else if (CommandsRegex.SetTimings.IsMatch(update.Message.Text))
+                {
+                    using (BreakoutPairsMsgHandler msg = new BreakoutPairsMsgHandler())
+                    {
+                        msg.SetTimings(update);
+                    }
+                }
                 else if (update.Message.Text == "/subscribe")
                 {
-                    using (BotMessageHandler msghandler = new BotMessageHandler())
+                    using (BreakoutPairsMsgHandler msghandler = new BreakoutPairsMsgHandler())
                     {
                         msghandler.SubNewUserBreakouts(update);
                     }
                 }
                 else if (update.Message.Text == "/subsets")
                 {
-                    using (BotMessageHandler msgHandler = new BotMessageHandler())
+                    using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler())
                     {
                         msgHandler.SubSettings(update);
                     }
                 }
+                else if (update.Message.Text == "/substop")
+                {
+                    using (BreakoutPairsMsgHandler msgH = new BreakoutPairsMsgHandler())
+                    {
+                        msgH.StopNotify(update);
+                    }
+                }
+                    
             }
             else if (update.Type == UpdateType.CallbackQuery)
+            { 
+                CallbackHandlerAsync(bot,update, canceltoken);
+            }
+        }
+
+        public static async void RepliedMsgHandlerAsync(ITelegramBotClient bot, Update update,
+            CancellationToken canceltoken)
+        {
+            if (update.Message.ReplyToMessage.Text == Messages.newPairRequestingForPair)
             {
-                if (Exchanges.Contains(update.CallbackQuery.Data))
+                using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
                 {
-                    using (BotMessageHandler msgHandler = new BotMessageHandler())
-                    {
-                        msgHandler.SelectingCryptoExchangeForPairQueryHandler(update);
-                    }
+                    msgh.CreatingPairStageCP(update);
+                }
+            }
+            else if (update.Message.ReplyToMessage.Text == Messages.newPairWrongPrice)
+            {
+                using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
+                {
+                    msgh.SetTriggerPriceStageCP(update);
+                }
+            }
+            else if (update.Message.ReplyToMessage.Text == Messages.newPairAfterExchangeSetPrice)
+            {
+                using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
+                {
+                    msgh.SetTriggerPriceStageCP(update);
+                }
+            }
+        }
+        public static async void CallbackHandlerAsync(ITelegramBotClient bot, Update update,
+            CancellationToken cancellationToken)
+        {
+            if (Exchanges.Contains(update.CallbackQuery.Data))
+            {
+                using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
+                {
+                    msgh.SetExchangeStageCP(update);
                 }
             }
         }
@@ -99,11 +150,11 @@ namespace TelegramBot.Static
             {
                 var messagelenght = message.Length;
                 if (messagelenght > 4125)
-                    for (int i =0; i< messagelenght; i+=4000)
-                        await BotClient.SendTextMessageAsync(chatId, message.Substring(i, i + 4000));
+                    for (int i =0; i< messagelenght/3500; i++)
+                        await BotClient.SendTextMessageAsync(chatId, message.Substring(i*3500, i + 3500));
                 else
                     await BotClient.SendTextMessageAsync(chatId, message);
-            }
+            }   
             catch (Telegram.Bot.Exceptions.ApiRequestException apiException)
             {
                 if (apiException.Message == "Bad Request: chat not found" || apiException.ErrorCode == 400)

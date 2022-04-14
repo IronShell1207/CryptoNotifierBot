@@ -6,11 +6,15 @@ using System.Threading.Tasks;
 
 namespace TelegramBot.Objects
 {
-    public class FavotitePairs
+    public class BlackListedPairs
     {
         public int Id { get; set; }
         public int OwnerId { get; set; }
         public string Base { get; set; }
         public string Quote { get; set; }
+        public override string ToString()
+        {
+            return $"{Base}/{Quote}";
+        }
     }
 }

@@ -46,46 +46,36 @@ namespace TelegramBot.Static
                     goto loopend;
                 }
                 var datetimeNow = DateTime.Now;
-                var latestData = ExchangesCheckerForUpdates.marketData[0];
-                for (var index = ExchangesCheckerForUpdates.marketData.Count - 1; index > 0; index--)
+                var latestData = ExchangesCheckerForUpdates.marketData.LastOrDefault();
+                for (var index = ExchangesCheckerForUpdates.marketData.Count - 1; index >= 0; index--)
                 {
+                    if (index > ExchangesCheckerForUpdates.marketData.Count) break;
                     List<SymbolTimedExInfo> data = ExchangesCheckerForUpdates.marketData[index];
                     for (var iTi = 0; iTi < ListTimings.Count; iTi++)
                     {
                         int timeIn = ListTimings[iTi];
                         if (data[0].CreationTime + TimeSpan.FromMinutes(timeIn) < datetimeNow &&
-                            datetimeNow < data[0].CreationTime + TimeSpan.FromMinutes(timeIn + 1) && 
+                            datetimeNow < data[0].CreationTime + TimeSpan.FromMinutes(timeIn + 1) &&
                             listDateTimes[iTi] + TimeSpan.FromMinutes(timeIn) < datetimeNow)
                         {
                             listDateTimes[iTi] = datetimeNow;
-                            index += timeIn + 1;
+                            index -= timeIn - 1;
                             for (int i = 0; i < data.Count; i++)
                             {
                                 SymbolTimedExInfo dataExchange = data[i];
                                 var compairedPairs = CompairedPairs(dataExchange.Pairs, latestData[i].Pairs,
                                     procentsDifference[iTi], ListTimings[iTi], dataExchange.Exchange);
-                                Console.WriteLine($"[{datetimeNow.ToString()}] {data[i].Exchange}: {compairedPairs.Count}");
+                                Console.WriteLine($"[{datetimeNow.ToString()}] {data[i].Exchange}: {compairedPairs.Count} Time: {timeIn}");
                                 if (compairedPairs.Count > 0)
                                 {
-                                    StringBuilder sb = new StringBuilder();
-                                    sb.Append($"Updated data from {dataExchange.Exchange}:\n");
-                                    foreach (var pair in compairedPairs)
-                                    {
-                                        var riimg = pair.oldPrice > pair.newPrice ? "📉" : "📈";
-                                        var pls = pair.oldPrice > pair.newPrice ? "" : "+";
-                                        var formater = pair.newPrice < 0.0099 ? "{0:0.#########}" : "{0:####0.###}";
-                                        sb.Append(
-                                            $"{riimg} {pair.Symbol.ToString()} {string.Format(formater, pair.oldPrice)}->{string.Format(formater, pair.newPrice)} {pls}{string.Format("{0:##.00}", ((pair.newPrice / pair.oldPrice) * 100) - 100)}% in {pair.Time} mins\n");
-                                    }
-
-                                    SpreadBreakoutNotify(sb.ToString(), data[i].Exchange, 2);
+                                    SpreadBreakoutNotify(compairedPairs, data[i].Exchange, timeIn);
                                     Thread.Sleep(25);
                                 }
                             }
                         }
                     }
                 }
-                loopend:
+            loopend:
                 count = countNow;
                 Thread.Sleep(30000);
             }
@@ -93,40 +83,73 @@ namespace TelegramBot.Static
 
         }
 
-        public static async void SpreadBreakoutNotify(string msg, string platform, int timing)
+        public static async void SpreadBreakoutNotify(List<BreakoutPair> pairs, string platform, int timing)
         {
             Console.WriteLine($"[{DateTime.Now.ToString()}] Breakout bot sending notify");
             using (AppDbContext db = new AppDbContext())
             {
+
                 foreach (BreakoutSub sub in db.BreakoutSubs.ToList())
                 {
-                    if ((timing == 2 && sub.S2MinUpdates)
-                        || (timing == 5 && sub.S5MinUpdates)
-                        || (timing == 15 && sub.S15MinUpdates)
-                        || (timing == 30 && sub.S30MinUpdates)
-                        || (timing == 45 && sub.S45MinUpdates)
-                        || (timing == 60 && sub.S60MinUpdates)
-                        || (timing == 120 && sub.S120MinUpdates)
-                        || (timing == 240 && sub.S240MinUpdates)
-                        || (timing == 480 && sub.S480MinUpdates)
-                        || (timing == 960 && sub.S960MinUpdates)
-                        || (timing == 1920 && sub.S1920MinUpdates))
-                    {
-                        //StringBuilder sendingMessage = new StringBuilder();
-                        if ((platform == Exchanges.Binance && sub.BinanceSub)
-                            || (platform == Exchanges.Kucoin && sub.KucoinSub)
-                            || (platform == Exchanges.Okx && sub.OkxSub)
-                            || (platform == Exchanges.GateIO && sub.GateioSub))
+                    if (sub.Subscribed)
+                        if ((timing == 2 && sub.S2MinUpdates)
+                            || (timing == 5 && sub.S5MinUpdates)
+                            || (timing == 15 && sub.S15MinUpdates)
+                            || (timing == 30 && sub.S30MinUpdates)
+                            || (timing == 45 && sub.S45MinUpdates)
+                            || (timing == 60 && sub.S60MinUpdates)
+                            || (timing == 120 && sub.S120MinUpdates)
+                            || (timing == 240 && sub.S240MinUpdates)
+                            || (timing == 480 && sub.S480MinUpdates)
+                            || (timing == 960 && sub.S960MinUpdates)
+                            || (timing == 1920 && sub.S1920MinUpdates))
                         {
-                            await BotApi.SendMessage(sub.TelegramId, msg);
+                            //StringBuilder sendingMessage = new StringBuilder();
+                            if ((platform == Exchanges.Binance && sub.BinanceSub)
+                                || (platform == Exchanges.Kucoin && sub.KucoinSub)
+                                || (platform == Exchanges.Okx && sub.OkxSub)
+                                || (platform == Exchanges.GateIO && sub.GateioSub))
+                            {
+                                Console.WriteLine($"{sub.TelegramId}");
+                                StringBuilder sb = new StringBuilder($"Updated data from {platform}:\n");
+                                var favList = db.FavoritePairs.ToList().Where(x => x.OwnerId == sub.Id).ToList();
+                                if (favList.Any())
+                                {
+                                    var newList = new List<BreakoutPair>() { };
+                                    foreach (var pair in pairs)
+                                    {
+                                        var fpair = favList.FirstOrDefault(x => x.ToString() == pair.Symbol.ToString());
+                                        if (fpair != null)
+                                        {
+                                            newList.Add(pair);
+                                        }
+                                    }
+                                    FormatAndSendAsync(newList, platform, timing, sb, sub);
+                                }
+                                else FormatAndSendAsync(pairs, platform, timing, sb, sub);
+
+                            }
                         }
-                    }
                 }
             }
         }
-        private static List<BreakuotPair> CompairedPairs(List<CryptoExchangePairInfo> oldData, List<CryptoExchangePairInfo> freshData, double procent, double time = 0, string exchange = "Binance")
+
+        private static async void FormatAndSendAsync(List<BreakoutPair> pairs, string platform, int timing, StringBuilder sb, BreakoutSub sub)
         {
-            List<BreakuotPair> changedData = new List<BreakuotPair>() { };
+            foreach (var pair in pairs)
+            {
+                //if (favList?.Contains(pair))
+                var riimg = pair.oldPrice > pair.newPrice ? "📉" : "📈";
+                var pls = pair.oldPrice > pair.newPrice ? "" : "+";
+                var formater = pair.newPrice < 0.0099 ? "{0:0.#########}" : "{0:####0.####}";
+                sb.Append(
+                    $"{riimg} {pair.Symbol.ToString()} {string.Format(formater, pair.oldPrice)}->{string.Format(formater, pair.newPrice)} {pls}{string.Format("{0:##.00}", ((pair.newPrice / pair.oldPrice) * 100) - 100)}% in {pair.Time} mins\n");
+            }
+            await BotApi.SendMessage(sub.TelegramId, sb.ToString());
+        }
+        private static List<BreakoutPair> CompairedPairs(List<CryptoExchangePairInfo> oldData, List<CryptoExchangePairInfo> freshData, double procent, double time = 0, string exchange = "Binance")
+        {
+            List<BreakoutPair> changedData = new List<BreakoutPair>() { };
             foreach (var data in oldData)
             {
                 var fresh = freshData.FirstOrDefault(x => x.Symbol.ToString() == data.Symbol.ToString());
@@ -134,7 +157,7 @@ namespace TelegramBot.Static
                 var diff = ((data.Price / fresh.Price) * 100) - 100;
                 var proc = data.Price < 0.0000009 ? 6 : procent;
                 if (diff > proc || diff < -proc)
-                    changedData.Add(new BreakuotPair()
+                    changedData.Add(new BreakoutPair()
                     {
                         newPrice = fresh.Price,
                         oldPrice = data.Price,

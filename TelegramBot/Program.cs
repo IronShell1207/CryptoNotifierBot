@@ -18,7 +18,7 @@ namespace TelegramBot
 
             if (string.IsNullOrWhiteSpace(AppSettingsStatic.Settings.TelegramBotToken))
             {
-                setbottoken:
+            setbottoken:
                 Console.Write("Set telegram bot token: ");
                 var token = RegexCombins.TelegramBotToken.Match(Console.ReadLine());
                 if (token.Success)
@@ -48,10 +48,10 @@ namespace TelegramBot
                 SetAdminId().Wait();
             }
             Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] Bot has been started!");
-            
-           // BotApi.SendMessage(1328993812, "test");
+
+            // BotApi.SendMessage(1328993812, "test");
             Task.Run(() => NotifyLoops.MainLoop());
-           while (true)
+            while (true)
             {
                 Console.ReadLine();
             }
@@ -59,7 +59,7 @@ namespace TelegramBot
 
         private static async Task SetAdminId()
         {
-            setid:
+        setid:
             Console.Write("Set admin telegram id: ");
             var id = Console.ReadLine();
             try

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CryptoApi.Constants;
 using CryptoApi.Objects;
 using CryptoApi.Static;
 
@@ -42,8 +43,13 @@ namespace TelegramBot.Static
             }
         }
 
-        public static async Task<double> GetCurrentPrice(TradingPair pair)
+        public static async Task<double> GetCurrentPrice(TradingPair pair, string exchange)
         {
+            var mData = marketData.LastOrDefault();
+            SymbolTimedExInfo sData = mData.FirstOrDefault(x => x.Exchange == exchange);
+            var pricedPair = sData.Pairs.FirstOrDefault(x => x.Symbol.ToString() == pair.ToString());
+            if (pricedPair != null)
+                return (double) pricedPair.Price;
             return 0;
         }
 

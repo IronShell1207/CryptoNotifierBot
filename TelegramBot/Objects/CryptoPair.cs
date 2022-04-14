@@ -18,9 +18,9 @@ namespace TelegramBot.Objects
         public string ExchangePlatform { get; set; }
         public bool GainOrFall { get; set; }
         public double Price { get; set; }
-        public bool TriggerOnce { get; set; }
-        public string Screenshot { get; set; }
-        public string Note { get; set; }
+        public bool TriggerOnce { get; set; } = false;
+        public string? Screenshot { get; set; }
+        public string? Note { get; set; }
 
         public CryptoPair(){}
         public CryptoPair(int owner)

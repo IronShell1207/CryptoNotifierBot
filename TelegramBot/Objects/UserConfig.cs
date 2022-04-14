@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,7 +28,7 @@ namespace TelegramBot.Objects
         /// <summary>
         /// Compact pairs notifications for true value, and full info for false
         /// </summary>
-        public bool CryptoNotifyStyle { get; set; } = false;
+        public string? CryptoNotifyStyle { get; set; }
 
         public string Language { get; set; } = "en";
         public bool DisplayTaskEditButtonsInNotifications { get; set; } = true;

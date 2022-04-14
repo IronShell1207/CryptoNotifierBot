@@ -86,7 +86,34 @@ namespace TelegramBot {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to You are successfully subscribed to breakout notifications. Current settings: {0}.
+        ///   Looks up a localized string similar to Exchange for new crypto pair setted. Set price in next message.
+        /// </summary>
+        internal static string newPairAfterExchangeSetPrice {
+            get {
+                return ResourceManager.GetString("newPairAfterExchangeSetPrice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to For creating new monitoring task, send me crypto pair with following next format of message with this message attached:\nBASE/QUOTE or BASE QUOTE\nExample: BTC/USDT or BTC USDT.
+        /// </summary>
+        internal static string newPairRequestingForPair {
+            get {
+                return ResourceManager.GetString("newPairRequestingForPair", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Wrong price. Try again.
+        /// </summary>
+        internal static string newPairWrongPrice {
+            get {
+                return ResourceManager.GetString("newPairWrongPrice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to You are successfully subscribed to breakout notifications. Current settings: {0}. .
         /// </summary>
         internal static string subscribedSucs {
             get {

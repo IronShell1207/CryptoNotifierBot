@@ -13,17 +13,18 @@ namespace TelegramBot.Static
     {
         public DbSet<UserConfig> Users { get; set; }
         public DbSet<CryptoPair> CryptoPairs { get; set; }
-        public DbSet<FavotitePairs> FavoritePairs { get; set; }
+        public DbSet<BlackListedPairs> FavoritePairs { get; set; }
         public DbSet<BreakoutSub> BreakoutSubs { get; set; } 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite(AppSettingsStatic.Settings.DbConnectionString);
-            // base.OnConfiguring(optionsBuilder);
+            string dbPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"/Tcryptobot/";
+            if (!Directory.Exists(dbPath)) Directory.CreateDirectory(dbPath);
+            dbPath = $"Filename={dbPath}telegrambot.db";
+            optionsBuilder.UseSqlite(dbPath);
         }
 
         public AppDbContext()
         {
-            //Database.Migrate();
             Database.EnsureCreated();
         }
     }

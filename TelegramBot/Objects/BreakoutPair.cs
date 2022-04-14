@@ -7,7 +7,7 @@ using CryptoApi.Objects;
 
 namespace TelegramBot.Objects
 {
-    public class BreakuotPair
+    public class BreakoutPair
     {
         public TradingPair Symbol { get; set; }
         public double? oldPrice { get; set; }
