@@ -33,7 +33,7 @@ namespace TelegramBot.Static.MessageHandlers
 
         public async void NewCP(Update update)
         {
-            var match = CommandsRegex.CreatePair.Match(update.Message.Text);
+            var match = CommandsRegex.MonitoringTaskCommands.CreatePair.Match(update.Message.Text);
             if (match.Success)
             {
                 string baseValue = match.Groups["base"].Value.ToUpper();
@@ -138,6 +138,27 @@ namespace TelegramBot.Static.MessageHandlers
                 }
 
                 BotApi.SendMessage(update.Message.Chat.Id, "New pair saved!");
+            }
+        }
+
+        public async void ListAllTask(Update update)
+        {
+            using (AppDbContext dbContext = new AppDbContext())
+            {
+                var tasks = dbContext.CryptoPairs.Where(x => x.OwnerId == update.Message.Chat.Id).ToList();
+                if (tasks.Any())
+                {
+                    StringBuilder strTasks = new StringBuilder("Your list of tasks:\n");
+                    foreach (var task in tasks)
+                    {
+                        strTasks.AppendLine(task.TaskStatus());
+                    }
+
+                    strTasks.AppendLine("");
+                    strTasks.AppendLine("To edit any task send: /edit 'id' 'new_price' or /edit BASE/QUOTE");
+                    BotApi.SendMessage(update.Message.Chat.Id, strTasks.ToString());
+                }
+                else BotApi.SendMessage(update.Message.Chat.Id, MessagesGetter.GetGlobalString("noCryptoTasks", "en"));
             }
         }
     }

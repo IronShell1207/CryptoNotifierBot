@@ -117,6 +117,9 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="cryptoPairAdded" xml:space="preserve">
+    <value>✅ New monitoring task has been created.\nDetails of your task:\n{0}</value>
+  </data>
   <data name="helpMsg" xml:space="preserve">
     <value>Brief information about this bot: 
 This bot is written on Python3 with pyTelegramBotApi library.
@@ -127,8 +130,37 @@ My web: https://droidapps.cf/en/
 If bot is usefull for you, you can buy my a ☕️ and thx 2u).
 \n🥇ETH: 0xa35fbab442da4e65413045a4b9b147e2a0fc3e0c\n🎈LTC: LQiBdMeCNWAcSBEhc2QT3ffFz8a2t7zPcG</value>
   </data>
+  <data name="newPairAfterExchangeSetPrice" xml:space="preserve">
+    <value>Exchange for new crypto pair setted. Set price in next message</value>
+  </data>
+  <data name="newPairRequestingForPair" xml:space="preserve">
+    <value>For creating new monitoring task, send me crypto pair with following next format of message with this message attached:\nBASE/QUOTE or BASE QUOTE\nExample: BTC/USDT or BTC USDT</value>
+  </data>
+  <data name="newPairWrongPrice" xml:space="preserve">
+    <value>Wrong price. Try again</value>
+  </data>
+  <data name="subscribedSucs" xml:space="preserve">
+    <value>You are successfully subscribed to breakout notifications. Current settings: {0}. </value>
+  </data>
+  <data name="noCryptoTasks" xml:space="preserve">
+    <value>You don't have any tasks yet. To add new send /create</value>
+  </data>
+  <data name="ToaddToTheBlackList" xml:space="preserve">
+    <value>To add new pair to the black list send it with this message attached using next format: BTC/USDT or BTC USDT
+</value>
+  </data>
   <data name="welcomeMsg" xml:space="preserve">
-    <value>Hello! I'm crypto currency exchange monitor bot. I can send you 💬 notification when your currency is raise 📉 or fall 📈 to setted value 💰. For example, you need to know when Bitcoin hits the $ 40,000 mark. To do this, press the 'Create 📊' button and send the bot either the name of the 'BTC' coin and select a pair from the options offered, or send the 'BTC/USDT' pair at once in this format.
-After that, the bot will ask you to indicate the price point that you want to know about. You send the bot a number, for example 40000. After that, the bot will send you information about the newly created task. You can view all tasks by clicking on the 'List of tasks 📝' button. As soon as the price of this pair reaches the target mark, you will immediately receive a notification from the bot for each of the added pairs. You can also edit, turn off or turn off the task at any time. For create new task 🖍 send: /createtask.\nFor get info 📋 send: /info\nFor get all available commands 🔎 send: /help</value>
+    <value>Hello! I'm crypto currency exchange monitor bot. I can send you 💬 notification when your currency is raise 📉 or fall 📈 to setted value 💰.
+For example, you need to know when Bitcoin hits the $ 40,000 mark. 
+To do this, press the 'Create 📊' button and send the bot either the name of the 'BTC' coin and select a pair from the options offered, or send the 'BTC/USDT' pair at once in this format.
+After that, the bot will ask you to indicate the price point that you want to know about. 
+You send the bot a number, for example 40000. After that, the bot will send you information about the newly created task. 
+You can view all tasks by clicking on the 'List of tasks 📝' button. 
+As soon as the price of this pair reaches the target mark, you will immediately receive a notification from the bot for each of the added pairs. 
+You can also edit, turn off or turn off the task at any time. 
+
+For create new task 🖍 send: /createtask.
+For get info 📋 send: /info
+For get all available commands 🔎 send: /help</value>
   </data>
 </root>

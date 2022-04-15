@@ -142,6 +142,12 @@ If bot is usefull for you, you can buy my a ☕️ and thx 2u).
   <data name="subscribedSucs" xml:space="preserve">
     <value>You are successfully subscribed to breakout notifications. Current settings: {0}. </value>
   </data>
+  <data name="noCryptoTasks" xml:space="preserve">
+    <value>You don't have any tasks yet. To add new send /create</value>
+  </data>
+  <data name="ToaddToTheBlackList" xml:space="preserve">
+    <value>To add new pair to the black list send it with this message attached using next format: BTC/USDT or BTC USDT</value>
+  </data>
   <data name="welcomeMsg" xml:space="preserve">
     <value>Hello! I'm crypto currency exchange monitor bot. I can send you 💬 notification when your currency is raise 📉 or fall 📈 to setted value 💰.
 For example, you need to know when Bitcoin hits the $ 40,000 mark. 

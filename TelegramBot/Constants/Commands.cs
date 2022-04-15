@@ -8,6 +8,6 @@ namespace TelegramBot.Constants
 {
     public class Commands
     {
-
+        public const string AllTasks = "/showtasks";
     }
 }

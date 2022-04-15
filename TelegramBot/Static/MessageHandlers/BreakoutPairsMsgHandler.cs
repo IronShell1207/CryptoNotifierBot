@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using CryptoApi.Objects;
 using Telegram.Bot.Types;
 using TelegramBot.Constants;
 using TelegramBot.Objects;
@@ -43,7 +45,7 @@ namespace TelegramBot.Static.MessageHandlers
                 }
                 else if (sub.Subscribed)
                 {
-                    
+
                     await BotApi.SendMessage(update.Message.Chat.Id, "You already subscribed to breakout bot. Your current settings: " +
                                                                      $"\nGate IO platform: {user.GateioSub}\nBinance platform: {user.BinanceSub}\nOkx platfrom: {user.OkxSub}\nKucoin platform: {user.KucoinSub}");
                 }
@@ -64,28 +66,59 @@ namespace TelegramBot.Static.MessageHandlers
             {
                 var sub = db.BreakoutSubs.FirstOrDefault(x => x.TelegramId == update.Message.Chat.Id);
                 var match = CommandsRegex.SetTimings.Match(update.Message.Text);
-                var timing = double.Parse( match.Groups["timing"].Value);
+                var timing = double.Parse(match.Groups["timing"].Value);
+                var enable = false;
                 switch (timing)
                 {
                     case 2:
                         sub.S2MinUpdates = !sub.S2MinUpdates;
+                        enable = sub.S2MinUpdates;
                         break;
                     case 5:
                         sub.S5MinUpdates = !sub.S5MinUpdates;
+                        enable = sub.S5MinUpdates;
                         break;
                     case 15:
                         sub.S15MinUpdates = !sub.S15MinUpdates;
+                        enable = sub.S15MinUpdates;
                         break;
                     case 30:
                         sub.S30MinUpdates = !sub.S30MinUpdates;
+                        enable = sub.S30MinUpdates;
                         break;
                     case 45:
                         sub.S45MinUpdates = !sub.S45MinUpdates;
+                        enable = sub.S45MinUpdates;
                         break;
                     case 60:
                         sub.S60MinUpdates = !sub.S60MinUpdates;
+                        enable = sub.S60MinUpdates;
+                        break;
+                    case 120:
+                        sub.S120MinUpdates = !sub.S120MinUpdates;
+                        enable = sub.S120MinUpdates;
+                        break;
+                    case 240:
+                        sub.S240MinUpdates = !sub.S240MinUpdates;
+                        enable = sub.S240MinUpdates;
+                        break;
+                    case 480:
+                        sub.S480MinUpdates = !sub.S480MinUpdates;
+                        enable = sub.S480MinUpdates;
+                        break;
+                    case 960:
+                        sub.S960MinUpdates = !sub.S960MinUpdates;
+                        enable = sub.S960MinUpdates;
+                        break;
+                    case 1920:
+                        sub.S1920MinUpdates = !sub.S1920MinUpdates;
+                        enable = sub.S1920MinUpdates;
                         break;
                 }
+
+                var en = enable ? "enabled" : "disabled";
+                BotApi.SendMessage(sub.TelegramId, $"Updates for {timing} mins {en}!");
+                db.SaveChangesAsync();
             }
         }
         public async void SubSettings(Update update)
@@ -99,6 +132,53 @@ namespace TelegramBot.Static.MessageHandlers
                     BotApi.SendMessage(update.Message.Chat.Id, message, true);
                 }
             }
+        }
+
+        public async void AddPairToBlackListCommandHandler(Update update)
+        {
+            var match = CommandsRegex.BreakoutCommands.AddToBlackList.Match(update.Message.Text);
+            if (match.Success)
+            {
+                var Pairbase = match.Groups["base"].Value.ToUpper();
+                var Pairquote = match.Groups["quote"].Value.ToUpper();
+                if (!string.IsNullOrWhiteSpace(Pairbase) && !string.IsNullOrWhiteSpace(Pairquote))
+                    AddPairToBlackList(update, Pairbase, Pairquote);
+                else
+                {
+                    BotApi.SendMessage(update.Message.Chat.Id,
+                        MessagesGetter.GetGlobalString("ToaddToTheBlackList", "en"),
+                        true);
+                }
+            }
+            else if (RegexCombins.CryptoPairRegex.IsMatch(update.Message.Text.ToUpper()))
+            {
+                match = RegexCombins.CryptoPairRegex.Match(update.Message.Text.ToUpper());
+                var Pairbase = match.Groups["base"].Value;
+                var Pairquote = match.Groups["quote"].Value;
+                if (!string.IsNullOrWhiteSpace(Pairbase) && !string.IsNullOrWhiteSpace(Pairquote))
+                    AddPairToBlackList(update, Pairbase, Pairquote);
+            }
+            
+        }
+
+        public async void AddPairToBlackList(Update update, string Pairbase, string Pairquote)
+        {
+            bool isValid = ExchangesCheckerForUpdates.GetCurrentPrice(new TradingPair(Pairbase, Pairquote)).Result > 0;
+            if (isValid)
+            {
+                using (AppDbContext dbContext = new AppDbContext())
+                {
+                    BlackListedPairs badPair = new BlackListedPairs()
+                    {
+                        Base = Pairbase,
+                        Quote = Pairquote,
+                        OwnerId = update.Message.Chat.Id
+                    };
+                    dbContext.BlackListedPairs.Add(badPair);
+                    dbContext.SaveChangesAsync();
+                }
+            }
+
         }
 
     }

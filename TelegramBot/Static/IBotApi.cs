@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using Telegram.Bot.Types;
 using Telegram.Bot.Extensions;
@@ -56,16 +57,27 @@ namespace TelegramBot.Static
             if (update.Type == UpdateType.Message)
             {
                 var user = GetUserSettings(update.Message.Chat.Id);
-                if (CommandsRegex.CreatePair.IsMatch(update.Message.Text))
+                if (CommandsRegex.MonitoringTaskCommands.CreatePair.IsMatch(update.Message.Text))
                 {
                     using (CryptoPairsMsgHandler msghandler = new CryptoPairsMsgHandler())
                     {
                         msghandler.NewCP(update);
                     }
                 }
-                else if (CommandsRegex.AddToBlackList.IsMatch(update.Message.Text))
+                else if (Commands.AllTasks == update.Message.Text)
                 {
-                    
+                    using (CryptoPairsMsgHandler cr = new CryptoPairsMsgHandler())
+                    {
+                        cr.ListAllTask(update);
+                    }
+                }
+
+                else if (CommandsRegex.BreakoutCommands.AddToBlackList.IsMatch(update.Message.Text))
+                {
+                    using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler())
+                    {
+                        msgHandler.AddPairToBlackListCommandHandler(update);
+                    }
                 }
                 else if (CommandsRegex.SetTimings.IsMatch(update.Message.Text))
                 {
@@ -106,6 +118,7 @@ namespace TelegramBot.Static
         public static async void RepliedMsgHandlerAsync(ITelegramBotClient bot, Update update,
             CancellationToken canceltoken)
         {
+            var user = GetUserSettings(update.Message.Chat.Id).Result;
             if (update.Message.ReplyToMessage.Text == Messages.newPairRequestingForPair)
             {
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
@@ -125,6 +138,14 @@ namespace TelegramBot.Static
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
                 {
                     msgh.SetTriggerPriceStageCP(update);
+                }
+            }
+            else if (update.Message.ReplyToMessage.Text ==
+                     MessagesGetter.GetGlobalString("ToaddToTheBlackList", user.Language))
+            {
+                using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler())
+                {
+                    msgHandler.AddPairToBlackListCommandHandler(update);
                 }
             }
         }
@@ -172,12 +193,66 @@ namespace TelegramBot.Static
 
         public static async Task SendMessage(ChatId chatId, string message, bool replythis)
         {
-            var msg = await BotClient.SendTextMessageAsync(chatId, message, replyMarkup: new ForceReplyMarkup());
+            try
+            {
+                var msg = await BotClient.SendTextMessageAsync(chatId, message, replyMarkup: new ForceReplyMarkup());
+            }
+            catch (Telegram.Bot.Exceptions.ApiRequestException apiException)
+            {
+                if (apiException.Message == "Bad Request: chat not found" || apiException.ErrorCode == 400)
+                {
+                    using (AppDbContext dbContext = new AppDbContext())
+                    {
+                        var baduser = dbContext.Users.FirstOrDefault(x => x.TelegramId == chatId.Identifier);
+                        if (baduser != null) dbContext.Users.Remove(baduser);
+                        Console.WriteLine($"Bad user {chatId.Identifier}. Removed from the database");
+                    }
+                }
+            }
         }
 
         public static async Task SendMessage(ChatId chatId, string message, IReplyMarkup replyMarkup)
         {
-            await BotClient.SendTextMessageAsync(chatId, message,replyMarkup: replyMarkup);
+            try
+            {
+                await BotClient.SendTextMessageAsync(chatId, message,replyMarkup: replyMarkup);
+            }
+            catch (Telegram.Bot.Exceptions.ApiRequestException apiException)
+            {
+                if (apiException.Message == "Bad Request: chat not found" || apiException.ErrorCode == 400)
+                {
+                    using (AppDbContext dbContext = new AppDbContext())
+                    {
+                        var baduser = dbContext.Users.FirstOrDefault(x => x.TelegramId == chatId.Identifier);
+                        if (baduser != null) dbContext.Users.Remove(baduser);
+                        Console.WriteLine($"Bad user {chatId.Identifier}. Removed from the database");
+                    }
+                }
+            }
+        }
+
+        public static async Task EditMessage(ChatId chatId, string newMessage, int messageID)
+        {
+            await BotClient.EditMessageTextAsync(chatId, messageID, newMessage);
+            //try
+            //{
+
+            //}
+            //catch (Exception ex) 
+            //{
+
+            //}
+        }
+        /// <summary>
+        /// Editing self message for revoking inline keyboard
+        /// </summary>
+        /// <param name="chatId">User chat id</param>
+        /// <param name="messageID">Message id</param>
+        /// <param name="removeKeyboard">New reply keyboard or null</param>
+        /// <returns></returns>
+        public static async Task EditMessage(ChatId chatId, int messageID, bool removeKeyboard)
+        {
+            await BotClient.EditMessageReplyMarkupAsync(chatId, messageID, null);
         }
 
         public static async Task<UserConfig> GetUserSettings(ChatId chatId)

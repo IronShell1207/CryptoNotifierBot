@@ -13,7 +13,7 @@ namespace TelegramBot.Static
     {
         public DbSet<UserConfig> Users { get; set; }
         public DbSet<CryptoPair> CryptoPairs { get; set; }
-        public DbSet<BlackListedPairs> FavoritePairs { get; set; }
+        public DbSet<BlackListedPairs> BlackListedPairs { get; set; }
         public DbSet<BreakoutSub> BreakoutSubs { get; set; } 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

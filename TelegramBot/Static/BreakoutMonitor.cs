@@ -112,7 +112,7 @@ namespace TelegramBot.Static
                             {
                                 Console.WriteLine($"{sub.TelegramId}");
                                 StringBuilder sb = new StringBuilder($"Updated data from {platform}:\n");
-                                var favList = db.FavoritePairs.ToList().Where(x => x.OwnerId == sub.Id).ToList();
+                                var favList = db.BlackListedPairs.ToList().Where(x => x.OwnerId == sub.Id).ToList();
                                 if (favList.Any())
                                 {
                                     var newList = new List<BreakoutPair>() { };
