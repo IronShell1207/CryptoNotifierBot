@@ -4,7 +4,7 @@
 
 namespace TelegramBot.Migrations
 {
-    public partial class dbNameSetandUserTypeChanged : Migration
+    public partial class blacklistAdd : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {

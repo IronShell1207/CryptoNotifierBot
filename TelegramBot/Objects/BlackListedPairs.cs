@@ -9,7 +9,7 @@ namespace TelegramBot.Objects
     public class BlackListedPairs
     {
         public int Id { get; set; }
-        public long OwnerId { get; set; }
+        public int OwnerId { get; set; }
         public string Base { get; set; }
         public string Quote { get; set; }
         public override string ToString()

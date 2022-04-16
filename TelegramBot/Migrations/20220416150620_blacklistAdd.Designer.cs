@@ -10,8 +10,8 @@ using TelegramBot.Static;
 namespace TelegramBot.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220415130248_dbNameSetandUserTypeChanged")]
-    partial class dbNameSetandUserTypeChanged
+    [Migration("20220416150620_blacklistAdd")]
+    partial class blacklistAdd
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -28,7 +28,7 @@ namespace TelegramBot.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<long>("OwnerId")
+                    b.Property<int>("OwnerId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Quote")
