@@ -146,8 +146,7 @@ If bot is usefull for you, you can buy my a ☕️ and thx 2u).
     <value>You don't have any tasks yet. To add new send /create</value>
   </data>
   <data name="ToaddToTheBlackList" xml:space="preserve">
-    <value>To add new pair to the black list send it with this message attached using next format: BTC/USDT or BTC USDT
-</value>
+    <value>To add new pair to the black list send it with this message attached using next format: BTC/USDT or BTC USDT</value>
   </data>
   <data name="welcomeMsg" xml:space="preserve">
     <value>Hello! I'm crypto currency exchange monitor bot. I can send you 💬 notification when your currency is raise 📉 or fall 📈 to setted value 💰.
@@ -162,5 +161,11 @@ You can also edit, turn off or turn off the task at any time.
 For create new task 🖍 send: /createtask.
 For get info 📋 send: /info
 For get all available commands 🔎 send: /help</value>
+  </data>
+  <data name="blacklistPairAdded" xml:space="preserve">
+    <value>Pair {0} added to the black list for breakout bot.</value>
+  </data>
+  <data name="blacklistPairExists" xml:space="preserve">
+    <value>Pair {0} already exists in the black list.</value>
   </data>
 </root>

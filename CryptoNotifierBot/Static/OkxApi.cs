@@ -44,6 +44,7 @@ namespace CryptoApi.Static
 
         public static OkxData GetTickerFullData()
         {
+
             RestResponse response = RestRequester.GetRequest(new Uri(ExchangesApiLinks.OkxSpotTicker)).Result;
             if (response?.StatusCode == HttpStatusCode.OK)
             {
@@ -58,7 +59,7 @@ namespace CryptoApi.Static
 
         public static SymbolTimedExInfo GetExchangeData()
         {
-            var pairs = PairsListConverter(GetTickerFullData().data.ToList());
+            var pairs = PairsListConverter(GetTickerFullData()?.data?.ToList());
             return new SymbolTimedExInfo()
             {
                 CreationTime = DateTime.Now,

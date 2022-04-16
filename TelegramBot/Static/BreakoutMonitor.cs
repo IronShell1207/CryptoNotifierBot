@@ -35,22 +35,24 @@ namespace TelegramBot.Static
         private static List<double> procentsDifference = new List<double>() { 2.5, 3, 4, 5, 5, 5, 5, 5, 6, 6, 8 };
         public static async void BreakoutLoop()
         {
-            var count = ExchangesCheckerForUpdates.marketData.Count();
+            var count = ExchangesCheckerForUpdates.MarketData.Count();
             while (true)
             {
+
                 if (count > 3000)
-                    ExchangesCheckerForUpdates.marketData.RemoveRange(1500, 500);
-                var countNow = ExchangesCheckerForUpdates.marketData.Count();
+                    ExchangesCheckerForUpdates.MarketData.RemoveRange(1500, 500);
+                var countNow = ExchangesCheckerForUpdates.MarketData.Count();
                 if (countNow <= count)
                 {
                     goto loopend;
                 }
+
                 var datetimeNow = DateTime.Now;
-                var latestData = ExchangesCheckerForUpdates.marketData.LastOrDefault();
-                for (var index = ExchangesCheckerForUpdates.marketData.Count - 1; index >= 0; index--)
+                var latestData = ExchangesCheckerForUpdates.MarketData.LastOrDefault();
+                for (var index = ExchangesCheckerForUpdates.MarketData.Count - 1; index >= 0; index--)
                 {
-                    if (index > ExchangesCheckerForUpdates.marketData.Count) break;
-                    List<SymbolTimedExInfo> data = ExchangesCheckerForUpdates.marketData[index];
+                    if (index > ExchangesCheckerForUpdates.MarketData.Count) break;
+                    List<SymbolTimedExInfo> data = ExchangesCheckerForUpdates.MarketData[index];
                     for (var iTi = 0; iTi < ListTimings.Count; iTi++)
                     {
                         int timeIn = ListTimings[iTi];
@@ -65,7 +67,8 @@ namespace TelegramBot.Static
                                 SymbolTimedExInfo dataExchange = data[i];
                                 var compairedPairs = CompairedPairs(dataExchange.Pairs, latestData[i].Pairs,
                                     procentsDifference[iTi], ListTimings[iTi], dataExchange.Exchange);
-                                Console.WriteLine($"[{datetimeNow.ToString()}] {data[i].Exchange}: {compairedPairs.Count} Time: {timeIn}");
+                                Console.WriteLine(
+                                    $"[{datetimeNow.ToString()}] {data[i].Exchange}: {compairedPairs.Count} Time: {timeIn}");
                                 if (compairedPairs.Count > 0)
                                 {
                                     SpreadBreakoutNotify(compairedPairs, data[i].Exchange, timeIn);
@@ -88,7 +91,6 @@ namespace TelegramBot.Static
             Console.WriteLine($"[{DateTime.Now.ToString()}] Breakout bot sending notify");
             using (AppDbContext db = new AppDbContext())
             {
-
                 foreach (BreakoutSub sub in db.BreakoutSubs.ToList())
                 {
                     if (sub.Subscribed)
@@ -112,17 +114,13 @@ namespace TelegramBot.Static
                             {
                                 Console.WriteLine($"{sub.TelegramId}");
                                 StringBuilder sb = new StringBuilder($"Updated data from {platform}:\n");
-                                var favList = db.BlackListedPairs.ToList().Where(x => x.OwnerId == sub.Id).ToList();
-                                if (favList.Any())
+                                var blackList = db.BlackListedPairs.Where(x => x.OwnerId == sub.Id).ToList();
+                                if (blackList.Any())
                                 {
-                                    var newList = new List<BreakoutPair>() { };
-                                    foreach (var pair in pairs)
+                                    var newList = pairs;
+                                    foreach (var pair in blackList)
                                     {
-                                        var fpair = favList.FirstOrDefault(x => x.ToString() == pair.Symbol.ToString());
-                                        if (fpair != null)
-                                        {
-                                            newList.Add(pair);
-                                        }
+                                        newList.RemoveAll(x => x.Symbol.ToString() == pair.ToString());
                                     }
                                     FormatAndSendAsync(newList, platform, timing, sb, sub);
                                 }

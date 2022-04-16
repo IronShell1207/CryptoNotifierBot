@@ -50,6 +50,7 @@ namespace CryptoApi.Static
         }
         public static SymbolTimedExInfo GetExchangeData()
         {
+            
             RestResponse responce = RestRequester.GetRequest(new Uri(ExchangesApiLinks.BinanceClearTicker)).Result;
             JsonSerializer serializer = new JsonSerializer();
             if (responce?.StatusCode == HttpStatusCode.OK)

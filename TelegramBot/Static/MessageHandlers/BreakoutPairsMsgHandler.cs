@@ -166,16 +166,29 @@ namespace TelegramBot.Static.MessageHandlers
             bool isValid = ExchangesCheckerForUpdates.GetCurrentPrice(new TradingPair(Pairbase, Pairquote)).Result > 0;
             if (isValid)
             {
+                var user = BotApi.GetUserSettings(update.Message.Chat.Id).Result;
                 using (AppDbContext dbContext = new AppDbContext())
                 {
-                    BlackListedPairs badPair = new BlackListedPairs()
+                    var blackPairEx = dbContext.BlackListedPairs.FirstOrDefault(x =>
+                        x.Base == Pairbase && x.Quote == Pairquote && x.OwnerId == user.Id);
+                    if (blackPairEx == null)
                     {
-                        Base = Pairbase,
-                        Quote = Pairquote,
-                        OwnerId = update.Message.Chat.Id
-                    };
-                    dbContext.BlackListedPairs.Add(badPair);
-                    dbContext.SaveChangesAsync();
+                        BlackListedPairs badPair = new BlackListedPairs()
+                        {
+                            Base = Pairbase,
+                            Quote = Pairquote,
+                            OwnerId = user.Id
+                        };
+                        dbContext.BlackListedPairs.Add(badPair);
+                        dbContext.SaveChangesAsync();
+                        BotApi.SendMessage(user.TelegramId,
+                            MessagesGetter.GetGlobalString("blacklistPairAdded", user.Language));
+                    }
+                    else
+                    {
+                        BotApi.SendMessage(user.TelegramId,
+                            MessagesGetter.GetGlobalString("blacklistPairExists", user.Language));
+                    }
                 }
             }
 

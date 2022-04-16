@@ -59,6 +59,7 @@ namespace CryptoApi.Static
             };
         }
         public static SymbolTimedExInfo GetExchangeData()
+        
         {
             var pairs = PairsListConverter(GetTickerFullData());
             return new SymbolTimedExInfo()

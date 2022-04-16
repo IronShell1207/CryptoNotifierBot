@@ -61,6 +61,24 @@ namespace TelegramBot {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Pair {0} added to the black list for breakout bot..
+        /// </summary>
+        internal static string blacklistPairAdded {
+            get {
+                return ResourceManager.GetString("blacklistPairAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pair {0} already exists in the black list..
+        /// </summary>
+        internal static string blacklistPairExists {
+            get {
+                return ResourceManager.GetString("blacklistPairExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ✅ New monitoring task has been created.\nDetails of your task:\n{0}.
         /// </summary>
         internal static string cryptoPairAdded {
@@ -113,11 +131,29 @@ namespace TelegramBot {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to You don&apos;t have any tasks yet. To add new send /create.
+        /// </summary>
+        internal static string noCryptoTasks {
+            get {
+                return ResourceManager.GetString("noCryptoTasks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to You are successfully subscribed to breakout notifications. Current settings: {0}. .
         /// </summary>
         internal static string subscribedSucs {
             get {
                 return ResourceManager.GetString("subscribedSucs", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to To add new pair to the black list send it with this message attached using next format: BTC/USDT or BTC USDT.
+        /// </summary>
+        internal static string ToaddToTheBlackList {
+            get {
+                return ResourceManager.GetString("ToaddToTheBlackList", resourceCulture);
             }
         }
         
