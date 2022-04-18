@@ -47,6 +47,11 @@ namespace TelegramBot.Objects
         /// </summary>
         public bool ShowMarketEvents { get; set; } = true;
 
+        /// <summary>
+        /// Spreads notify of selected pairs of changes in 24h and 8h in selected time
+        /// </summary>
+        public int? MorningReport { get; set; } = null;
+
 
 
 

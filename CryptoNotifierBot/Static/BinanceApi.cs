@@ -23,11 +23,14 @@ namespace CryptoApi.Static
         {
             var listReturner = new List<CryptoExchangePairInfo>();
             //var listbi = list as List<BinancePair>;
-            foreach (var pair in list)
+            if (list != null)
             {
-                var pairSymbol = SplitSymbolConverter(pair.symbol);
-                if (pairSymbol != null)
-                    listReturner.Add(new CryptoExchangePairInfo(pairSymbol, pair.price));
+                foreach (var pair in list)
+                {
+                    var pairSymbol = SplitSymbolConverter(pair.symbol);
+                    if (pairSymbol != null)
+                        listReturner.Add(new CryptoExchangePairInfo(pairSymbol, pair.price));
+                }
             }
 
             return listReturner;

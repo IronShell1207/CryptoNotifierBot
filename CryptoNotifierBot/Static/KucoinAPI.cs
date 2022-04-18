@@ -15,17 +15,19 @@ namespace CryptoApi.Static
 {
     public class KucoinAPI
     {
-        public static List<CryptoExchangePairInfo> PairsListConverter(List<KucoinData.Ticker> list)
+        public static List<CryptoExchangePairInfo>PairsListConverter(List<KucoinData.Ticker> list)
         {
             var listReturner = new List<CryptoExchangePairInfo>();
-            foreach (KucoinData.Ticker pair in list)
+            if (list != null)
             {
-                var pairSymbol = SplitSymbolConverter(pair.symbol);
-                if (pairSymbol != null)
-                    listReturner.Add(new CryptoExchangePairInfo(pairSymbol, double.Parse(pair.last)));
-               // listReturner.Add(new CryptoExchangePairInfo(SplitSymbolConverter(pair.symbol), double.Parse(pair.last)));
+                foreach (KucoinData.Ticker pair in list)
+                {
+                    var pairSymbol = SplitSymbolConverter(pair.symbol);
+                    if (pairSymbol != null)
+                        listReturner.Add(new CryptoExchangePairInfo(pairSymbol, double.Parse(pair.last)));
+                    // listReturner.Add(new CryptoExchangePairInfo(SplitSymbolConverter(pair.symbol), double.Parse(pair.last)));
+                }
             }
-
             return listReturner;
         }
 

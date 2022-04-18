@@ -33,6 +33,11 @@ namespace TelegramBot.Constants
                     @"/(delfav)\s*(((?<id>[0-9]+)\s*)|((?<base>[a-zA-Z0-9]{2,9})((\s+|/)(?<quote>[a-zA-Z]{2,9})|)))");
         }
 
+        public class SettingsCommands
+        {
+            public static Regex ChangeDelay = new Regex(@"/settimeout (?<time>[0-9]*)");
+        }
+
         public static Regex SetTimings = new Regex(@"/setsubtimes\s+(?<timing>[0-9]+)");
         
         //public static Regex CreatePosition = new Regex(@"/(newpos)\s*((?<base>[a-zA-Z0-9]{2,9})(\s+(?<quote>[a-zA-Z]{2,9})|))");

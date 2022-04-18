@@ -13,6 +13,8 @@ namespace TelegramBot.Objects
         public string Base { get; set; }
         public string Quote { get; set; }
         public double Entry { get; set; }
+        public double Margin { get; set; }
+        public double Leverage { get; set; }
         public double StopLoss { get; set; }
     }
 }

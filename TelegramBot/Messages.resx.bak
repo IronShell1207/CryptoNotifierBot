@@ -134,7 +134,9 @@ If bot is usefull for you, you can buy my a ☕️ and thx 2u).
     <value>Exchange for new crypto pair setted. Set price in next message</value>
   </data>
   <data name="newPairRequestingForPair" xml:space="preserve">
-    <value>For creating new monitoring task, send me crypto pair with following next format of message with this message attached:\nBASE/QUOTE or BASE QUOTE\nExample: BTC/USDT or BTC USDT</value>
+    <value>For creating new monitoring task, send me crypto pair with following next format of message with this message attached:
+BASE/QUOTE or BASE QUOTE
+Example: BTC/USDT or BTC USDT</value>
   </data>
   <data name="newPairWrongPrice" xml:space="preserve">
     <value>Wrong price. Try again</value>

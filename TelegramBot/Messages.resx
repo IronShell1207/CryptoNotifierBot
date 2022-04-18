@@ -147,6 +147,9 @@ Example: BTC/USDT or BTC USDT</value>
   <data name="noCryptoTasks" xml:space="preserve">
     <value>You don't have any tasks yet. To add new send /create</value>
   </data>
+  <data name="cryptoPairRemoved" xml:space="preserve">
+    <value>Crypto pair {0} id {1} removed from monitoring!</value>
+  </data>
   <data name="ToaddToTheBlackList" xml:space="preserve">
     <value>To add new pair to the black list send it with this message attached using next format: BTC/USDT or BTC USDT</value>
   </data>

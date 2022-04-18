@@ -16,12 +16,15 @@ namespace CryptoApi.Static
         public static List<CryptoExchangePairInfo> PairsListConverter(List<OkxPairsInfo> list)
         {
             var listReturner = new List<CryptoExchangePairInfo>();
-            foreach (OkxPairsInfo pair in list)
+            if (list != null)
             {
-                var pairSymbol = SplitSymbolConverter(pair.instId);
-                if (pairSymbol != null)
-                    listReturner.Add(new CryptoExchangePairInfo(pairSymbol, double.Parse(pair.last)));
-               // listReturner.Add(new CryptoExchangePairInfo(SplitSymbolConverter(pair.instId), double.Parse(pair.last)));
+                foreach (OkxPairsInfo pair in list)
+                {
+                    var pairSymbol = SplitSymbolConverter(pair.instId);
+                    if (pairSymbol != null)
+                        listReturner.Add(new CryptoExchangePairInfo(pairSymbol, double.Parse(pair.last)));
+                    // listReturner.Add(new CryptoExchangePairInfo(SplitSymbolConverter(pair.instId), double.Parse(pair.last)));
+                }
             }
 
             return listReturner;
@@ -54,6 +57,7 @@ namespace CryptoApi.Static
 
             return new OkxData()
             {
+                data = new OkxPairsInfo[0]
             };
         }
 

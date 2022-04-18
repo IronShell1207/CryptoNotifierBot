@@ -18,12 +18,15 @@ namespace CryptoApi.Static
         public static List<CryptoExchangePairInfo> PairsListConverter(List<GateIOData> list)
         {
             var listReturner = new List<CryptoExchangePairInfo>();
-            foreach (GateIOData pair in list)
+            if (list != null)
             {
-                var pairSymbol = SplitSymbolConverter(pair.currency_pair);
-                if (pairSymbol != null)
-                    listReturner.Add(new CryptoExchangePairInfo(pairSymbol, double.Parse(pair.last)));
-                //listReturner.Add(new CryptoExchangePairInfo(SplitSymbolConverter(pair.currency_pair), double.Parse(pair.last)));
+                foreach (GateIOData pair in list)
+                {
+                    var pairSymbol = SplitSymbolConverter(pair.currency_pair);
+                    if (pairSymbol != null)
+                        listReturner.Add(new CryptoExchangePairInfo(pairSymbol, double.Parse(pair.last)));
+                    //listReturner.Add(new CryptoExchangePairInfo(SplitSymbolConverter(pair.currency_pair), double.Parse(pair.last)));
+                }
             }
 
             return listReturner;
@@ -55,6 +58,7 @@ namespace CryptoApi.Static
 
             return new List<GateIOData>()
             {
+
             };
         }
         public static SymbolTimedExInfo GetExchangeData()

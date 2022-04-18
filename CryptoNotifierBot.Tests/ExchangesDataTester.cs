@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
 using CryptoApi.Objects;
@@ -78,6 +79,31 @@ namespace CryptoApi.Tests
                 if (BTCPrice.Price != 0)
                     Assert.Pass($"{BTCPrice.Symbol.ToString()} {BTCPrice.Price.ToString()}");
             }
+            Assert.Fail();
+        }
+
+        [Test]
+        public void KucoinConverterNullTester()
+        {
+            List<KucoinData.Ticker> list = null;
+            var converted=  KucoinAPI.PairsListConverter(list);
+            if (converted != null && converted.Count==0) Assert.Pass();
+            Assert.Fail();
+        }
+        [Test]
+        public void OkxConverterNullTester()
+        {
+            List<OkxPairsInfo> list = null;
+            var converted = OkxApi.PairsListConverter(list);
+            if (converted != null && converted.Count == 0) Assert.Pass();
+            Assert.Fail();
+        }
+        [Test]
+        public void GateioConverterNullTester()
+        {
+            List<GateIOData> list = null;
+            var converted = GateioApi.PairsListConverter(list);
+            if (converted != null && converted.Count == 0) Assert.Pass();
             Assert.Fail();
         }
 

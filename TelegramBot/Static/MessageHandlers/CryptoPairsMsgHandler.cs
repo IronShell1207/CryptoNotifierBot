@@ -26,9 +26,40 @@ namespace TelegramBot.Static.MessageHandlers
 
             return pair;
         }
-        private void RemoveTempUserTask(CryptoPair pair)
+
+        public void RemoveTempUserTask(Update update)
         {
-            PairsManager.TempObjects?.Remove(pair);
+            var match = CommandsRegex.MonitoringTaskCommands.DeletePair.Match(update.Message.Text);
+            if (match.Success)
+            {
+                var user = BotApi.GetUserSettings(update.Message.Chat.Id).Result;
+                int? id = int.Parse(match.Groups["id"].Value);
+                if (id != null)
+                {
+                    using (AppDbContext dbContext = new AppDbContext())
+                    {
+                        var pair = dbContext.CryptoPairs.FirstOrDefault(x => x.Id == id && x.OwnerId == user.Id);
+                        if (pair != null)
+                        {
+                            dbContext.CryptoPairs.Remove(pair);
+                            var strMessage = MessagesGetter.GetGlobalString("cryptoPairRemoved", user.Language);
+                            BotApi.SendMessage(user.TelegramId, string.Format(strMessage, arg0: pair.ToString(), arg1: pair.Id));
+                        }
+                    }  
+                }
+                else
+                {
+                    string baseValue = match.Groups["base"].Value.ToUpper();
+                    string quoteValue = match.Groups["quote"].Value.ToUpper();
+                    if (!string.IsNullOrEmpty(baseValue) && !string.IsNullOrEmpty(quoteValue))
+                    {
+                        var strMessage = MessagesGetter.GetGlobalString("cryptoPairRemoveBySymbol", user.Language);
+                        var pairsMatch = 
+                        BotApi.SendMessage(user.TelegramId, strMessage);
+                    }
+                }
+                //PairsManager.TempObjects?.Remove(pair);
+            }
         }
 
         public async void NewCP(Update update)
@@ -138,6 +169,14 @@ namespace TelegramBot.Static.MessageHandlers
                 }
 
                 BotApi.SendMessage(update.Message.Chat.Id, "New pair saved!");
+            }
+        }
+
+        public async void ListMatchingTasks(CryptoPair pair, int owner)
+        {
+            using (AppDbContext dbContext = new AppDbContext())
+            {
+                var tasks = dbContext.CryptoPairs.Where(x => x.OwnerId == owner && x.ToString() == pair.ToString());
             }
         }
 

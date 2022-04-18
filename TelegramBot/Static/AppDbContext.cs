@@ -15,6 +15,10 @@ namespace TelegramBot.Static
         public DbSet<CryptoPair> CryptoPairs { get; set; }
         public DbSet<BlackListedPairs> BlackListedPairs { get; set; }
         public DbSet<BreakoutSub> BreakoutSubs { get; set; } 
+        public DbSet<NotifyMyPos> PositionsNotify { get; set; }
+        public DbSet<PositionPair> Positions { get; set; }
+        public DbSet<Takes> PositionTakes { get; set; }
+            
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             string dbPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"/Tcryptobot/";

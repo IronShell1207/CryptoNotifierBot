@@ -13,6 +13,7 @@ using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types.Enums;
 using System.Threading.Tasks;
 using CryptoApi.Constants;
+using Microsoft.EntityFrameworkCore;
 using Telegram.Bot;
 using TelegramBot.Constants;
 using TelegramBot.Objects;
@@ -64,6 +65,17 @@ namespace TelegramBot.Static
                         msghandler.NewCP(update);
                     }
                 }
+                else if (CommandsRegex.MonitoringTaskCommands.EditPair.IsMatch(update.Message.Text))
+                {
+                    using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
+                    {
+                        msgHandler.RemoveTempUserTask(update);
+                    }
+                }
+                else if (CommandsRegex.MonitoringTaskCommands.DeletePair.IsMatch(update.Message.Text))
+                {
+
+                }
                 else if (Commands.AllTasks == update.Message.Text)
                 {
                     using (CryptoPairsMsgHandler cr = new CryptoPairsMsgHandler())
@@ -71,6 +83,7 @@ namespace TelegramBot.Static
                         cr.ListAllTask(update);
                     }
                 }
+               
 
                 else if (CommandsRegex.BreakoutCommands.AddToBlackList.IsMatch(update.Message.Text))
                 {
@@ -86,6 +99,10 @@ namespace TelegramBot.Static
                         msg.SetTimings(update);
                     }
                 }
+
+
+
+
                 else if (update.Message.Text == "/subscribe")
                 {
                     using (BreakoutPairsMsgHandler msghandler = new BreakoutPairsMsgHandler())
