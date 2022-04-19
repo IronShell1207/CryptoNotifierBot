@@ -71,7 +71,7 @@ namespace CryptoApi.Static
             }
             else
             {
-                Console.WriteLine($"[{DateTime.Now.ToString()}] Binance api request failed. Status code: {responce.StatusCode}, {responce.ErrorMessage}");
+                Console.WriteLine($"[{DateTime.Now.ToString()}] Binance api request failed. Status code: {responce?.StatusCode}, {responce?.ErrorMessage}");
                 Thread.Sleep(4000);
                 return GetExchangeData();
             }

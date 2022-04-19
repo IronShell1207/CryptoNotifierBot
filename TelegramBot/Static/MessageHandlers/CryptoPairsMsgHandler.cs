@@ -184,18 +184,23 @@ namespace TelegramBot.Static.MessageHandlers
         {
             using (AppDbContext dbContext = new AppDbContext())
             {
-                var tasks = dbContext.CryptoPairs.Where(x => x.OwnerId == update.Message.Chat.Id).ToList();
-                if (tasks.Any())
+                var user = dbContext.Users.FirstOrDefault(x => x.TelegramId == update.Message.Chat.Id);
+                if (user != null)
                 {
-                    StringBuilder strTasks = new StringBuilder("Your list of tasks:\n");
-                    foreach (var task in tasks)
+                    var tasks = dbContext.CryptoPairs.Where(x => x.OwnerId == user.Id).ToList();
+                    if (tasks.Any())
                     {
-                        strTasks.AppendLine(task.TaskStatus());
-                    }
+                        StringBuilder strTasks = new StringBuilder("Your list of tasks:\n");
+                        foreach (var task in tasks)
+                        {
+                            strTasks.AppendLine(task.TaskStatus());
+                        }
 
-                    strTasks.AppendLine("");
-                    strTasks.AppendLine("To edit any task send: /edit 'id' 'new_price' or /edit BASE/QUOTE");
-                    BotApi.SendMessage(update.Message.Chat.Id, strTasks.ToString());
+                        strTasks.AppendLine("");
+                        strTasks.AppendLine("To edit any task send: /edit 'id' 'new_price' or /edit BASE/QUOTE");
+                        BotApi.SendMessage(update.Message.Chat.Id, strTasks.ToString());
+                    }
+                    else BotApi.SendMessage(update.Message.Chat.Id, MessagesGetter.GetGlobalString("noCryptoTasks", user.Language));
                 }
                 else BotApi.SendMessage(update.Message.Chat.Id, MessagesGetter.GetGlobalString("noCryptoTasks", "en"));
             }

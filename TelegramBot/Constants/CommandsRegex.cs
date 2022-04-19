@@ -20,6 +20,13 @@ namespace TelegramBot.Constants
             public static Regex DeletePair =
                 new Regex(
                     @"/(delete)\s*(((?<id>[0-9]+)\s*)|((?<base>[a-zA-Z0-9]{2,9})((\s+|/)(?<quote>[a-zA-Z]{2,9})|)))");
+            public List<string> Commands
+            {
+                get
+                {
+                    return new List<string> { "/new", "/edit", "/delete" };
+                }
+            }
         }
 
         public class BreakoutCommands
@@ -31,6 +38,14 @@ namespace TelegramBot.Constants
             public static Regex DeleteFav =
                 new Regex(
                     @"/(delfav)\s*(((?<id>[0-9]+)\s*)|((?<base>[a-zA-Z0-9]{2,9})((\s+|/)(?<quote>[a-zA-Z]{2,9})|)))");
+
+            public List<string> Commands
+            {
+                get
+                {
+                    return new List<string> { "/addtoblack", "/delfav" };
+                }
+            }
         }
 
         public class SettingsCommands

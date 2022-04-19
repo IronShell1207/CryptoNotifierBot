@@ -62,14 +62,11 @@ namespace TelegramBot.Static
                     CommandsHandler(bot, update, canceltoken);
                 if (CommandsRegex.MonitoringTaskCommands.CreatePair.IsMatch(update.Message.Text))
                     using (CryptoPairsMsgHandler msghandler = new CryptoPairsMsgHandler()) msghandler.NewCP(update);
-                else if (CommandsRegex.MonitoringTaskCommands.EditPair.IsMatch(update.Message.Text))
-                    using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler()) msgHandler.RemoveTempUserTask(update);
+                else if (CommandsRegex.MonitoringTaskCommands.EditPair.IsMatch(update.Message.Text)) {}
+                   
                 else if (CommandsRegex.MonitoringTaskCommands.DeletePair.IsMatch(update.Message.Text))
-                {
-
-                }
-                else if (Commands.AllTasks == update.Message.Text)
-                    using (CryptoPairsMsgHandler cr = new CryptoPairsMsgHandler()) cr.ListAllTask(update);
+                    using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler()) msgHandler.RemoveTempUserTask(update);
+               
                 else if (CommandsRegex.BreakoutCommands.AddToBlackList.IsMatch(update.Message.Text))
                 {
                     using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler())
@@ -98,6 +95,8 @@ namespace TelegramBot.Static
                 using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler()) msgHandler.SubSettings(update);
             else if (update.Message?.Text == Commands.SubStop)
                 using (BreakoutPairsMsgHandler msgH = new BreakoutPairsMsgHandler()) msgH.StopNotify(update);
+            else if (Commands.AllTasks == update.Message.Text)
+                using (CryptoPairsMsgHandler cr = new CryptoPairsMsgHandler()) cr.ListAllTask(update);
         }
         public static async void RepliedMsgHandlerAsync(ITelegramBotClient bot, Update update,
             CancellationToken canceltoken)
