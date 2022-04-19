@@ -14,6 +14,8 @@ namespace CryptoApi.Objects
 
         public override string ToString()
         {
+            if (string.IsNullOrWhiteSpace(Name) && string.IsNullOrWhiteSpace(Quote))
+                return "";
             return $"{Name}/{Quote}";
         }
         public TradingPair(){}

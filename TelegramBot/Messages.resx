@@ -173,4 +173,16 @@ For get all available commands 🔎 send: /help</value>
   <data name="blacklistPairExists" xml:space="preserve">
     <value>Pair {0} already exists in the black list.</value>
   </data>
+  <data name="CPCantFindAnyPairsMatching" xml:space="preserve">
+    <value>I can't find any pairs matching your request!</value>
+  </data>
+  <data name="cryptoPairCantRemove" xml:space="preserve">
+    <value>I can't remove your pair because of some problems!</value>
+  </data>
+  <data name="cryptoPairRemoveBySymbol" xml:space="preserve">
+    <value>Select task you needed to remove from your tasks</value>
+  </data>
+  <data name="CPEditPair" xml:space="preserve">
+    <value>To edit price of {0} pair with id {1} please send new price with this message attached!</value>
+  </data>
 </root>

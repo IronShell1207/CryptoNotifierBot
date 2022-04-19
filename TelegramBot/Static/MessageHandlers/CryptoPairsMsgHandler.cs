@@ -8,6 +8,7 @@ using CryptoApi.Objects;
 using Telegram.Bot.Types;
 using TelegramBot.Constants;
 using TelegramBot.Objects;
+using TelegramBot.Static.DbOperations;
 
 namespace TelegramBot.Static.MessageHandlers
 {
@@ -15,7 +16,7 @@ namespace TelegramBot.Static.MessageHandlers
     {
         private async Task<CryptoPair> GetTempUserTask(Update update)
         {
-            var userId = update.Message?.Chat?.Id ?? update.CallbackQuery?.From?.Id; 
+            var userId = update.Message?.Chat?.Id ?? update.CallbackQuery?.From?.Id;
             var user = await BotApi.GetUserSettings(userId);
             CryptoPair pair = PairsManager.TempObjects?.FirstOrDefault(x => x.OwnerId == user.Id);
             if (pair == null)
@@ -27,35 +28,90 @@ namespace TelegramBot.Static.MessageHandlers
             return pair;
         }
 
+        public void EditUserTask(Update update)
+        {
+            var match = CommandsRegex.MonitoringTaskCommands.EditPair.Match(update.Message.Text);
+            var user = BotApi.GetUserSettings(BotApi.GetTelegramIdFromUpdate(update)).Result;
+            if (match.Success)
+            {
+                var id = match.Groups["id"].Value;
+                var price = match.Groups["price"].Value;
+                if (!string.IsNullOrWhiteSpace(id))
+                {
+                    int iid = int.Parse(id);
+                    using (CryptoPairDbHandler dbh = new CryptoPairDbHandler())
+                    {
+                        var task = dbh.GetPairFromId(iid, user.Id);
+                        if (task != null)
+                        {
+                            var msg = string.Format(MessagesGetter.GetGlobalString("CPEditPair", user.Language), task.TaskStatus());
+                        }
+                    }
+                }
+            }
+        }
+        public void RemoveUserTaskCallbackHandler(Update update)
+        {   
+            var match = CallbackDataPatterns.DeletePairRegex.Match(update.CallbackQuery.Data);
+            var user = BotApi.GetUserSettings(BotApi.GetTelegramIdFromUpdate(update)).Result;
+            if (match.Success)
+            {
+                var Id = int.Parse(match.Groups["id"].Value);
+                var userId = int.Parse(match.Groups["ownerId"].Value);
+                if (userId == user.Id)
+                {
+                    using (CryptoPairDbHandler dbh = new CryptoPairDbHandler())
+                    {
+                        var pair = dbh.GetPairFromId(Id, user.Id);
+                        if (dbh.DeletePair(pair))
+                        {
+                            var strMessage = MessagesGetter.GetGlobalString("cryptoPairRemoved", user.Language);
+                            BotApi.SendMessage(user.TelegramId, string.Format(strMessage, arg0: pair.ToString(), arg1: pair.Id));
+                        }
+                        else
+                        {
+                            BotApi.SendMessage(user.TelegramId,
+                                string.Format(MessagesGetter.GetGlobalString("cryptoPairCantRemove", user.Language)));
+                        }
+                    }
+                }
+            }
+        }
         public void RemoveUserTask(Update update)
         {
             var match = CommandsRegex.MonitoringTaskCommands.DeletePair.Match(update.Message.Text);
             if (match.Success)
             {
                 var user = BotApi.GetUserSettings(update.Message.Chat.Id).Result;
-                int? id = int.Parse(match.Groups["id"].Value);
-                if (id != null)
+                var strId = match.Groups["id"].Value;
+                if (!string.IsNullOrWhiteSpace(strId))
                 {
-                    using (AppDbContext dbContext = new AppDbContext())
+                
+                    int id = int.Parse(strId);
+                    using (CryptoPairDbHandler dbh = new CryptoPairDbHandler())
                     {
-                        var pair = dbContext.CryptoPairs.FirstOrDefault(x => x.Id == id && x.OwnerId == user.Id);
-                        if (pair != null)
+                        var pair = dbh.GetPairFromId(id, user.Id);
+                        if (dbh.DeletePair(pair))
                         {
-                            dbContext.CryptoPairs.Remove(pair);
                             var strMessage = MessagesGetter.GetGlobalString("cryptoPairRemoved", user.Language);
                             BotApi.SendMessage(user.TelegramId, string.Format(strMessage, arg0: pair.ToString(), arg1: pair.Id));
                         }
-                    }  
+                        else
+                        {
+                            BotApi.SendMessage(user.TelegramId,
+                                string.Format(MessagesGetter.GetGlobalString("cryptoPairCantRemove", user.Language)));
+                        }
+                    }
                 }
                 else
                 {
-                    string baseValue = match.Groups["base"].Value.ToUpper();
-                    string quoteValue = match.Groups["quote"].Value.ToUpper();
-                    if (!string.IsNullOrEmpty(baseValue) && !string.IsNullOrEmpty(quoteValue))
+                    TradingPair pair = new TradingPair(match.Groups["base"].Value.ToUpper(),
+                        match.Groups["quote"].Value.ToUpper());
+
+                    if (!string.IsNullOrWhiteSpace(pair.ToString()))
                     {
                         var strMessage = MessagesGetter.GetGlobalString("cryptoPairRemoveBySymbol", user.Language);
-                        var pairsMatch = 
-                        BotApi.SendMessage(user.TelegramId, strMessage);
+                        ListMatchingTasks(pair, user, CallbackDataPatterns.DeletePair, strMessage);
                     }
                 }
                 //PairsManager.TempObjects?.Remove(pair);
@@ -139,7 +195,7 @@ namespace TelegramBot.Static.MessageHandlers
 
         private async void SetRaiseOrFallStatus(Update update, CryptoPair pair, double price = 0)
         {
-            if (price >0)
+            if (price > 0)
                 pair.Price = price;
             if (pair.ToString() == "/")
                 BotApi.SendMessage(update.Message.Chat.Id, "Task creating expired. Start again");
@@ -147,7 +203,7 @@ namespace TelegramBot.Static.MessageHandlers
             {
                 var curprice = ExchangesCheckerForUpdates.GetCurrentPrice(new TradingPair(
                     pair.PairBase, pair.PairQuote), pair.ExchangePlatform);
-                pair.GainOrFall = curprice.Result < price;
+                pair.GainOrFall = curprice.Result < pair.Price;
                 SaveNewTaskToDB(update);
             }
         }
@@ -159,7 +215,7 @@ namespace TelegramBot.Static.MessageHandlers
             {
                 var price = double.Parse(update.Message.Text);
                 SetRaiseOrFallStatus(update, pair, price);
-                
+
             }
             catch (ArgumentException ex)
             {
@@ -170,8 +226,8 @@ namespace TelegramBot.Static.MessageHandlers
         private async void SaveNewTaskToDB(Update update)
         {
             var pair = GetTempUserTask(update).Result;
-            if (pair?.Price != null && 
-                !string.IsNullOrWhiteSpace(pair?.PairBase) && 
+            if (pair?.Price != null &&
+                !string.IsNullOrWhiteSpace(pair?.PairBase) &&
                 !string.IsNullOrWhiteSpace(pair?.PairQuote) &&
                 !string.IsNullOrWhiteSpace(pair?.ExchangePlatform))
             {
@@ -179,27 +235,26 @@ namespace TelegramBot.Static.MessageHandlers
                 {
                     pair.Enabled = true;
                     db.CryptoPairs.Add(pair);
-                     db.SaveChangesAsync();
+                    db.SaveChangesAsync();
                 }
 
-                BotApi.SendMessage(GetTelegramIdFromUpdate(update).Identifier, "New pair saved!");
+                BotApi.SendMessage(BotApi.GetTelegramIdFromUpdate(update).Identifier, "New pair saved!");
             }
         }
 
-        private ChatId GetTelegramIdFromUpdate(Update update)
-        {
-            if (update.Message?.Chat.Id != null)
-                return update.Message.Chat.Id;
-            else if (update.CallbackQuery?.From?.Id != null)
-                return update.CallbackQuery.From.Id;
-            else return null;
-        }
+       
 
-        public async void ListMatchingTasks(CryptoPair pair, int owner)
+        public async void ListMatchingTasks(TradingPair pair, UserConfig user, string datapattern, string Message)
         {
             using (AppDbContext dbContext = new AppDbContext())
             {
-                var tasks = dbContext.CryptoPairs.Where(x => x.OwnerId == owner && x.ToString() == pair.ToString());
+                var tasks = dbContext.CryptoPairs.Where(x => x.OwnerId == user.Id && x.PairBase == pair.Name && x.PairQuote == pair.Quote).ToList();
+                if (tasks != null && tasks.Any())
+                {
+                    var kb = Keyboards.PairsSelectingKeyboardMarkup(tasks, datapattern);
+                    BotApi.SendMessage(user.TelegramId, Message, replyMarkup: kb);
+                }
+                else BotApi.SendMessage(user.TelegramId, MessagesGetter.GetGlobalString("CPCantFindAnyPairsMatching", user.Language));
             }
         }
 

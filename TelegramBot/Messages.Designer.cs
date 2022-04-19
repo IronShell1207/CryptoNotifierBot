@@ -79,11 +79,56 @@ namespace TelegramBot {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to I can&apos;t find any pairs matching your request!.
+        /// </summary>
+        internal static string CPCantFindAnyPairsMatching {
+            get {
+                return ResourceManager.GetString("CPCantFindAnyPairsMatching", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to To edit price of {0} pair with id {1} please send new price with this message attached!.
+        /// </summary>
+        internal static string CPEditPair {
+            get {
+                return ResourceManager.GetString("CPEditPair", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ✅ New monitoring task has been created.\nDetails of your task:\n{0}.
         /// </summary>
         internal static string cryptoPairAdded {
             get {
                 return ResourceManager.GetString("cryptoPairAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to I can&apos;t remove your pair because of some problems!.
+        /// </summary>
+        internal static string cryptoPairCantRemove {
+            get {
+                return ResourceManager.GetString("cryptoPairCantRemove", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Select task you needed to remove from your tasks.
+        /// </summary>
+        internal static string cryptoPairRemoveBySymbol {
+            get {
+                return ResourceManager.GetString("cryptoPairRemoveBySymbol", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Crypto pair {0} id {1} removed from monitoring!.
+        /// </summary>
+        internal static string cryptoPairRemoved {
+            get {
+                return ResourceManager.GetString("cryptoPairRemoved", resourceCulture);
             }
         }
         
@@ -113,7 +158,9 @@ namespace TelegramBot {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to For creating new monitoring task, send me crypto pair with following next format of message with this message attached:\nBASE/QUOTE or BASE QUOTE\nExample: BTC/USDT or BTC USDT.
+        ///   Looks up a localized string similar to For creating new monitoring task, send me crypto pair with following next format of message with this message attached:
+        ///BASE/QUOTE or BASE QUOTE
+        ///Example: BTC/USDT or BTC USDT.
         /// </summary>
         internal static string newPairRequestingForPair {
             get {

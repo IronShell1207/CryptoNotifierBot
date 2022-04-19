@@ -136,12 +136,9 @@ namespace TelegramBot.Static
             CancellationToken cancellationToken)
         {
             if (Exchanges.Contains(update.CallbackQuery.Data))
-            {
-                using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
-                {
-                    msgh.SetExchangeStageCP(update);
-                }
-            }
+                using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler()) msgh.SetExchangeStageCP(update);
+            else if (CallbackDataPatterns.DeletePairRegex.IsMatch(update.CallbackQuery.Data))
+                using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler()) msgh.RemoveUserTaskCallbackHandler(update);
         }
         public static Task ErrorHandler(ITelegramBotClient botClient, Exception ex, CancellationToken csToken)
         {
@@ -173,7 +170,14 @@ namespace TelegramBot.Static
                 }
             }
         }
-
+        public static ChatId GetTelegramIdFromUpdate(Update update)
+        {
+            if (update.Message?.Chat.Id != null)
+                return update.Message.Chat.Id;
+            else if (update.CallbackQuery?.From?.Id != null)
+                return update.CallbackQuery.From.Id;
+            else return null;
+        }
         public static async Task SendMessage(ChatId chatId, string message, bool replythis)
         {
             try
@@ -198,7 +202,7 @@ namespace TelegramBot.Static
         {
             try
             {
-                await BotClient.SendTextMessageAsync(chatId, message,replyMarkup: replyMarkup);
+                await BotClient.SendTextMessageAsync(chatId, message, replyMarkup: replyMarkup);
             }
             catch (Telegram.Bot.Exceptions.ApiRequestException apiException)
             {
@@ -238,11 +242,23 @@ namespace TelegramBot.Static
             await BotClient.EditMessageReplyMarkupAsync(chatId, messageID, null);
         }
 
+        public static async Task<UserConfig> GetUserSettings(int userId)
+        {
+            using (AppDbContext db = new AppDbContext())
+            {
+                var user = db.Users.FirstOrDefault(x => x.Id == userId);
+                if (user == null)
+                {
+                    return null;
+                }
+                return user;
+            }
+        }
         public static async Task<UserConfig> GetUserSettings(ChatId chatId)
         {
             using (AppDbContext db = new AppDbContext())
             {
-                var user = db.Users.ToList().FirstOrDefault(x => x.TelegramId == chatId.Identifier);
+                var user = db.Users.FirstOrDefault(x => x.TelegramId == chatId.Identifier);
                 if (user == null)
                 {
                     user = new UserConfig()

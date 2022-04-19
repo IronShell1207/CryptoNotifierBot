@@ -5,6 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using NUnit.Framework;
 using TelegramBot;
+using TelegramBot.Constants;
+
 namespace CryptoNotifierBot.Tests
 {
     
@@ -53,6 +55,30 @@ namespace CryptoNotifierBot.Tests
         {
             var test2 = TelegramBot.Static.MessagesGetter.GetGlobalString("newPairWrongPrice", "ru");
             if (test2 == "Неверная цена. Попробуйте снова") Assert.Pass(test2);
+        }
+
+        [Test]
+        public void MessageToRegexFormater()
+        {
+            var teststroke = "To edit price of {0} with id {1} send new price with this message attached!";
+            var testRusStroke = "Чтобы изменить цену {0} с id {1} отправь новую цену с прикрепленным сообщением!";
+            var testRusStrokeResult = "Чтобы изменить цену BTC/USDT с id 1231 отправь новую цену с прикрепленным сообщением!";
+            var resultstroke = "To edit price of BTC/USDT with id 1231 send new price with this message attached!";
+            string pair = "BTC/USDT";
+            int id = 1231;
+            var paramsList = new List<string>(){ @"(?<base>[a-zA-Z0-9]{2,9})(\s+|/)(?<quote>[a-zA-Z0-9]{2,6})", "(?<id>[0-9]+)"};
+            var reRegx = CommandsRegex.ConvertMessageToRegex(teststroke, paramsList);
+            var reRegxRus = CommandsRegex.ConvertMessageToRegex(testRusStroke, paramsList);
+            var match = reRegxRus.Match(testRusStrokeResult);
+            if (match.Success)
+            {
+                var pairRes = match.Groups["base"].Value;
+                var pairQRes = match.Groups["quote"].Value;
+                var pairR = $"{pairRes}/{pairQRes}";
+                var idRes = int.Parse(match.Groups["id"].Value);
+                if (pairR == pair && id == idRes) Assert.Pass(pairRes);
+            }
+            Assert.Fail();
         }
     }
 }
