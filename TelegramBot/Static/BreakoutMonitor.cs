@@ -122,7 +122,8 @@ namespace TelegramBot.Static
                                     {
                                         newList.RemoveAll(x => x.Symbol.ToString() == pair.ToString());
                                     }
-                                    FormatAndSendAsync(newList, platform, timing, sb, sub);
+                                    if (blackList.Any())
+                                        FormatAndSendAsync(newList, platform, timing, sb, sub);
                                 }
                                 else FormatAndSendAsync(pairs, platform, timing, sb, sub);
 

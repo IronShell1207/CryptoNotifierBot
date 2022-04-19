@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -66,7 +67,7 @@ namespace TelegramBot.Static.MessageHandlers
             {
                 var sub = db.BreakoutSubs.FirstOrDefault(x => x.TelegramId == update.Message.Chat.Id);
                 var match = CommandsRegex.SetTimings.Match(update.Message.Text);
-                var timing = double.Parse(match.Groups["timing"].Value);
+                var timing = double.Parse(match.Groups["timing"].Value, new CultureInfo("en"));
                 var enable = false;
                 switch (timing)
                 {
@@ -146,7 +147,7 @@ namespace TelegramBot.Static.MessageHandlers
                 else
                 {
                     BotApi.SendMessage(update.Message.Chat.Id,
-                        MessagesGetter.GetGlobalString("ToaddToTheBlackList", "en"),
+                        CultureTextRequest.GetMessageString("ToaddToTheBlackList", "en"),
                         true);
                 }
             }
@@ -182,12 +183,12 @@ namespace TelegramBot.Static.MessageHandlers
                         dbContext.BlackListedPairs.Add(badPair);
                         dbContext.SaveChangesAsync();
                         BotApi.SendMessage(user.TelegramId, string.Format(
-                            MessagesGetter.GetGlobalString("blacklistPairAdded", user.Language), badPair.ToString()));
+                            CultureTextRequest.GetMessageString("blacklistPairAdded", user.Language), badPair.ToString()));
                     }
                     else
                     {
                         BotApi.SendMessage(user.TelegramId,string.Format(
-                            MessagesGetter.GetGlobalString("blacklistPairExists", user.Language), blackPairEx.ToString()));
+                            CultureTextRequest.GetMessageString("blacklistPairExists", user.Language), blackPairEx.ToString()));
                     }
                 }
             }

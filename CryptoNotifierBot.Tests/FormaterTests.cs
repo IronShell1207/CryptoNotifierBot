@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CryptoApi.Constants;
 using NUnit.Framework;
 using TelegramBot;
 using TelegramBot.Constants;
+using TelegramBot.Objects;
 
 namespace CryptoNotifierBot.Tests
 {
@@ -45,7 +47,7 @@ namespace CryptoNotifierBot.Tests
         [Test]
         public void ResxTester()
         {
-            var test1= TelegramBot.Static.MessagesGetter.GetGlobalString("newPairWrongPrice", "en");
+            var test1= TelegramBot.Static.CultureTextRequest.GetMessageString("newPairWrongPrice", "en");
             if (test1== "Wrong price. Try again") Assert.Pass(test1);
             
         }
@@ -53,7 +55,7 @@ namespace CryptoNotifierBot.Tests
         [Test]
         public void Resx2Tester()
         {
-            var test2 = TelegramBot.Static.MessagesGetter.GetGlobalString("newPairWrongPrice", "ru");
+            var test2 = TelegramBot.Static.CultureTextRequest.GetMessageString("newPairWrongPrice", "ru");
             if (test2 == "Неверная цена. Попробуйте снова") Assert.Pass(test2);
         }
 
@@ -79,6 +81,22 @@ namespace CryptoNotifierBot.Tests
                 if (pairR == pair && id == idRes) Assert.Pass(pairRes);
             }
             Assert.Fail();
+        }
+
+        [Test]
+        public void PairToFullInfo()
+        {
+            CryptoPair pair = new CryptoPair(128318293)
+            {
+                Enabled = true,
+                ExchangePlatform = Exchanges.Binance,
+                GainOrFall = true,
+                Id = 31,
+                PairBase = "BTC",
+                PairQuote = "USDT",
+                Price = 43241
+            };
+            pair.FullTaskInfo();
         }
     }
 }

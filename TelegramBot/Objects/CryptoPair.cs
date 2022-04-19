@@ -5,6 +5,8 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CryptoApi.Constants;
+using TelegramBot.Static;
 
 namespace TelegramBot.Objects
 {
@@ -37,6 +39,26 @@ namespace TelegramBot.Objects
             var enabled = Enabled ? "✅" : "⛔️";
             var rofl = GainOrFall ? ">" : "<";
             return $"{enabled} #{Id} {PairBase}/{PairQuote} {rofl}{Price}";
+        }
+
+        public string FullTaskInfo(string lang = "en")
+        {
+            var enableSymbol = CultureTextRequest.GetSettingsMsgString("enabled", lang);
+            var disableSymbol = CultureTextRequest.GetSettingsMsgString("disabled", lang);
+            var linkExh = CryptoApi.Constants.ExchangesSpotLinks.GetSpotLink(this.ExchangePlatform);
+            var link =
+                $"<a href='{linkExh}{ExchangesSpotLinks.GetPairConverted(this.ExchangePlatform, this.PairBase, this.PairQuote)}'>{this.ToString()}</a>";
+            string enable = Enabled ? enableSymbol : disableSymbol;
+            string lessOrGreater = GainOrFall ? ">" : "<";
+            string lessOrGreaterSymbol = GainOrFall ? "📈" : "📉";
+            StringBuilder sb = new StringBuilder(CultureTextRequest.GetSettingsMsgString("taskInfoTitle", lang));
+            sb.AppendLine($"{CultureTextRequest.GetSettingsMsgString("taskInfoSymbol", lang)}{link}");
+            sb.AppendLine($"{CultureTextRequest.GetSettingsMsgString("taskInfoActiveStatus", lang)}{enable}");
+            sb.AppendLine($"{CultureTextRequest.GetSettingsMsgString("taskInfoTriggerPrice", lang)}{lessOrGreater}{this.Price} {lessOrGreaterSymbol}");
+            sb.AppendLine($"{CultureTextRequest.GetSettingsMsgString("taskInfoExchangePlatform", lang)}{this.ExchangePlatform}");
+            if (!string.IsNullOrEmpty(Note)) sb.AppendLine($"Notes: {Note}");
+            return sb.ToString();
+
         }
 
     }

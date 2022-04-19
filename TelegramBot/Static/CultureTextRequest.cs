@@ -9,9 +9,9 @@ using TelegramBot.Constants;
 
 namespace TelegramBot.Static
 {
-    public class MessagesGetter
+    public class CultureTextRequest
     {
-        public static string GetGlobalString(string key, string language)
+        public static string GetMessageString(string key, string language)
         {
             CultureInfo ci = new CultureInfo(language);
             ResourceManager rm = new ResourceManager(typeof(TelegramBot.Messages));

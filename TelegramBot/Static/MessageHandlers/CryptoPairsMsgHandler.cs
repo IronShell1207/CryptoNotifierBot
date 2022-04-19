@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -44,14 +45,14 @@ namespace TelegramBot.Static.MessageHandlers
                         var task = dbh.GetPairFromId(iid, user.Id);
                         if (task != null)
                         {
-                            var msg = string.Format(MessagesGetter.GetGlobalString("CPEditPair", user.Language), task.TaskStatus());
+                            var msg = string.Format(CultureTextRequest.GetMessageString("CPEditPair", user.Language), task.TaskStatus());
                         }
                     }
                 }
             }
         }
         public void RemoveUserTaskCallbackHandler(Update update)
-        {   
+        {
             var match = CallbackDataPatterns.DeletePairRegex.Match(update.CallbackQuery.Data);
             var user = BotApi.GetUserSettings(BotApi.GetTelegramIdFromUpdate(update)).Result;
             if (match.Success)
@@ -65,13 +66,13 @@ namespace TelegramBot.Static.MessageHandlers
                         var pair = dbh.GetPairFromId(Id, user.Id);
                         if (dbh.DeletePair(pair))
                         {
-                            var strMessage = MessagesGetter.GetGlobalString("cryptoPairRemoved", user.Language);
+                            var strMessage = CultureTextRequest.GetMessageString("cryptoPairRemoved", user.Language);
                             BotApi.SendMessage(user.TelegramId, string.Format(strMessage, arg0: pair.ToString(), arg1: pair.Id));
                         }
                         else
                         {
                             BotApi.SendMessage(user.TelegramId,
-                                string.Format(MessagesGetter.GetGlobalString("cryptoPairCantRemove", user.Language)));
+                                string.Format(CultureTextRequest.GetMessageString("cryptoPairCantRemove", user.Language)));
                         }
                     }
                 }
@@ -86,20 +87,20 @@ namespace TelegramBot.Static.MessageHandlers
                 var strId = match.Groups["id"].Value;
                 if (!string.IsNullOrWhiteSpace(strId))
                 {
-                
+
                     int id = int.Parse(strId);
                     using (CryptoPairDbHandler dbh = new CryptoPairDbHandler())
                     {
                         var pair = dbh.GetPairFromId(id, user.Id);
                         if (dbh.DeletePair(pair))
                         {
-                            var strMessage = MessagesGetter.GetGlobalString("cryptoPairRemoved", user.Language);
+                            var strMessage = CultureTextRequest.GetMessageString("cryptoPairRemoved", user.Language);
                             BotApi.SendMessage(user.TelegramId, string.Format(strMessage, arg0: pair.ToString(), arg1: pair.Id));
                         }
                         else
                         {
                             BotApi.SendMessage(user.TelegramId,
-                                string.Format(MessagesGetter.GetGlobalString("cryptoPairCantRemove", user.Language)));
+                                string.Format(CultureTextRequest.GetMessageString("cryptoPairCantRemove", user.Language)));
                         }
                     }
                 }
@@ -110,7 +111,7 @@ namespace TelegramBot.Static.MessageHandlers
 
                     if (!string.IsNullOrWhiteSpace(pair.ToString()))
                     {
-                        var strMessage = MessagesGetter.GetGlobalString("cryptoPairRemoveBySymbol", user.Language);
+                        var strMessage = CultureTextRequest.GetMessageString("cryptoPairRemoveBySymbol", user.Language);
                         ListMatchingTasks(pair, user, CallbackDataPatterns.DeletePair, strMessage);
                     }
                 }
@@ -133,7 +134,7 @@ namespace TelegramBot.Static.MessageHandlers
                     pair.PairQuote = quoteValue;
                     if (!string.IsNullOrWhiteSpace(priceStr))
                     {
-                        pair.Price = double.Parse(priceStr);
+                        pair.Price = double.Parse(priceStr, new CultureInfo("en"));
                     }
 
                     var exchangesForPair =
@@ -213,7 +214,7 @@ namespace TelegramBot.Static.MessageHandlers
             var pair = GetTempUserTask(update).Result;
             try
             {
-                var price = double.Parse(update.Message.Text);
+                var price = double.Parse(update.Message.Text, new CultureInfo("en"));
                 SetRaiseOrFallStatus(update, pair, price);
 
             }
@@ -235,6 +236,7 @@ namespace TelegramBot.Static.MessageHandlers
                 {
                     pair.Enabled = true;
                     db.CryptoPairs.Add(pair);
+                    PairsManager.TempObjects?.Remove(pair);
                     db.SaveChangesAsync();
                 }
 
@@ -242,7 +244,7 @@ namespace TelegramBot.Static.MessageHandlers
             }
         }
 
-       
+
 
         public async void ListMatchingTasks(TradingPair pair, UserConfig user, string datapattern, string Message)
         {
@@ -254,7 +256,7 @@ namespace TelegramBot.Static.MessageHandlers
                     var kb = Keyboards.PairsSelectingKeyboardMarkup(tasks, datapattern);
                     BotApi.SendMessage(user.TelegramId, Message, replyMarkup: kb);
                 }
-                else BotApi.SendMessage(user.TelegramId, MessagesGetter.GetGlobalString("CPCantFindAnyPairsMatching", user.Language));
+                else BotApi.SendMessage(user.TelegramId, CultureTextRequest.GetMessageString("CPCantFindAnyPairsMatching", user.Language));
             }
         }
 
@@ -278,9 +280,9 @@ namespace TelegramBot.Static.MessageHandlers
                         strTasks.AppendLine("To edit any task send: /edit 'id' 'new_price' or /edit BASE/QUOTE");
                         BotApi.SendMessage(update.Message.Chat.Id, strTasks.ToString());
                     }
-                    else BotApi.SendMessage(update.Message.Chat.Id, MessagesGetter.GetGlobalString("noCryptoTasks", user.Language));
+                    else BotApi.SendMessage(update.Message.Chat.Id, CultureTextRequest.GetMessageString("noCryptoTasks", user.Language));
                 }
-                else BotApi.SendMessage(update.Message.Chat.Id, MessagesGetter.GetGlobalString("noCryptoTasks", "en"));
+                else BotApi.SendMessage(update.Message.Chat.Id, CultureTextRequest.GetMessageString("noCryptoTasks", "en"));
             }
         }
     }

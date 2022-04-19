@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -22,7 +23,7 @@ namespace CryptoApi.Static
                 {
                     var pairSymbol = SplitSymbolConverter(pair.instId);
                     if (pairSymbol != null)
-                        listReturner.Add(new CryptoExchangePairInfo(pairSymbol, double.Parse(pair.last)));
+                        listReturner.Add(new CryptoExchangePairInfo(pairSymbol, double.Parse(pair.last, new CultureInfo("en"))));
                     // listReturner.Add(new CryptoExchangePairInfo(SplitSymbolConverter(pair.instId), double.Parse(pair.last)));
                 }
             }

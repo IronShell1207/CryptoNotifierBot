@@ -61,11 +61,74 @@ namespace TelegramBot.Constants {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to disabled ⛔️.
+        /// </summary>
+        internal static string disabled {
+            get {
+                return ResourceManager.GetString("disabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to enabled ✅.
+        /// </summary>
+        internal static string enabled {
+            get {
+                return ResourceManager.GetString("enabled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Notifications interval for crypto monitoring setted to {0} secs!.
         /// </summary>
         internal static string SetNotifyInterval {
             get {
                 return ResourceManager.GetString("SetNotifyInterval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Task status: .
+        /// </summary>
+        internal static string taskInfoActiveStatus {
+            get {
+                return ResourceManager.GetString("taskInfoActiveStatus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exchange platform: .
+        /// </summary>
+        internal static string taskInfoExchangePlatform {
+            get {
+                return ResourceManager.GetString("taskInfoExchangePlatform", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Symbol: .
+        /// </summary>
+        internal static string taskInfoSymbol {
+            get {
+                return ResourceManager.GetString("taskInfoSymbol", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Monitoring task total info:.
+        /// </summary>
+        internal static string taskInfoTitle {
+            get {
+                return ResourceManager.GetString("taskInfoTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Trigger price: .
+        /// </summary>
+        internal static string taskInfoTriggerPrice {
+            get {
+                return ResourceManager.GetString("taskInfoTriggerPrice", resourceCulture);
             }
         }
     }

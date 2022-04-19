@@ -24,7 +24,7 @@ namespace TelegramBot.Static
                     {
                         user.NoticationsInterval = int.Parse(match.Groups["time"].Value);
                         dbContext.SaveChangesAsync();
-                        BotApi.SendMessage(user.TelegramId, string.Format(MessagesGetter.GetSettingsMsgString("SetNotifyInterval", user.Language),
+                        BotApi.SendMessage(user.TelegramId, string.Format(CultureTextRequest.GetSettingsMsgString("SetNotifyInterval", user.Language),
                             user.NoticationsInterval));
                     }
                 }

@@ -117,8 +117,28 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="disabled" xml:space="preserve">
+    <value>disabled ⛔️</value>
+  </data>
+  <data name="enabled" xml:space="preserve">
+    <value>enabled ✅</value>
+  </data>
   <data name="SetNotifyInterval" xml:space="preserve">
     <value>Notifications interval for crypto monitoring setted to {0} secs!</value>
-    <comment> </comment>
+  </data>
+  <data name="taskInfoActiveStatus" xml:space="preserve">
+    <value>Task status: </value>
+  </data>
+  <data name="taskInfoExchangePlatform" xml:space="preserve">
+    <value>Exchange platform: </value>
+  </data>
+  <data name="taskInfoSymbol" xml:space="preserve">
+    <value>Symbol: </value>
+  </data>
+  <data name="taskInfoTitle" xml:space="preserve">
+    <value>Monitoring task total info:</value>
+  </data>
+  <data name="taskInfoTriggerPrice" xml:space="preserve">
+    <value>Trigger price: </value>
   </data>
 </root>

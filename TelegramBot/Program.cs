@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using TelegramBot;
@@ -14,6 +15,8 @@ namespace TelegramBot
     {
         static void Main(string[] args)
         {
+            CultureInfo ci = new CultureInfo("en");
+            Thread.CurrentThread.CurrentCulture = ci;
             Console.WriteLine("Crypto notifications bot loading...");
             if (string.IsNullOrWhiteSpace(AppSettingsStatic.Settings.TelegramBotToken))
             {

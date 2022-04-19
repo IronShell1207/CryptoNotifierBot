@@ -125,7 +125,7 @@ namespace TelegramBot.Static
                 }
             }
             else if (update.Message.ReplyToMessage.Text ==
-                     MessagesGetter.GetGlobalString("ToaddToTheBlackList", user.Language))
+                     CultureTextRequest.GetMessageString("ToaddToTheBlackList", user.Language))
             {
                 using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler())
                 {
@@ -136,6 +136,7 @@ namespace TelegramBot.Static
         public static async void CallbackHandlerAsync(ITelegramBotClient bot, Update update,
             CancellationToken cancellationToken)
         {
+            EditMessage(GetTelegramIdFromUpdate(update), update.CallbackQuery.Message.MessageId, true);
             if (Exchanges.Contains(update.CallbackQuery.Data))
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler()) msgh.SetExchangeStageCP(update);
             else if (CallbackDataPatterns.DeletePairRegex.IsMatch(update.CallbackQuery.Data))
