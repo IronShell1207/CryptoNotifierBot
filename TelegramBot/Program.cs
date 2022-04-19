@@ -29,7 +29,7 @@ namespace TelegramBot
             while (true)
             {
                 var reader = Console.ReadLine();
-                if (reader.ToString() == "/changebotkey")
+                if (reader.ToString() == "/changebotkey" || reader.ToString() == "/setbotkey")
                 {
                     ConsoleCommandsHandler.ChangeTokenAsync();
                 }

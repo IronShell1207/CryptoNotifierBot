@@ -181,13 +181,13 @@ namespace TelegramBot.Static.MessageHandlers
                         };
                         dbContext.BlackListedPairs.Add(badPair);
                         dbContext.SaveChangesAsync();
-                        BotApi.SendMessage(user.TelegramId,
-                            MessagesGetter.GetGlobalString("blacklistPairAdded", user.Language));
+                        BotApi.SendMessage(user.TelegramId, string.Format(
+                            MessagesGetter.GetGlobalString("blacklistPairAdded", user.Language), badPair.ToString()));
                     }
                     else
                     {
-                        BotApi.SendMessage(user.TelegramId,
-                            MessagesGetter.GetGlobalString("blacklistPairExists", user.Language));
+                        BotApi.SendMessage(user.TelegramId,string.Format(
+                            MessagesGetter.GetGlobalString("blacklistPairExists", user.Language), blackPairEx.ToString()));
                     }
                 }
             }

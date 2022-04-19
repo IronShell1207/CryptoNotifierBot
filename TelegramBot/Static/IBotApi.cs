@@ -55,36 +55,21 @@ namespace TelegramBot.Static
             {
                 RepliedMsgHandlerAsync(bot, update, canceltoken);
             }
-            if (update.Type == UpdateType.Message)
+            if (update.Type == UpdateType.Message && update.Message != null)
             {
-                var user = GetUserSettings(update.Message.Chat.Id);
+                var user = GetUserSettings(update.Message?.Chat?.Id);
+                if (RegexCombins.CommandPattern.IsMatch(update.Message?.Text))
+                    CommandsHandler(bot, update, canceltoken);
                 if (CommandsRegex.MonitoringTaskCommands.CreatePair.IsMatch(update.Message.Text))
-                {
-                    using (CryptoPairsMsgHandler msghandler = new CryptoPairsMsgHandler())
-                    {
-                        msghandler.NewCP(update);
-                    }
-                }
+                    using (CryptoPairsMsgHandler msghandler = new CryptoPairsMsgHandler()) msghandler.NewCP(update);
                 else if (CommandsRegex.MonitoringTaskCommands.EditPair.IsMatch(update.Message.Text))
-                {
-                    using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
-                    {
-                        msgHandler.RemoveTempUserTask(update);
-                    }
-                }
+                    using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler()) msgHandler.RemoveTempUserTask(update);
                 else if (CommandsRegex.MonitoringTaskCommands.DeletePair.IsMatch(update.Message.Text))
                 {
 
                 }
                 else if (Commands.AllTasks == update.Message.Text)
-                {
-                    using (CryptoPairsMsgHandler cr = new CryptoPairsMsgHandler())
-                    {
-                        cr.ListAllTask(update);
-                    }
-                }
-               
-
+                    using (CryptoPairsMsgHandler cr = new CryptoPairsMsgHandler()) cr.ListAllTask(update);
                 else if (CommandsRegex.BreakoutCommands.AddToBlackList.IsMatch(update.Message.Text))
                 {
                     using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler())
@@ -99,39 +84,21 @@ namespace TelegramBot.Static
                         msg.SetTimings(update);
                     }
                 }
-
-
-
-
-                else if (update.Message.Text == "/subscribe")
-                {
-                    using (BreakoutPairsMsgHandler msghandler = new BreakoutPairsMsgHandler())
-                    {
-                        msghandler.SubNewUserBreakouts(update);
-                    }
-                }
-                else if (update.Message.Text == "/subsets")
-                {
-                    using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler())
-                    {
-                        msgHandler.SubSettings(update);
-                    }
-                }
-                else if (update.Message.Text == "/substop")
-                {
-                    using (BreakoutPairsMsgHandler msgH = new BreakoutPairsMsgHandler())
-                    {
-                        msgH.StopNotify(update);
-                    }
-                }
-                    
             }
             else if (update.Type == UpdateType.CallbackQuery)
-            { 
                 CallbackHandlerAsync(bot,update, canceltoken);
-            }
         }
 
+        public static async void CommandsHandler(ITelegramBotClient bot, Update update,
+            CancellationToken cancellationToken)
+        {
+            if (update.Message?.Text == Commands.Subscribe)
+                using (BreakoutPairsMsgHandler msghandler = new BreakoutPairsMsgHandler()) msghandler.SubNewUserBreakouts(update);
+            else if (update.Message?.Text == Commands.SubSettings)
+                using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler()) msgHandler.SubSettings(update);
+            else if (update.Message?.Text == Commands.SubStop)
+                using (BreakoutPairsMsgHandler msgH = new BreakoutPairsMsgHandler()) msgH.StopNotify(update);
+        }
         public static async void RepliedMsgHandlerAsync(ITelegramBotClient bot, Update update,
             CancellationToken canceltoken)
         {
