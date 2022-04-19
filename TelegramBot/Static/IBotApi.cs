@@ -65,7 +65,7 @@ namespace TelegramBot.Static
                 else if (CommandsRegex.MonitoringTaskCommands.EditPair.IsMatch(update.Message.Text)) {}
                    
                 else if (CommandsRegex.MonitoringTaskCommands.DeletePair.IsMatch(update.Message.Text))
-                    using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler()) msgHandler.RemoveTempUserTask(update);
+                    using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler()) msgHandler.RemoveUserTask(update);
                
                 else if (CommandsRegex.BreakoutCommands.AddToBlackList.IsMatch(update.Message.Text))
                 {

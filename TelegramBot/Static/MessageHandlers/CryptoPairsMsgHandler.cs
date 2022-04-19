@@ -27,7 +27,7 @@ namespace TelegramBot.Static.MessageHandlers
             return pair;
         }
 
-        public void RemoveTempUserTask(Update update)
+        public void RemoveUserTask(Update update)
         {
             var match = CommandsRegex.MonitoringTaskCommands.DeletePair.Match(update.Message.Text);
             if (match.Success)
@@ -126,8 +126,30 @@ namespace TelegramBot.Static.MessageHandlers
             var exchange = update.CallbackQuery.Data;
             var pair = GetTempUserTask(update).Result;
             pair.ExchangePlatform = exchange;
-            await BotApi.SendMessage(update.CallbackQuery.From.Id,
-                "Exchange for new crypto pair setted. Set price in next message", true);
+            if (pair.Price == 0)
+            {
+                await BotApi.SendMessage(update.CallbackQuery.From.Id,
+                    "Exchange for new crypto pair setted. Set price in next message", true);
+            }
+            else if (pair.Price > 0)
+            {
+                SetRaiseOrFallStatus(update, pair);
+            }
+        }
+
+        private async void SetRaiseOrFallStatus(Update update, CryptoPair pair, double price = 0)
+        {
+            if (price >0)
+                pair.Price = price;
+            if (pair.ToString() == "/")
+                BotApi.SendMessage(update.Message.Chat.Id, "Task creating expired. Start again");
+            else
+            {
+                var curprice = ExchangesCheckerForUpdates.GetCurrentPrice(new TradingPair(
+                    pair.PairBase, pair.PairQuote), pair.ExchangePlatform);
+                pair.GainOrFall = curprice.Result < price;
+                SaveNewTaskToDB(update);
+            }
         }
 
         public async void SetTriggerPriceStageCP(Update update)
@@ -136,16 +158,8 @@ namespace TelegramBot.Static.MessageHandlers
             try
             {
                 var price = double.Parse(update.Message.Text);
-                pair.Price = price;
-                if (pair.ToString() == "/")
-                    BotApi.SendMessage(update.Message.Chat.Id, "Task creating expired. Start again");
-                else
-                {
-                    var curprice = ExchangesCheckerForUpdates.GetCurrentPrice(new TradingPair(
-                        pair.PairBase, pair.PairQuote), pair.ExchangePlatform);
-                    pair.GainOrFall = curprice.Result < price;
-                    SaveNewTaskToDB(update);
-                }
+                SetRaiseOrFallStatus(update, pair, price);
+                
             }
             catch (ArgumentException ex)
             {
@@ -168,8 +182,17 @@ namespace TelegramBot.Static.MessageHandlers
                      db.SaveChangesAsync();
                 }
 
-                BotApi.SendMessage(update.Message.Chat.Id, "New pair saved!");
+                BotApi.SendMessage(GetTelegramIdFromUpdate(update).Identifier, "New pair saved!");
             }
+        }
+
+        private ChatId GetTelegramIdFromUpdate(Update update)
+        {
+            if (update.Message?.Chat.Id != null)
+                return update.Message.Chat.Id;
+            else if (update.CallbackQuery?.From?.Id != null)
+                return update.CallbackQuery.From.Id;
+            else return null;
         }
 
         public async void ListMatchingTasks(CryptoPair pair, int owner)
