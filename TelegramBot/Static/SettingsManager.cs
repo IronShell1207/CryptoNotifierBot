@@ -16,12 +16,17 @@ namespace TelegramBot.Static
             var match = CommandsRegex.SettingsCommands.ChangeDelay.Match(update.Message.Text);
             if (match.Success)
             {
-                var user = BotApi.GetUserSettings(BotApi.GetTelegramIdFromUpdate(update)).Result;
-                if (user != null)
+                using (AppDbContext dbContext = new AppDbContext())
                 {
-                    user.NoticationsInterval = int.Parse(match.Groups["time"].Value);
-                    BotApi.SendMessage(user.TelegramId, MessagesGetter.GetGlobalString("SetNotifyInterval"))
-
+                    var userId = BotApi.GetTelegramIdFromUpdate(update);
+                    var user = dbContext.Users.FirstOrDefault(x=>x.TelegramId == userId.Identifier);
+                    if (user != null)
+                    {
+                        user.NoticationsInterval = int.Parse(match.Groups["time"].Value);
+                        dbContext.SaveChangesAsync();
+                        BotApi.SendMessage(user.TelegramId, string.Format(MessagesGetter.GetSettingsMsgString("SetNotifyInterval", user.Language),
+                            user.NoticationsInterval));
+                    }
                 }
             }
         }

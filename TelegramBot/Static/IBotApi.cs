@@ -60,8 +60,9 @@ namespace TelegramBot.Static
                 var user = GetUserSettings(update.Message?.Chat?.Id);
                 if (RegexCombins.CommandPattern.IsMatch(update.Message?.Text))
                     CommandsHandler(bot, update, canceltoken);
-                if (CommandsRegex.MonitoringTaskCommands.CreatePair.IsMatch(update.Message.Text))
+                else if (CommandsRegex.MonitoringTaskCommands.CreatePair.IsMatch(update.Message.Text))
                     using (CryptoPairsMsgHandler msghandler = new CryptoPairsMsgHandler()) msghandler.NewCP(update);
+                else if (CommandsRegex.SettingsCommands.ChangeDelay.IsMatch(update.Message.Text))   using (SettingsManager sm = new SettingsManager()) sm.SetNotifyDelay(update);
                 else if (CommandsRegex.MonitoringTaskCommands.EditPair.IsMatch(update.Message.Text)) {}
                    
                 else if (CommandsRegex.MonitoringTaskCommands.DeletePair.IsMatch(update.Message.Text))
