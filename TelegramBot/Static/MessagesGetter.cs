@@ -16,5 +16,6 @@ namespace TelegramBot.Static
             ResourceManager rm = new ResourceManager(typeof(TelegramBot.Messages));
             return rm.GetString(key, ci);
         }
+       // public static string GetSettingsMsgString(string key)
     }
 }

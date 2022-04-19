@@ -55,7 +55,7 @@ namespace TelegramBot.Constants
 
         public class SettingsCommands
         {
-            public static Regex ChangeDelay = new Regex(@"/settimeout (?<time>[0-9]*)");
+            public static Regex ChangeDelay = new Regex(@"/(setinterval|settime|setnotifytimeout) (?<time>[0-9]*)");
         }
 
         public static Regex SetTimings = new Regex(@"/setsubtimes\s+(?<timing>[0-9]+)");

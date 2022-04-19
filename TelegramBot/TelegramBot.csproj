@@ -32,6 +32,11 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>BotButtons.resx</DependentUpon>
     </Compile>
+    <Compile Update="Constants\SettingsMessages.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>SettingsMessages.resx</DependentUpon>
+    </Compile>
     <Compile Update="Messages.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -43,6 +48,10 @@
     <EmbeddedResource Update="Constants\BotButtons.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>BotButtons.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Constants\SettingsMessages.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>SettingsMessages.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="Messages.resx">
       <Generator>ResXFileCodeGenerator</Generator>
