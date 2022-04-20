@@ -365,7 +365,7 @@ namespace TelegramBot.Static.MessageHandlers
                         StringBuilder strTasks = new StringBuilder("Your list of tasks:\n");
                         foreach (var task in tasks)
                         {
-                            strTasks.AppendLine(task.TaskStatus());
+                            strTasks.AppendLine(task.TaskStatusWithLink());
                         }
 
                         strTasks.AppendLine("");
