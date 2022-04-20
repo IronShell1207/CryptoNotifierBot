@@ -193,9 +193,9 @@ For get all available commands 🔎 send: /help</value>
 
 {0}</value>
   </data>
-<data name="CPEditTaskCreated" xml:space="preserve">
+  <data name="CPEditTaskCreated" xml:space="preserve">
     <value>🖍Task created successfully:
 
-{0}</value>
+</value>
   </data>
 </root>

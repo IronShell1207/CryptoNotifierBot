@@ -106,11 +106,24 @@ namespace TelegramBot {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to 🖍Task edited successfully:\r\n {0}.
+        ///   Looks up a localized string similar to 🖍Task edited successfully:
+        ///
+        ///{0}.
         /// </summary>
         internal static string CPEditTaskComplete {
             get {
                 return ResourceManager.GetString("CPEditTaskComplete", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 🖍Task created successfully:
+        ///
+        ///.
+        /// </summary>
+        internal static string CPEditTaskCreated {
+            get {
+                return ResourceManager.GetString("CPEditTaskCreated", resourceCulture);
             }
         }
         

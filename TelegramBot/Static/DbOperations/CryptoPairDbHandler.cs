@@ -26,9 +26,9 @@ namespace TelegramBot.Static.DbOperations
             }
         }
 
-        public bool SetNewPriceFromPair(CryptoPair pair, double price) =>
-            SetNewPriceTriggerPair(pair.Id, pair.OwnerId, price);
-        public bool SetNewPriceTriggerPair(int id, int ownerId, double price)
+        public async Task<bool> SetNewPriceFromPair(CryptoPair pair, double price) =>
+            SetNewPriceTriggerPair(pair.Id, pair.OwnerId, price).Result;
+        public async Task<bool> SetNewPriceTriggerPair(int id, int ownerId, double price)
         {
             using (AppDbContext dbContext = new AppDbContext())
             {
@@ -36,7 +36,7 @@ namespace TelegramBot.Static.DbOperations
                 if (pair != null)
                 {
                     pair.Price = price;
-                    dbContext.SaveChangesAsync();
+                    await dbContext.SaveChangesAsync();
                     return true;
                 }
 

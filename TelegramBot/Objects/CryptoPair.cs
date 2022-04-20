@@ -67,6 +67,7 @@ namespace TelegramBot.Objects
             string lessOrGreaterSymbol = GainOrFall ? "📈" : "📉";
             StringBuilder sb = new StringBuilder(CultureTextRequest.GetSettingsMsgString("taskInfoTitle", lang));
             sb.AppendLine("");
+            sb.AppendLine($"Task id: #{this.Id}");
             sb.AppendLine($"{CultureTextRequest.GetSettingsMsgString("taskInfoSymbol", lang)}{link}");
             sb.AppendLine($"{CultureTextRequest.GetSettingsMsgString("taskInfoActiveStatus", lang)}{enable}");
             sb.AppendLine($"{CultureTextRequest.GetSettingsMsgString("taskInfoTriggerPrice", lang)}{lessOrGreater}{this.Price} {lessOrGreaterSymbol}");
