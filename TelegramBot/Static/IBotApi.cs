@@ -49,6 +49,7 @@ namespace TelegramBot.Static
             return true;
         }
 
+        #region Updates
         public static async Task UpdateHandler(ITelegramBotClient bot, Update update, CancellationToken canceltoken)
         {
             if (!string.IsNullOrWhiteSpace(update.Message?.ReplyToMessage?.Text))
@@ -60,31 +61,35 @@ namespace TelegramBot.Static
                 var user = GetUserSettings(update.Message?.Chat?.Id);
                 if (RegexCombins.CommandPattern.IsMatch(update.Message?.Text))
                     CommandsHandler(bot, update, canceltoken);
+
                 else if (CommandsRegex.MonitoringTaskCommands.CreatePair.IsMatch(update.Message.Text))
-                    using (CryptoPairsMsgHandler msghandler = new CryptoPairsMsgHandler()) msghandler.NewCP(update);
-                else if (CommandsRegex.SettingsCommands.ChangeDelay.IsMatch(update.Message.Text))   using (SettingsManager sm = new SettingsManager()) sm.SetNotifyDelay(update);
-                else if (CommandsRegex.MonitoringTaskCommands.EditPair.IsMatch(update.Message.Text)) {}
-                   
+                    using (CryptoPairsMsgHandler msghandler = new CryptoPairsMsgHandler())
+                        msghandler.NewCP(update);
+
+                else if (CommandsRegex.SettingsCommands.ChangeDelay.IsMatch(update.Message.Text))
+                    using (SettingsManager sm = new SettingsManager())
+                        sm.SetNotifyDelay(update);
+
+                else if (CommandsRegex.MonitoringTaskCommands.EditPair.IsMatch(update.Message.Text))
+                    using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
+                        msgHandler.EditUserTask(update);
+
                 else if (CommandsRegex.MonitoringTaskCommands.DeletePair.IsMatch(update.Message.Text))
-                    using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler()) msgHandler.RemoveUserTask(update);
-               
+                    using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
+                        msgHandler.RemoveUserTask(update);
+
                 else if (CommandsRegex.BreakoutCommands.AddToBlackList.IsMatch(update.Message.Text))
-                {
                     using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler())
-                    {
                         msgHandler.AddPairToBlackListCommandHandler(update);
-                    }
-                }
+
                 else if (CommandsRegex.SetTimings.IsMatch(update.Message.Text))
-                {
                     using (BreakoutPairsMsgHandler msg = new BreakoutPairsMsgHandler())
-                    {
                         msg.SetTimings(update);
-                    }
-                }
+
+
             }
             else if (update.Type == UpdateType.CallbackQuery)
-                CallbackHandlerAsync(bot,update, canceltoken);
+                CallbackHandlerAsync(bot, update, canceltoken);
         }
 
         public static async void CommandsHandler(ITelegramBotClient bot, Update update,
@@ -103,35 +108,34 @@ namespace TelegramBot.Static
             CancellationToken canceltoken)
         {
             var user = GetUserSettings(update.Message.Chat.Id).Result;
+            var editPriceMsgRegex =
+                CommandsRegex.ConvertMessageToRegex(CultureTextRequest.GetMessageString("CPEditPair", user.Language),
+                    new List<string>() { @"(?<base>[a-zA-Z0-9]{2,9})(\s+|/)(?<quote>[a-zA-Z0-9]{2,6})", "(?<id>[0-9]+)" });
+
             if (update.Message.ReplyToMessage.Text == Messages.newPairRequestingForPair)
-            {
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
-                {
                     msgh.CreatingPairStageCP(update);
-                }
-            }
+            
             else if (update.Message.ReplyToMessage.Text == Messages.newPairWrongPrice)
-            {
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
-                {
                     msgh.SetTriggerPriceStageCP(update);
-                }
-            }
+            
             else if (update.Message.ReplyToMessage.Text == Messages.newPairAfterExchangeSetPrice)
-            {
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
-                {
                     msgh.SetTriggerPriceStageCP(update);
-                }
-            }
+
             else if (update.Message.ReplyToMessage.Text ==
                      CultureTextRequest.GetMessageString("ToaddToTheBlackList", user.Language))
-            {
                 using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler())
-                {
                     msgHandler.AddPairToBlackListCommandHandler(update);
-                }
-            }
+
+            else if (editPriceMsgRegex.IsMatch(update.Message.ReplyToMessage.Text))
+                using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler()) 
+                    msgHandler.EditUserTaskReplyHandler(update, user);
+            
+
+
+
         }
         public static async void CallbackHandlerAsync(ITelegramBotClient bot, Update update,
             CancellationToken cancellationToken)
@@ -141,11 +145,45 @@ namespace TelegramBot.Static
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler()) msgh.SetExchangeStageCP(update);
             else if (CallbackDataPatterns.DeletePairRegex.IsMatch(update.CallbackQuery.Data))
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler()) msgh.RemoveUserTaskCallbackHandler(update);
+            else if (CallbackDataPatterns.EditPairRegex.IsMatch(update.CallbackQuery.Data))
+                using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler()) msgh.EditUserTaskCallbackHandler(update);
         }
         public static Task ErrorHandler(ITelegramBotClient botClient, Exception ex, CancellationToken csToken)
         {
             Console.WriteLine(ex.Message);
             return Task.CompletedTask;
+        }
+        #endregion
+        #region Send or edit
+        public static async Task SendMessage(ChatId chatId, string message, ParseMode parse = ParseMode.MarkdownV2)
+        {
+            try
+            {
+                var messagelenght = message.Length;
+                if (messagelenght > 4125)
+                    for (int i = 0; i < messagelenght / 3500; i++)
+                        await BotClient.SendTextMessageAsync(chatId, message.Substring(i * 3500, i + 3500), parse, disableWebPagePreview: true);
+                else
+                    await BotClient.SendTextMessageAsync(chatId, message, parse, disableWebPagePreview: true);
+            }
+            catch (Telegram.Bot.Exceptions.ApiRequestException apiException)
+            {
+                if (apiException.Message == "Bad Request: chat not found") // || apiException.ErrorCode == 400)
+                {
+                    using (AppDbContext dbContext = new AppDbContext())
+                    {
+                        var baduser = dbContext.Users.ToList().Where(x => x.TelegramId == chatId.Identifier)
+                            .FirstOrDefault();
+                        if (baduser != null)
+                        {
+                            dbContext.Users.Remove(baduser);
+                            dbContext.SaveChangesAsync();
+                            Console.WriteLine($"Bad user {chatId.Identifier}. Removed from the database");
+                        }
+                    }
+                }
+                else throw;
+            }
         }
         public static async Task SendMessage(ChatId chatId, string message)
         {
@@ -153,23 +191,28 @@ namespace TelegramBot.Static
             {
                 var messagelenght = message.Length;
                 if (messagelenght > 4125)
-                    for (int i =0; i< messagelenght/3500; i++)
-                        await BotClient.SendTextMessageAsync(chatId, message.Substring(i*3500, i + 3500));
+                    for (int i = 0; i < messagelenght / 3500; i++)
+                        await BotClient.SendTextMessageAsync(chatId, message.Substring(i * 3500, i + 3500));
                 else
                     await BotClient.SendTextMessageAsync(chatId, message);
-            }   
+            }
             catch (Telegram.Bot.Exceptions.ApiRequestException apiException)
             {
-                if (apiException.Message == "Bad Request: chat not found" || apiException.ErrorCode == 400)
+                if (apiException.Message == "Bad Request: chat not found") // || apiException.ErrorCode == 400)
                 {
                     using (AppDbContext dbContext = new AppDbContext())
                     {
-                        var baduser =  dbContext.Users.ToList().Where(x => x.TelegramId == chatId.Identifier)
+                        var baduser = dbContext.Users.ToList().Where(x => x.TelegramId == chatId.Identifier)
                             .FirstOrDefault();
-                        if (baduser != null) dbContext.Users.Remove(baduser);
-                        Console.WriteLine($"Bad user {chatId.Identifier}. Removed from the database");
+                        if (baduser != null)
+                        {
+                            dbContext.Users.Remove(baduser);
+                            dbContext.SaveChangesAsync();
+                            Console.WriteLine($"Bad user {chatId.Identifier}. Removed from the database");
+                        }
                     }
                 }
+                else throw;
             }
         }
         public static ChatId GetTelegramIdFromUpdate(Update update)
@@ -244,6 +287,11 @@ namespace TelegramBot.Static
             await BotClient.EditMessageReplyMarkupAsync(chatId, messageID, null);
         }
 
+        #endregion
+        #region UsersStuff
+
+        public static async Task<UserConfig> GetUserSettings(Update update) =>
+            GetUserSettings(GetTelegramIdFromUpdate(update)).Result;
         public static async Task<UserConfig> GetUserSettings(int userId)
         {
             using (AppDbContext db = new AppDbContext())
@@ -275,5 +323,6 @@ namespace TelegramBot.Static
             }
         }
 
+        #endregion
     }
 }

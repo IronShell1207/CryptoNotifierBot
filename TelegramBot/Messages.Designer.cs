@@ -88,11 +88,29 @@ namespace TelegramBot {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Select task you need to edit.
+        /// </summary>
+        internal static string CPEditbySymbol {
+            get {
+                return ResourceManager.GetString("CPEditbySymbol", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to To edit price of {0} pair with id {1} please send new price with this message attached!.
         /// </summary>
         internal static string CPEditPair {
             get {
                 return ResourceManager.GetString("CPEditPair", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 🖍Task edited successfully:\r\n {0}.
+        /// </summary>
+        internal static string CPEditTaskComplete {
+            get {
+                return ResourceManager.GetString("CPEditTaskComplete", resourceCulture);
             }
         }
         

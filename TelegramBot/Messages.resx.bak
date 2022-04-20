@@ -147,6 +147,9 @@ Example: BTC/USDT or BTC USDT</value>
   <data name="noCryptoTasks" xml:space="preserve">
     <value>You don't have any tasks yet. To add new send /create</value>
   </data>
+  <data name="cryptoPairRemoved" xml:space="preserve">
+    <value>Crypto pair {0} id {1} removed from monitoring!</value>
+  </data>
   <data name="ToaddToTheBlackList" xml:space="preserve">
     <value>To add new pair to the black list send it with this message attached using next format: BTC/USDT or BTC USDT</value>
   </data>
@@ -169,5 +172,25 @@ For get all available commands 🔎 send: /help</value>
   </data>
   <data name="blacklistPairExists" xml:space="preserve">
     <value>Pair {0} already exists in the black list.</value>
+  </data>
+  <data name="CPCantFindAnyPairsMatching" xml:space="preserve">
+    <value>I can't find any pairs matching your request!</value>
+  </data>
+  <data name="cryptoPairCantRemove" xml:space="preserve">
+    <value>I can't remove your pair because of some problems!</value>
+  </data>
+  <data name="cryptoPairRemoveBySymbol" xml:space="preserve">
+    <value>Select task you needed to remove from your tasks</value>
+  </data>
+  <data name="CPEditPair" xml:space="preserve">
+    <value>To edit price of {0} pair with id {1} please send new price with this message attached!</value>
+  </data>
+  <data name="CPEditbySymbol" xml:space="preserve">
+    <value>Select task you need to edit</value>
+  </data>
+  <data name="CPEditTaskComplete" xml:space="preserve">
+    <value>🖍Task edited successfully:
+
+{0}</value>
   </data>
 </root>

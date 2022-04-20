@@ -26,6 +26,24 @@ namespace TelegramBot.Static.DbOperations
             }
         }
 
+        public bool SetNewPriceFromPair(CryptoPair pair, double price) =>
+            SetNewPriceTriggerPair(pair.Id, pair.OwnerId, price);
+        public bool SetNewPriceTriggerPair(int id, int ownerId, double price)
+        {
+            using (AppDbContext dbContext = new AppDbContext())
+            {
+                var pair = dbContext.CryptoPairs.FirstOrDefault(x => x.Id == id && x.OwnerId == ownerId);
+                if (pair != null)
+                {
+                    pair.Price = price;
+                    dbContext.SaveChangesAsync();
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
         public CryptoPair GetPairFromId(int id, int ownerId)
         {
             using (AppDbContext dbContext = new AppDbContext())
