@@ -18,6 +18,7 @@ namespace TelegramBot.Static.DbOperations
                 if (pair != null)
                 {
                     dbContext.CryptoPairs.Remove(pair);
+                    dbContext.SaveChangesAsync();
                     return true;
                 }
 
