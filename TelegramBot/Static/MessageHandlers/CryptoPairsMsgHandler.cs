@@ -30,7 +30,7 @@ namespace TelegramBot.Static.MessageHandlers
             return pair;
         }
 
-        public void EditUserTask(Update update)
+        public async void EditUserTask(Update update)
         {
             var match = CommandsRegex.MonitoringTaskCommands.EditPair.Match(update.Message.Text);
             var user = BotApi.GetUserSettings(BotApi.GetTelegramIdFromUpdate(update)).Result;
@@ -48,7 +48,7 @@ namespace TelegramBot.Static.MessageHandlers
                         {
                             if (!string.IsNullOrWhiteSpace(price))
                             {
-                                if (dbh.SetNewPriceTriggerPair(iid, user.Id, double.Parse(price)))
+                                if (await dbh.SetNewPriceTriggerPair(iid, user.Id, double.Parse(price)))
                                 {
                                     var msg = string.Format(
                                         CultureTextRequest.GetMessageString("CPEditTaskComplete", user.Language),
@@ -109,7 +109,7 @@ namespace TelegramBot.Static.MessageHandlers
                             var msg = string.Format(
                                 CultureTextRequest.GetMessageString("CPEditTaskComplete", user.Language),
                                 pair.FullTaskInfo());
-                            BotApi.SendMessage(user.TelegramId, msg);
+                            BotApi.SendMessage(user.TelegramId, msg, ParseMode.Html);
                         }
                     }
                 } 
@@ -327,12 +327,12 @@ namespace TelegramBot.Static.MessageHandlers
                     pair.Enabled = true;
                     db.CryptoPairs.Add(pair);
                     PairsManager.TempObjects?.Remove(pair);
-                    db.SaveChangesAsync();
+                     db.SaveChangesAsync();
                 }
 
-                BotApi.SendMessage(BotApi.GetTelegramIdFromUpdate(update).Identifier, 
-                    string.Format(CultureTextRequest.GetSettingsMsgString("CPEditTaskCreated", user.Language), 
-                    pair.FullTaskInfo(user.Language)), ParseMode.Html);
+                var msg = CultureTextRequest.GetSettingsMsgString("CPEditTaskCreated", user.Language);
+                var formatedmsg = $"{msg} {pair.FullTaskInfo(user.Language)}";
+                BotApi.SendMessage(BotApi.GetTelegramIdFromUpdate(update).Identifier, formatedmsg, ParseMode.Html);
             }
         }
 
