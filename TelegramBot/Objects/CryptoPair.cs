@@ -46,7 +46,7 @@ namespace TelegramBot.Objects
         {
             var enabled = Enabled ? "✅" : "⛔️";
             var rofl = GainOrFall ? "&#62;" : "&#60;";
-            return $"{enabled} #{Id} {this.ToStringWithLink()} {rofl}{Price}";
+            return $"{enabled} #{Id} {this.ToString()} {rofl}{Price}";
         }
         public string TaskStatusWithLink()
         {
