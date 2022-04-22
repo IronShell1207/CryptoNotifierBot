@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CryptoApi.Objects.ExchangesPairs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
 using TelegramBot.Objects;
@@ -29,7 +31,16 @@ namespace TelegramBot.Static
 
         public AppDbContext()
         {
-            Database.EnsureCreated();
+           // Database.EnsureCreated();
+            var migr=  Database.GetPendingMigrations();
+            var appl = Database.GetAppliedMigrations();
+            if (migr.Any())
+            {
+                Console.WriteLine("Migration");
+                Database.Migrate();
+            }
+
+
         }
     }
 }
