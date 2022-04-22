@@ -44,6 +44,7 @@ namespace CryptoApi.Constants
             else if (exchange == Exchanges.Okx)    return $"{Base}-{Quote}";
             else if (exchange == Exchanges.GateIO) return $"{Base}-{Quote}";
             else if (exchange == Exchanges.Kucoin) return $"{Base}_{Quote}";
+            else if (exchange == Exchanges.Bitget) return $"{Base}_{Quote}";
             return null;
         }
     }

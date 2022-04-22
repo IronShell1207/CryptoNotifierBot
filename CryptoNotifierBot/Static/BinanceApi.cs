@@ -16,16 +16,16 @@ using RestSharp;
 
 namespace CryptoApi.Static
 {
-    public class BinanceApi
+    public class BinanceApi : TheDisposable, ITradingApi
     {
 
-        public static List<CryptoExchangePairInfo> ExchangePairsConverter(List<BinancePair> list)
+        public List<CryptoExchangePairInfo> ExchangePairsConverter(List<BinancePair> list)
         {
             var listReturner = new List<CryptoExchangePairInfo>();
             //var listbi = list as List<BinancePair>;
             if (list != null)
             {
-                foreach (var pair in list)
+                foreach (BinancePair pair in list)
                 {
                     var pairSymbol = SplitSymbolConverter(pair.symbol);
                     if (pairSymbol != null)
@@ -36,7 +36,7 @@ namespace CryptoApi.Static
             return listReturner;
         }
 
-        public static TradingPair SplitSymbolConverter(string symbol)
+        public TradingPair SplitSymbolConverter(string symbol)
         {
             var crp = new TradingPair();
             
@@ -51,15 +51,14 @@ namespace CryptoApi.Static
             return null;
 
         }
-        public static SymbolTimedExInfo GetExchangeData()
+        public SymbolTimedExInfo GetExchangeData()
         {
-            
+
             RestResponse responce = RestRequester.GetRequest(new Uri(ExchangesApiLinks.BinanceClearTicker)).Result;
             JsonSerializer serializer = new JsonSerializer();
             if (responce?.StatusCode == HttpStatusCode.OK)
             {
-                
-            
+
                 var pairsSerialized = serializer.Deserialize<List<BinancePair>>(new JsonTextReader(new StringReader(responce.Content)));
                 var pairs = ExchangePairsConverter(pairsSerialized);
                 return new SymbolTimedExInfo()
@@ -77,7 +76,7 @@ namespace CryptoApi.Static
             }
         }
 
-        public static BinanceSymbolsData GetFullData()
+        public BinanceSymbolsData GetFullData()
         {
             RestResponse response = RestRequester.GetRequest(new Uri(ExchangesApiLinks.BinanceFullExchangeInfoTicker)).Result;
             JsonSerializer serializer = new JsonSerializer();

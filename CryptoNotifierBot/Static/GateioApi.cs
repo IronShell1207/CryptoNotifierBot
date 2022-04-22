@@ -14,9 +14,9 @@ using RestSharp;
 
 namespace CryptoApi.Static
 {
-    public class GateioApi
+    public class GateioApi : TheDisposable, ITradingApi
     {
-        public static List<CryptoExchangePairInfo> PairsListConverter(List<GateIOData> list)
+        public List<CryptoExchangePairInfo> ExchangePairsConverter(List<GateIOData> list)
         {
             var listReturner = new List<CryptoExchangePairInfo>();
             if (list != null)
@@ -33,7 +33,7 @@ namespace CryptoApi.Static
             return listReturner;
         }
 
-        public static TradingPair SplitSymbolConverter(string symbol)
+        public TradingPair SplitSymbolConverter(string symbol)
         {
             var name = symbol.Split("_").FirstOrDefault();
             var quote = symbol.Split("_").LastOrDefault();
@@ -48,7 +48,7 @@ namespace CryptoApi.Static
             return null;
         }
 
-        public  static List<GateIOData> GetTickerFullData()
+        public List<GateIOData> GetTickerFullData()
         {
             RestResponse response = RestRequester.GetRequest(new Uri(ExchangesApiLinks.GateIOSpotTicker)).Result;
             if (response?.StatusCode == HttpStatusCode.OK)
@@ -62,9 +62,9 @@ namespace CryptoApi.Static
 
             };
         }
-        public static SymbolTimedExInfo GetExchangeData()
+        public SymbolTimedExInfo GetExchangeData()
         {
-            var pairs = PairsListConverter(GetTickerFullData());
+            var pairs = ExchangePairsConverter(GetTickerFullData());
             return new SymbolTimedExInfo()
             {
                 CreationTime = DateTime.Now,

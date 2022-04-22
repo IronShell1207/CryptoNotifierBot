@@ -267,7 +267,7 @@ namespace TelegramBot.Static.MessageHandlers
             }
         }
 
-        public async void SetExchangeStageCP(Update update)
+        public async Task SetExchangeStageCP(Update update)
         {
             var exchange = update.CallbackQuery.Data;
             var pair = GetTempUserTask(update).Result;
@@ -289,7 +289,11 @@ namespace TelegramBot.Static.MessageHandlers
             if (price > 0)
                 pair.Price = price;
             if (pair.ToString() == "/")
-                BotApi.SendMessage(update.Message.Chat.Id, "Task creating expired. Start again");
+            {
+                BotApi.EditMessage(update.Message.Chat.Id, BotApi.GetMessageIdFromUpdateTask(update).Result,
+                    "Task creating expired. Start again");
+               // BotApi.SendMessage(update.Message.Chat.Id, );
+            }
             else
             {
                 var curprice = ExchangesCheckerForUpdates.GetCurrentPrice(new TradingPair(
@@ -332,7 +336,7 @@ namespace TelegramBot.Static.MessageHandlers
 
                 var msg = CultureTextRequest.GetSettingsMsgString("CPEditTaskCreated", user.Language);
                 var formatedmsg = $"{msg} {pair.FullTaskInfo(user.Language)}";
-                BotApi.SendMessage(BotApi.GetTelegramIdFromUpdate(update).Identifier, formatedmsg, ParseMode.Html);
+                BotApi.EditMessage(BotApi.GetTelegramIdFromUpdate(update).Identifier, BotApi.GetMessageIdFromUpdateTask(update).Result, formatedmsg, ParseMode.Html);
             }
         }
 

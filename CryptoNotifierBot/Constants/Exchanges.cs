@@ -12,7 +12,7 @@ namespace CryptoApi.Constants
         public static string Okx = "Okx";
         public static string Binance = "Binance";
         public static string Kucoin = "Kucoin";
-
+        public static string Bitget = "Bitget";
         public static bool Contains(string name)
         {
             if (name == GateIO || name == Okx || name == Binance || name == Kucoin)

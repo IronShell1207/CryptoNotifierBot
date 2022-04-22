@@ -34,15 +34,19 @@ namespace TelegramBot.Static
 
         public static async void ExchangesUpdaterLoop()
         {
+            var binanceApi = new BinanceApi();
+            var gateIOApi = new GateioApi();
+            var okxApi = new OkxApi();
+            var kucoinApi = new KucoinAPI();
             while (true)
             {
                 //try
                 // {
 
-                binancePairsData = BinanceApi.GetExchangeData();
-                gateioPairsData = GateioApi.GetExchangeData();
-                okxPairsData = OkxApi.GetExchangeData();
-                kucoinPairsData = KucoinAPI.GetExchangeData();
+                binancePairsData = binanceApi.GetExchangeData();
+                gateioPairsData = gateIOApi.GetExchangeData();
+                okxPairsData = okxApi.GetExchangeData();
+                kucoinPairsData = kucoinApi.GetExchangeData();
                 var list = new List<SymbolTimedExInfo>()
                     {binancePairsData, gateioPairsData, okxPairsData, kucoinPairsData};
                 MarketData.Add(list);

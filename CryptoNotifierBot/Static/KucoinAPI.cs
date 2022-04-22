@@ -14,9 +14,9 @@ using RestSharp;
 
 namespace CryptoApi.Static
 {
-    public class KucoinAPI
+    public class KucoinAPI : TheDisposable, ITradingApi
     {
-        public static List<CryptoExchangePairInfo>PairsListConverter(List<KucoinData.Ticker> list)
+        public List<CryptoExchangePairInfo>PairsListConverter(List<KucoinData.Ticker> list)
         {
             var listReturner = new List<CryptoExchangePairInfo>();
             if (list != null)
@@ -32,7 +32,7 @@ namespace CryptoApi.Static
             return listReturner;
         }
 
-        public static TradingPair SplitSymbolConverter(string symbol)
+        public TradingPair SplitSymbolConverter(string symbol)
         {
             var name = symbol.Split("-").FirstOrDefault();
             var quote = symbol.Split("-").LastOrDefault();
@@ -47,7 +47,7 @@ namespace CryptoApi.Static
             return null;
         }
 
-        public static List<KucoinData.Ticker> GetTickerFullData()
+        public List<KucoinData.Ticker> GetTickerFullData()
         {
             RestResponse response = RestRequester.GetRequest(new Uri(ExchangesApiLinks.KucoinSpotTicker)).Result;
             if (response?.StatusCode == HttpStatusCode.OK)
@@ -61,7 +61,7 @@ namespace CryptoApi.Static
             {
             };
         }
-        public static SymbolTimedExInfo GetExchangeData()
+        public SymbolTimedExInfo GetExchangeData()
         
         {
             var pairs = PairsListConverter(GetTickerFullData());

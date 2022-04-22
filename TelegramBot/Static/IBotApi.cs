@@ -26,6 +26,7 @@ namespace TelegramBot.Static
         public static bool IsBotStarted;
         public static TelegramBotClient BotClient { get; set; }
         public static CancellationTokenSource CancelToken { get; set; }
+
         public static async Task<bool> StartBotAsync()
         {
             try
@@ -50,12 +51,14 @@ namespace TelegramBot.Static
         }
 
         #region Updates
+
         public static async Task UpdateHandler(ITelegramBotClient bot, Update update, CancellationToken canceltoken)
         {
             if (!string.IsNullOrWhiteSpace(update.Message?.ReplyToMessage?.Text))
             {
                 RepliedMsgHandlerAsync(bot, update, canceltoken);
             }
+
             if (update.Type == UpdateType.Message && update.Message != null)
             {
                 var user = GetUserSettings(update.Message?.Chat?.Id);
@@ -86,7 +89,6 @@ namespace TelegramBot.Static
                     using (BreakoutPairsMsgHandler msg = new BreakoutPairsMsgHandler())
                         msg.SetTimings(update);
 
-
             }
             else if (update.Type == UpdateType.CallbackQuery)
                 CallbackHandlerAsync(bot, update, canceltoken);
@@ -96,30 +98,36 @@ namespace TelegramBot.Static
             CancellationToken cancellationToken)
         {
             if (update.Message?.Text == Commands.Subscribe)
-                using (BreakoutPairsMsgHandler msghandler = new BreakoutPairsMsgHandler()) msghandler.SubNewUserBreakouts(update);
+                using (BreakoutPairsMsgHandler msghandler = new BreakoutPairsMsgHandler())
+                    msghandler.SubNewUserBreakouts(update);
             else if (update.Message?.Text == Commands.SubSettings)
-                using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler()) msgHandler.SubSettings(update);
+                using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler())
+                    msgHandler.SubSettings(update);
             else if (update.Message?.Text == Commands.SubStop)
-                using (BreakoutPairsMsgHandler msgH = new BreakoutPairsMsgHandler()) msgH.StopNotify(update);
+                using (BreakoutPairsMsgHandler msgH = new BreakoutPairsMsgHandler())
+                    msgH.StopNotify(update);
             else if (Commands.AllTasks == update.Message.Text)
-                using (CryptoPairsMsgHandler cr = new CryptoPairsMsgHandler()) cr.ListAllTask(update);
+                using (CryptoPairsMsgHandler cr = new CryptoPairsMsgHandler())
+                    cr.ListAllTask(update);
         }
+
         public static async void RepliedMsgHandlerAsync(ITelegramBotClient bot, Update update,
             CancellationToken canceltoken)
         {
             var user = GetUserSettings(update.Message.Chat.Id).Result;
             var editPriceMsgRegex =
                 CommandsRegex.ConvertMessageToRegex(CultureTextRequest.GetMessageString("CPEditPair", user.Language),
-                    new List<string>() { @"(?<base>[a-zA-Z0-9]{2,9})(\s+|/)(?<quote>[a-zA-Z0-9]{2,6})", "(?<id>[0-9]+)" });
+                    new List<string>()
+                        {@"(?<base>[a-zA-Z0-9]{2,9})(\s+|/)(?<quote>[a-zA-Z0-9]{2,6})", "(?<id>[0-9]+)"});
 
             if (update.Message.ReplyToMessage.Text == Messages.newPairRequestingForPair)
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
                     msgh.CreatingPairStageCP(update);
-            
+
             else if (update.Message.ReplyToMessage.Text == Messages.newPairWrongPrice)
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
                     msgh.SetTriggerPriceStageCP(update);
-            
+
             else if (update.Message.ReplyToMessage.Text == Messages.newPairAfterExchangeSetPrice)
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
                     msgh.SetTriggerPriceStageCP(update);
@@ -130,31 +138,39 @@ namespace TelegramBot.Static
                     msgHandler.AddPairToBlackListCommandHandler(update);
 
             else if (editPriceMsgRegex.IsMatch(update.Message.ReplyToMessage.Text))
-                using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler()) 
+                using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
                     msgHandler.EditUserTaskReplyHandler(update, user);
-            
+
 
 
 
         }
+
         public static async void CallbackHandlerAsync(ITelegramBotClient bot, Update update,
             CancellationToken cancellationToken)
         {
             EditMessage(GetTelegramIdFromUpdate(update), update.CallbackQuery.Message.MessageId, true);
             if (Exchanges.Contains(update.CallbackQuery.Data))
-                using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler()) msgh.SetExchangeStageCP(update);
+                using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
+                    msgh.SetExchangeStageCP(update);
             else if (CallbackDataPatterns.DeletePairRegex.IsMatch(update.CallbackQuery.Data))
-                using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler()) msgh.RemoveUserTaskCallbackHandler(update);
+                using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
+                    msgh.RemoveUserTaskCallbackHandler(update);
             else if (CallbackDataPatterns.EditPairRegex.IsMatch(update.CallbackQuery.Data))
-                using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler()) msgh.EditUserTaskCallbackHandler(update);
+                using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
+                    msgh.EditUserTaskCallbackHandler(update);
         }
+
         public static Task ErrorHandler(ITelegramBotClient botClient, Exception ex, CancellationToken csToken)
         {
             Console.WriteLine(ex.Message);
             return Task.CompletedTask;
         }
+
         #endregion
+
         #region Send or edit
+
         public static async Task SendMessage(ChatId chatId, string message, ParseMode parse = ParseMode.MarkdownV2)
         {
             try
@@ -162,7 +178,8 @@ namespace TelegramBot.Static
                 var messagelenght = message.Length;
                 if (messagelenght > 4125)
                     for (int i = 0; i < messagelenght / 3500; i++)
-                        await BotClient.SendTextMessageAsync(chatId, message.Substring(i * 3500, i + 3500), parse, disableWebPagePreview: true);
+                        await BotClient.SendTextMessageAsync(chatId, message.Substring(i * 3500, i + 3500), parse,
+                            disableWebPagePreview: true);
                 else
                     await BotClient.SendTextMessageAsync(chatId, message, parse, disableWebPagePreview: true);
             }
@@ -185,6 +202,7 @@ namespace TelegramBot.Static
                 else throw;
             }
         }
+
         public static async Task SendMessage(ChatId chatId, string message)
         {
             try
@@ -215,6 +233,7 @@ namespace TelegramBot.Static
                 else throw;
             }
         }
+
         public static ChatId GetTelegramIdFromUpdate(Update update)
         {
             if (update.Message?.Chat.Id != null)
@@ -223,6 +242,7 @@ namespace TelegramBot.Static
                 return update.CallbackQuery.From.Id;
             else return null;
         }
+
         public static async Task SendMessage(ChatId chatId, string message, bool replythis)
         {
             try
@@ -263,18 +283,16 @@ namespace TelegramBot.Static
             }
         }
 
-        public static async Task EditMessage(ChatId chatId, string newMessage, int messageID)
+        public static async Task EditMessage(ChatId chatId, int messageID, string newMessage)
         {
             await BotClient.EditMessageTextAsync(chatId, messageID, newMessage);
-            //try
-            //{
-
-            //}
-            //catch (Exception ex) 
-            //{
-
-            //}
         }
+
+        public static async Task EditMessage(ChatId chatId, int messageId, string message, ParseMode parseMode)
+        {
+            await BotClient.EditMessageTextAsync(chatId, messageId, message, parseMode: parseMode);
+        }
+
         /// <summary>
         /// Editing self message for revoking inline keyboard
         /// </summary>
@@ -282,16 +300,18 @@ namespace TelegramBot.Static
         /// <param name="messageID">Message id</param>
         /// <param name="removeKeyboard">New reply keyboard or null</param>
         /// <returns></returns>
-        public static async Task EditMessage(ChatId chatId, int messageID, bool removeKeyboard)
+        public static async Task EditMessage(ChatId chatId, int messageID, bool revokeKB)
         {
             await BotClient.EditMessageReplyMarkupAsync(chatId, messageID, null);
         }
 
         #endregion
+
         #region UsersStuff
 
         public static async Task<UserConfig> GetUserSettings(Update update) =>
             GetUserSettings(GetTelegramIdFromUpdate(update)).Result;
+
         public static async Task<UserConfig> GetUserSettings(int userId)
         {
             using (AppDbContext db = new AppDbContext())
@@ -301,9 +321,11 @@ namespace TelegramBot.Static
                 {
                     return null;
                 }
+
                 return user;
             }
         }
+
         public static async Task<UserConfig> GetUserSettings(ChatId chatId)
         {
             using (AppDbContext db = new AppDbContext())
@@ -313,16 +335,24 @@ namespace TelegramBot.Static
                 {
                     user = new UserConfig()
                     {
-                        TelegramId = (long)chatId.Identifier
+                        TelegramId = (long) chatId.Identifier
                     };
                     db.Users.Add(user);
                     await SendMessage(chatId, Messages.welcomeMsg);
                     await db.SaveChangesAsync();
                 }
+
                 return user;
             }
         }
 
-        #endregion
+        public static async Task<int> GetMessageIdFromUpdateTask(Update update)
+        {
+            if (update.Message?.MessageId != null) return update.Message.MessageId;
+            else if (update.CallbackQuery?.Message?.MessageId != null) return update.CallbackQuery.Message.MessageId;
+            else return 0;
+        }
+
+    #endregion
     }
 }

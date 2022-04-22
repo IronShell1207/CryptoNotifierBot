@@ -9,7 +9,7 @@ namespace CryptoApi
     {
         static void Main(string[] args)
         {
-            var data = OkxApi.GetExchangeData();
+           // var data = OkxApi.GetExchangeData();
             //Task.Run(()=>
             //{
             //    while (true) ExchangeDataKeeper.DataUpdater();

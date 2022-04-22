@@ -12,9 +12,9 @@ using RestSharp;
 
 namespace CryptoApi.Static
 {
-    public class OkxApi
+    public class OkxApi : TheDisposable, ITradingApi
     {
-        public static List<CryptoExchangePairInfo> PairsListConverter(List<OkxPairsInfo> list)
+        public List<CryptoExchangePairInfo> PairsListConverter(List<OkxPairsInfo> list)
         {
             var listReturner = new List<CryptoExchangePairInfo>();
             if (list != null)
@@ -31,7 +31,7 @@ namespace CryptoApi.Static
             return listReturner;
         }
 
-        public static TradingPair SplitSymbolConverter(string symbol)
+        public TradingPair SplitSymbolConverter(string symbol)
         {
             var name = symbol.Split("-").FirstOrDefault();
             var quote = symbol.Split("-").LastOrDefault();
@@ -46,7 +46,7 @@ namespace CryptoApi.Static
             return null;
         }
 
-        public static OkxData GetTickerFullData()
+        public OkxData GetTickerFullData()
         {
 
             RestResponse response = RestRequester.GetRequest(new Uri(ExchangesApiLinks.OkxSpotTicker)).Result;
@@ -62,7 +62,7 @@ namespace CryptoApi.Static
             };
         }
 
-        public static SymbolTimedExInfo GetExchangeData()
+        public SymbolTimedExInfo GetExchangeData()
         {
             var pairs = PairsListConverter(GetTickerFullData()?.data?.ToList());
             return new SymbolTimedExInfo()

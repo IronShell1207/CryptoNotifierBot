@@ -18,7 +18,8 @@ namespace CryptoApi.Tests
         [Test]
         public void BinanceApiFullInfoGetter()
         {
-            var data = BinanceApi.GetFullData();
+            var binanceApi = new BinanceApi();
+            var data = binanceApi.GetFullData();
             if (data is BinanceSymbolsData)
             {
                 var sdata = data.symbols?[new Random(2).Next(0, data.symbols.Length-1)]; 
@@ -30,7 +31,8 @@ namespace CryptoApi.Tests
         [Test]
         public void BinanceApiExGetter()
         {
-            var data = BinanceApi.GetExchangeData();
+            var binanceApi = new BinanceApi();
+            var data = binanceApi.GetExchangeData();
             if (data is SymbolTimedExInfo)
             {
                 var sdata = data.Pairs[new Random(23).Next(0,data.Pairs.Count-1)];
@@ -43,7 +45,8 @@ namespace CryptoApi.Tests
         [Test]
         public void OkxApiTester()
         {
-            var data = OkxApi.GetExchangeData();
+            var okxApi = new OkxApi();
+            var data = okxApi.GetExchangeData();
             if (data is SymbolTimedExInfo && data.Pairs.Any())
             {
                 var bitcoinprice = data.Pairs.Find(x => x.Symbol.Name == "BTC" && x.Symbol.Quote == "USDT");
@@ -57,7 +60,8 @@ namespace CryptoApi.Tests
         [Test]
         public void GateioApiTester()
         {
-            var data = GateioApi.GetExchangeData();
+            var gateApi = new GateioApi();
+            var data = gateApi.GetExchangeData();
             if (data is SymbolTimedExInfo)
             {
                 var bitcoinprice = data.Pairs.Find(x => x.Symbol.Name == "BTC" && x.Symbol.Quote == "USDT");
@@ -72,7 +76,8 @@ namespace CryptoApi.Tests
         [Test]
         public void KucoinApiTester()
         {
-            var data = KucoinAPI.GetExchangeData();
+            var kucoapi = new KucoinAPI();
+            var data = kucoapi.GetExchangeData();
             if (data is SymbolTimedExInfo)
             {
                 var BTCPrice = data.Pairs.Find(x => x.Symbol.ToString() == "BTC/USDT");
@@ -85,26 +90,46 @@ namespace CryptoApi.Tests
         [Test]
         public void KucoinConverterNullTester()
         {
+            var kucoapi = new KucoinAPI();
             List<KucoinData.Ticker> list = null;
-            var converted=  KucoinAPI.PairsListConverter(list);
+            var converted= kucoapi.PairsListConverter(list);
             if (converted != null && converted.Count==0) Assert.Pass();
             Assert.Fail();
         }
         [Test]
         public void OkxConverterNullTester()
         {
+            var okxApi = new OkxApi();
             List<OkxPairsInfo> list = null;
-            var converted = OkxApi.PairsListConverter(list);
+            var converted = okxApi.PairsListConverter(list);
             if (converted != null && converted.Count == 0) Assert.Pass();
             Assert.Fail();
         }
         [Test]
         public void GateioConverterNullTester()
         {
+            var gateapi = new GateioApi();
             List<GateIOData> list = null;
-            var converted = GateioApi.PairsListConverter(list);
+            var converted = gateapi.ExchangePairsConverter(list);
             if (converted != null && converted.Count == 0) Assert.Pass();
             Assert.Fail();
+        }
+
+        [Test]
+        public void BitgetDataTester()
+        {
+            using (var bitgetApi = new BitgetApi())
+            {
+                var data= bitgetApi.GetExchangeData();
+                if (data is SymbolTimedExInfo && data.Pairs.Any())
+                {
+                    var bitcoin = data.Pairs.FirstOrDefault(x => x.Symbol.ToString() == "BTC/USDT");
+                    var btcprice = bitcoin.Price;
+                    if (btcprice > 0) Assert.Pass(btcprice.ToString());
+                    
+                }
+                else Assert.Fail(data.ToString());
+            }
         }
 
     }

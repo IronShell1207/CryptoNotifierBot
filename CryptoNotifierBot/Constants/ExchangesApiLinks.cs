@@ -15,6 +15,7 @@ namespace CryptoApi.Constants
         public static string OkxSpotTicker = "https://www.okx.com/api/v5/market/tickers?instType=SPOT";
         public static string GateIOSpotTicker = "https://api.gateio.ws/api/v4/spot/tickers";
         public static string KucoinSpotTicker = "https://api.kucoin.com/api/v1/market/allTickers";
+        public static string BitgetSpotTicker = "https://capi.bitgetapi.com/api/spot/v1/market/tickers";
     }
 
 }
