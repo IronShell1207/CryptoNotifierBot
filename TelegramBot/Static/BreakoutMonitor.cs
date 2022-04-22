@@ -110,7 +110,8 @@ namespace TelegramBot.Static
                             if ((platform == Exchanges.Binance && sub.BinanceSub)
                                 || (platform == Exchanges.Kucoin && sub.KucoinSub)
                                 || (platform == Exchanges.Okx && sub.OkxSub)
-                                || (platform == Exchanges.GateIO && sub.GateioSub))
+                                || (platform == Exchanges.GateIO && sub.GateioSub) 
+                                || (platform == Exchanges.Bitget && sub.BitgetSub))
                             {
                                 Console.WriteLine($"{sub.TelegramId}");
                                 StringBuilder sb = new StringBuilder($"Updated data from {platform}:\n");

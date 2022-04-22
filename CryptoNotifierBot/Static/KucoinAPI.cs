@@ -47,11 +47,11 @@ namespace CryptoApi.Static
             return null;
         }
 
-        public List<KucoinData.Ticker> GetTickerFullData()
+        public async Task<List<KucoinData.Ticker>> GetTickerFullData()
         {
             using (var restRequester = new RestRequester())
             {
-                RestResponse response = restRequester.GetRequest(new Uri(ExchangesApiLinks.KucoinSpotTicker)).Result;
+                RestResponse response = await restRequester.GetRequest(new Uri(ExchangesApiLinks.KucoinSpotTicker));
                 if (response?.StatusCode == HttpStatusCode.OK)
                 {
                     JsonSerializer serializer = new JsonSerializer();
@@ -66,10 +66,10 @@ namespace CryptoApi.Static
             {
             };
         }
-        public SymbolTimedExInfo GetExchangeData()
-        
+        public async Task<SymbolTimedExInfo> GetExchangeData()
         {
-            var pairs = PairsListConverter(GetTickerFullData());
+            var data = await GetTickerFullData();
+            var pairs = PairsListConverter(data);
             return new SymbolTimedExInfo()
             {
                 CreationTime = DateTime.Now,

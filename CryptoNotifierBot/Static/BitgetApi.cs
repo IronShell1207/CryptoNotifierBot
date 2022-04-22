@@ -47,9 +47,9 @@ namespace CryptoApi.Static
             }
             return null;
         }
-        public SymbolTimedExInfo GetExchangeData()
+        public async Task<SymbolTimedExInfo> GetExchangeData()
         {
-            var pairs = ExchangePairsConverter(GetTickerFullData());
+            var pairs = ExchangePairsConverter(await GetTickerFullData());
             return new SymbolTimedExInfo()
             {
                 CreationTime = DateTime.Now,
@@ -57,11 +57,11 @@ namespace CryptoApi.Static
                 Exchange = Exchanges.Bitget
             };
         }
-        public List<BitgetTicker> GetTickerFullData()
+        public async Task<List<BitgetTicker>> GetTickerFullData()
         {
             using (var restRequester = new RestRequester())
             {
-                RestResponse response = restRequester.GetRequest(new Uri(ExchangesApiLinks.BitgetSpotTicker)).Result;
+                RestResponse response = await restRequester.GetRequest(new Uri(ExchangesApiLinks.BitgetSpotTicker));
                 if (response?.StatusCode == HttpStatusCode.OK)
                 {
                     JsonSerializer serializer = new JsonSerializer();

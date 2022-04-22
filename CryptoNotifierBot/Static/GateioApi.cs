@@ -48,11 +48,11 @@ namespace CryptoApi.Static
             return null;
         }
 
-        public List<GateIOData> GetTickerFullData()
+        public async Task<List<GateIOData>> GetTickerFullData()
         {
             using (var restRequester = new RestRequester())
             {
-                RestResponse response = restRequester.GetRequest(new Uri(ExchangesApiLinks.GateIOSpotTicker)).Result;
+                RestResponse response = await restRequester.GetRequest(new Uri(ExchangesApiLinks.GateIOSpotTicker));
                 if (response?.StatusCode == HttpStatusCode.OK)
                 {
                     JsonSerializer serializer = new JsonSerializer();
@@ -66,9 +66,9 @@ namespace CryptoApi.Static
 
             };
         }
-        public SymbolTimedExInfo GetExchangeData()
+        public async Task<SymbolTimedExInfo> GetExchangeData()
         {
-            var pairs = ExchangePairsConverter(GetTickerFullData());
+            var pairs = ExchangePairsConverter(await GetTickerFullData());
             return new SymbolTimedExInfo()
             {
                 CreationTime = DateTime.Now,

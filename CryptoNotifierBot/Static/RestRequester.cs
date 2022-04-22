@@ -23,7 +23,6 @@ namespace CryptoApi.Static
                 var request = new RestRequest(Link);
                 request.Method = Method.Get;
                 request.Timeout = 6000;
-
                 var client = new RestClient();
                 var result = await client.ExecuteAsync(request);
                 if (!result.IsSuccessful)

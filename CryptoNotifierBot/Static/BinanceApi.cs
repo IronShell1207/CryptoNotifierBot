@@ -22,7 +22,6 @@ namespace CryptoApi.Static
         public List<CryptoExchangePairInfo> ExchangePairsConverter(List<BinancePair> list)
         {
             var listReturner = new List<CryptoExchangePairInfo>();
-            //var listbi = list as List<BinancePair>;
             if (list != null)
             {
                 foreach (BinancePair pair in list)
@@ -51,11 +50,11 @@ namespace CryptoApi.Static
             return null;
 
         }
-        public SymbolTimedExInfo GetExchangeData()
+        public async Task<SymbolTimedExInfo> GetExchangeData()
         {
             using (var restRequester = new RestRequester())
             {
-                RestResponse response = restRequester.GetRequest(new Uri(ExchangesApiLinks.BinanceClearTicker)).Result;
+                RestResponse response = await restRequester.GetRequest(new Uri(ExchangesApiLinks.BinanceClearTicker));
                 JsonSerializer serializer = new JsonSerializer();
                 if (response?.StatusCode == HttpStatusCode.OK)
                 {
@@ -71,10 +70,9 @@ namespace CryptoApi.Static
                     };
                 }
 
-                Console.WriteLine(
-                    $"[{DateTime.Now.ToString()}] Binance api request failed. Status code: {response?.StatusCode}, {response?.ErrorMessage}");
+                Console.WriteLine($"[{DateTime.Now.ToString()}] Binance api request failed. Status code: {response?.StatusCode}, {response?.ErrorMessage}");
                 Thread.Sleep(4000);
-                return GetExchangeData();
+                return GetExchangeData().Result;
 
             }
         }

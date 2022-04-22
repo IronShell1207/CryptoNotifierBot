@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using CryptoApi.Constants;
 using CryptoApi.Objects;
 using CryptoApi.Objects.ExchangesPairs;
@@ -46,27 +47,25 @@ namespace CryptoApi.Static
             return null;
         }
 
-        public OkxData GetTickerFullData()
+        public async Task<List<OkxPairsInfo>> GetTickerFullData()
         {
             using (var restRequester = new RestRequester())
             {
-                RestResponse response = restRequester.GetRequest(new Uri(ExchangesApiLinks.OkxSpotTicker)).Result;
+                RestResponse response = await restRequester.GetRequest(new Uri(ExchangesApiLinks.OkxSpotTicker));
                 if (response?.StatusCode == HttpStatusCode.OK)
                 {
                     JsonSerializer serializer = new JsonSerializer();
-                    return serializer.Deserialize<OkxData>(new JsonTextReader(new StringReader(response.Content)));
+                    var data = serializer.Deserialize<OkxData>(new JsonTextReader(new StringReader(response.Content)));
+                    return data.data.ToList();
                 }
             }
 
-            return new OkxData()
-            {
-                data = Array.Empty<OkxPairsInfo>()
-            };
+            return new List<OkxPairsInfo>();
         }
 
-        public SymbolTimedExInfo GetExchangeData()
+        public async Task<SymbolTimedExInfo> GetExchangeData()
         {
-            var pairs = PairsListConverter(GetTickerFullData()?.data?.ToList());
+            var pairs = PairsListConverter(await GetTickerFullData());
             return new SymbolTimedExInfo()
             {
                 CreationTime = DateTime.Now,

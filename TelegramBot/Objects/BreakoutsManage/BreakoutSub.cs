@@ -18,6 +18,7 @@ namespace TelegramBot.Objects
         public bool GateioSub { get; set; } = true;
         public bool BinanceSub { get; set; } = true;
         public bool KucoinSub { get; set; } = true;
+        public bool BitgetSub { get; set; } = true;
         public bool OkxSub { get; set; } = true;
         public bool S5MinUpdates { get; set; } = true;
         public bool S2MinUpdates { get; set; } = false;

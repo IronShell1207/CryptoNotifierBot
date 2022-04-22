@@ -11,6 +11,7 @@ namespace CryptoApi.Objects
     {
         public string Name { get; set; }
         public string Quote { get; set; }
+        public string Exchange { get; set; }
 
         public override string ToString()
         {
@@ -23,6 +24,12 @@ namespace CryptoApi.Objects
         {
             this.Name = name;
             this.Quote = quote;
+        }
+        public TradingPair(string name, string quote, string exchange)
+        {
+            Exchange = exchange;
+            Name = name;
+            Quote = quote;
         }
     }
 }

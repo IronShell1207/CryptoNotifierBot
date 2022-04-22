@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
+using System.Threading;
+using System.Threading.Tasks;
 using CryptoApi.Objects;
 using CryptoApi.Objects.ExchangesPairs;
 using CryptoApi.Static;
@@ -9,6 +11,7 @@ using NUnit.Framework;
 using CryptoApi;
 using CryptoApi.Constants;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using TelegramBot.Static;
 
 namespace CryptoApi.Tests
 {
@@ -16,7 +19,7 @@ namespace CryptoApi.Tests
     {
 
         [Test]
-        public void BinanceApiFullInfoGetter()
+        public async Task BinanceApiFullInfoGetter()
         {
             var binanceApi = new BinanceApi();
             var data = binanceApi.GetFullData();
@@ -29,10 +32,10 @@ namespace CryptoApi.Tests
             Assert.Fail();
         }
         [Test]
-        public void BinanceApiExGetter()
+        public async Task BinanceApiExGetter()
         {
             var binanceApi = new BinanceApi();
-            var data = binanceApi.GetExchangeData();
+            var data = await binanceApi.GetExchangeData();
             if (data is SymbolTimedExInfo)
             {
                 var sdata = data.Pairs[new Random(23).Next(0,data.Pairs.Count-1)];
@@ -43,10 +46,10 @@ namespace CryptoApi.Tests
         }
 
         [Test]
-        public void OkxApiTester()
+        public async Task OkxApiTester()
         {
             var okxApi = new OkxApi();
-            var data = okxApi.GetExchangeData();
+            var data = await okxApi.GetExchangeData();
             if (data is SymbolTimedExInfo && data.Pairs.Any())
             {
                 var bitcoinprice = data.Pairs.Find(x => x.Symbol.Name == "BTC" && x.Symbol.Quote == "USDT");
@@ -58,10 +61,10 @@ namespace CryptoApi.Tests
             Assert.Fail();
         }
         [Test]
-        public void GateioApiTester()
+        public async Task GateioApiTester()
         {
             var gateApi = new GateioApi();
-            var data = gateApi.GetExchangeData();
+            var data = await gateApi.GetExchangeData();
             if (data is SymbolTimedExInfo)
             {
                 var bitcoinprice = data.Pairs.Find(x => x.Symbol.Name == "BTC" && x.Symbol.Quote == "USDT");
@@ -74,10 +77,10 @@ namespace CryptoApi.Tests
         }
 
         [Test]
-        public void KucoinApiTester()
+        public async Task KucoinApiTester()
         {
             var kucoapi = new KucoinAPI();
-            var data = kucoapi.GetExchangeData();
+            var data = await kucoapi.GetExchangeData();
             if (data is SymbolTimedExInfo)
             {
                 var BTCPrice = data.Pairs.Find(x => x.Symbol.ToString() == "BTC/USDT");
@@ -116,11 +119,11 @@ namespace CryptoApi.Tests
         }
 
         [Test]
-        public void BitgetDataTester()
+        public async Task BitgetDataTester()
         {
             using (var bitgetApi = new BitgetApi())
             {
-                var data= bitgetApi.GetExchangeData();
+                var data= await bitgetApi.GetExchangeData();
                 if (data is SymbolTimedExInfo && data.Pairs.Any())
                 {
                     var bitcoin = data.Pairs.FirstOrDefault(x => x.Symbol.ToString() == "BTC/USDT");
@@ -129,6 +132,25 @@ namespace CryptoApi.Tests
                     
                 }
                 else Assert.Fail(data.ToString());
+            }
+        }
+
+        [Test]
+        public async Task LoopTester()
+        {
+            var time = DateTime.Now;
+            Task.Run(ExchangesCheckerForUpdates.ExchangesUpdaterLoop);
+            while (!ExchangesCheckerForUpdates.DataAvailable)
+            {
+                Thread.Sleep(100);
+            }
+            var btc = ExchangesCheckerForUpdates.binancePairsData.Pairs.FirstOrDefault(x =>
+                x.Symbol.ToString() == "BTC/USDT".ToUpper());
+            if (btc != null && btc.Symbol.ToString() == "BTC/USDT" && btc.Price>0)
+            {
+                ExchangesCheckerForUpdates.DataUpdating = false;
+                var timeNow = DateTime.Now - time;
+                Assert.Pass($"{btc.Symbol.ToString()}: {btc.Price}, time elapsed: {timeNow.Minutes*60+timeNow.Seconds} secs");
             }
         }
 

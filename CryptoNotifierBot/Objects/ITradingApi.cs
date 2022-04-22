@@ -8,7 +8,7 @@ namespace CryptoApi.Objects
 {
     public interface ITradingApi
     {
-        public SymbolTimedExInfo GetExchangeData();
+        public Task<SymbolTimedExInfo> GetExchangeData();
         //  public  List<CryptoExchangePairInfo> ExchangePairsConverter(List<object> list);
     }
 }
