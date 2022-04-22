@@ -290,7 +290,7 @@ namespace TelegramBot.Static
 
         public static async Task EditMessage(ChatId chatId, int messageId, string message, ParseMode parseMode)
         {
-            await BotClient.EditMessageTextAsync(chatId, messageId, message, parseMode: parseMode);
+            await BotClient.EditMessageTextAsync(chatId, messageId, message, parseMode: parseMode, disableWebPagePreview:true);
         }
 
         /// <summary>

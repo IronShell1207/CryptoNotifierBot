@@ -336,7 +336,7 @@ namespace TelegramBot.Static.MessageHandlers
 
                 var msg = CultureTextRequest.GetSettingsMsgString("CPEditTaskCreated", user.Language);
                 var formatedmsg = $"{msg} {pair.FullTaskInfo(user.Language)}";
-                BotApi.EditMessage(BotApi.GetTelegramIdFromUpdate(update).Identifier, BotApi.GetMessageIdFromUpdateTask(update).Result, formatedmsg, ParseMode.Html);
+                BotApi.SendMessage(BotApi.GetTelegramIdFromUpdate(update).Identifier, formatedmsg, ParseMode.Html);
             }
         }
 
