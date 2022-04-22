@@ -9,13 +9,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CryptoApi.Constants;
+using CryptoApi.Objects;
 using RestSharp;
 
 namespace CryptoApi.Static
 {
-    public class RestRequester
+    public class RestRequester : TheDisposable
     {
-        public async static Task<RestResponse> GetRequest(Uri Link)
+        public async Task<RestResponse> GetRequest(Uri Link)
         {
             try
             {
@@ -36,7 +37,7 @@ namespace CryptoApi.Static
             }
         }
 
-        private static HttpClient ProxyClient(Uri link)
+        private HttpClient ProxyClient(Uri link)
         {
             List<Uri> ProxyList = new List<Uri>()
             {
@@ -72,7 +73,7 @@ namespace CryptoApi.Static
             };
         }
 
-        private async static Task<bool> CheckProxy(HttpClient client)
+        private async Task<bool> CheckProxy(HttpClient client)
         {
             bool isfirstry = true;
             start:

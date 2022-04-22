@@ -59,13 +59,17 @@ namespace CryptoApi.Static
         }
         public List<BitgetTicker> GetTickerFullData()
         {
-            RestResponse response = RestRequester.GetRequest(new Uri(ExchangesApiLinks.BitgetSpotTicker)).Result;
-            if (response?.StatusCode == HttpStatusCode.OK)
+            using (var restRequester = new RestRequester())
             {
-                JsonSerializer serializer = new JsonSerializer();
-                var data = serializer.Deserialize<BitgetData>(new JsonTextReader(new StringReader(response.Content)));
-                if (data.msg == "success")
-                    return data.data.ToList();
+                RestResponse response = restRequester.GetRequest(new Uri(ExchangesApiLinks.BitgetSpotTicker)).Result;
+                if (response?.StatusCode == HttpStatusCode.OK)
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    var data = serializer.Deserialize<BitgetData>(
+                        new JsonTextReader(new StringReader(response.Content)));
+                    if (data.msg == "success")
+                        return data.data.ToList();
+                }
             }
 
             return new List<BitgetTicker>()

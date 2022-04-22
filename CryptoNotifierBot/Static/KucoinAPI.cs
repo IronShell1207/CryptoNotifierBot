@@ -49,12 +49,17 @@ namespace CryptoApi.Static
 
         public List<KucoinData.Ticker> GetTickerFullData()
         {
-            RestResponse response = RestRequester.GetRequest(new Uri(ExchangesApiLinks.KucoinSpotTicker)).Result;
-            if (response?.StatusCode == HttpStatusCode.OK)
+            using (var restRequester = new RestRequester())
             {
-                JsonSerializer serializer = new JsonSerializer();
-                var kudata = serializer.Deserialize<KucoinData.Rootobject>(new JsonTextReader(new StringReader(response.Content)));
-                return kudata.data.ticker.ToList();
+                RestResponse response = restRequester.GetRequest(new Uri(ExchangesApiLinks.KucoinSpotTicker)).Result;
+                if (response?.StatusCode == HttpStatusCode.OK)
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    var kudata =
+                        serializer.Deserialize<KucoinData.Rootobject>(
+                            new JsonTextReader(new StringReader(response.Content)));
+                    return kudata.data.ticker.ToList();
+                }
             }
 
             return new List<KucoinData.Ticker>()

@@ -50,11 +50,15 @@ namespace CryptoApi.Static
 
         public List<GateIOData> GetTickerFullData()
         {
-            RestResponse response = RestRequester.GetRequest(new Uri(ExchangesApiLinks.GateIOSpotTicker)).Result;
-            if (response?.StatusCode == HttpStatusCode.OK)
+            using (var restRequester = new RestRequester())
             {
-                JsonSerializer serializer = new JsonSerializer();
-                return serializer.Deserialize<List<GateIOData>>(new JsonTextReader(new StringReader(response.Content)));
+                RestResponse response = restRequester.GetRequest(new Uri(ExchangesApiLinks.GateIOSpotTicker)).Result;
+                if (response?.StatusCode == HttpStatusCode.OK)
+                {
+                    JsonSerializer serializer = new JsonSerializer();
+                    return serializer.Deserialize<List<GateIOData>>(
+                        new JsonTextReader(new StringReader(response.Content)));
+                }
             }
 
             return new List<GateIOData>()
