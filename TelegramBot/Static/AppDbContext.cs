@@ -20,7 +20,8 @@ namespace TelegramBot.Static
         public DbSet<NotifyMyPos> PositionsNotify { get; set; }
         public DbSet<PositionPair> Positions { get; set; }
         public DbSet<Takes> PositionTakes { get; set; }
-            
+        public DbSet<BannedUser> BannedUsers { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             string dbPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"/Tcryptobot/";
@@ -31,7 +32,6 @@ namespace TelegramBot.Static
 
         public AppDbContext()
         {
-           // Database.EnsureCreated();
             var migr=  Database.GetPendingMigrations();
             var appl = Database.GetAppliedMigrations();
             if (migr.Any())
@@ -39,8 +39,6 @@ namespace TelegramBot.Static
                 Console.WriteLine("Migration");
                 Database.Migrate();
             }
-
-
         }
     }
 }

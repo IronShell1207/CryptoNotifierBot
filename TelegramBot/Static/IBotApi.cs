@@ -51,9 +51,10 @@ namespace TelegramBot.Static
         }
 
         #region Updates
-
         public static async Task UpdateHandler(ITelegramBotClient bot, Update update, CancellationToken canceltoken)
         {
+            if (IsUserBanned(update))
+                return;
             if (!string.IsNullOrWhiteSpace(update.Message?.ReplyToMessage?.Text))
             {
                 RepliedMsgHandlerAsync(bot, update, canceltoken);
@@ -100,12 +101,15 @@ namespace TelegramBot.Static
             if (update.Message?.Text == Commands.Subscribe)
                 using (BreakoutPairsMsgHandler msghandler = new BreakoutPairsMsgHandler())
                     msghandler.SubNewUserBreakouts(update);
+
             else if (update.Message?.Text == Commands.SubSettings)
                 using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler())
                     msgHandler.SubSettings(update);
+
             else if (update.Message?.Text == Commands.SubStop)
                 using (BreakoutPairsMsgHandler msgH = new BreakoutPairsMsgHandler())
                     msgH.StopNotify(update);
+
             else if (Commands.AllTasks == update.Message.Text)
                 using (CryptoPairsMsgHandler cr = new CryptoPairsMsgHandler())
                     cr.ListAllTask(update);
@@ -123,6 +127,10 @@ namespace TelegramBot.Static
             if (update.Message.ReplyToMessage.Text == Messages.newPairRequestingForPair)
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
                     msgh.CreatingPairStageCP(update);
+            
+            else if (CommandsRegex.MonitoringTaskCommands.ShiftTasks.IsMatch(update.Message.Text))
+                using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
+                    msgHandler.DropEverythingByProcent(update);
 
             else if (update.Message.ReplyToMessage.Text == Messages.newPairWrongPrice)
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
@@ -140,10 +148,6 @@ namespace TelegramBot.Static
             else if (editPriceMsgRegex.IsMatch(update.Message.ReplyToMessage.Text))
                 using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
                     msgHandler.EditUserTaskReplyHandler(update, user);
-
-
-
-
         }
 
         public static async void CallbackHandlerAsync(ITelegramBotClient bot, Update update,
@@ -153,9 +157,11 @@ namespace TelegramBot.Static
             if (Exchanges.Contains(update.CallbackQuery.Data))
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
                     msgh.SetExchangeStageCP(update);
+
             else if (CallbackDataPatterns.DeletePairRegex.IsMatch(update.CallbackQuery.Data))
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
                     msgh.RemoveUserTaskCallbackHandler(update);
+
             else if (CallbackDataPatterns.EditPairRegex.IsMatch(update.CallbackQuery.Data))
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
                     msgh.EditUserTaskCallbackHandler(update);
@@ -321,11 +327,22 @@ namespace TelegramBot.Static
                 {
                     return null;
                 }
-
                 return user;
             }
         }
 
+        public static bool IsUserBanned(Update update)
+        {
+            var userid = GetTelegramIdFromUpdate(update);
+            using (AppDbContext db = new AppDbContext())
+            {
+                var user = db.BannedUsers.FirstOrDefault(x => x.TelegramId == userid);
+                if (user == null)
+                    return false;
+                SendMessage(userid, "You are banned!");
+                return true;
+            }
+        }
         public static async Task<UserConfig> GetUserSettings(ChatId chatId)
         {
             using (AppDbContext db = new AppDbContext())

@@ -416,5 +416,17 @@ namespace TelegramBot.Static.MessageHandlers
                 else BotApi.SendMessage(update.Message.Chat.Id, CultureTextRequest.GetMessageString("noCryptoTasks", "en"));
             }
         }
+
+        public async void DropEverythingByProcent(Update update)
+        {
+            var match = CommandsRegex.MonitoringTaskCommands.ShiftTasks.Match(update.Message.Text);
+            if (match.Success)
+            {
+                var procent = string.IsNullOrWhiteSpace(match.Groups["procent"].Value)
+                    ? int.Parse(match.Groups["procent"].Value)
+                    : 2;
+
+            }
+        }
     }
 }
