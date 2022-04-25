@@ -24,7 +24,7 @@ namespace TelegramBot.Static.BotLoops
                     foreach (UserConfig user in dbContext.Users)
                     {
                         StringBuilder sb = new StringBuilder();
-                        List<(CryptoPair, double)> pairs = await UserTasksToNotify(user, dbContext);
+                        List<(CryptoPair, double)> pairs = await UserTasksToNotify(user, dbContext, true);
                         if (pairs.Any())
                         {
                             foreach (var pair in pairs)
@@ -40,11 +40,11 @@ namespace TelegramBot.Static.BotLoops
             Thread.Sleep(1420);
         }
 
-        public static async Task<List<(CryptoPair, double)>> UserTasksToNotify(UserConfig user, AppDbContext dbContext)
+        public static async Task<List<(CryptoPair, double)>> UserTasksToNotify(UserConfig user, AppDbContext dbContext, bool useInterval = true)
         {
             List<(CryptoPair, double)> tasks = new List<(CryptoPair, double)>();
             DateTime dateTimenow = DateTime.Now;
-            if (UpdateIntervalExpired(user.Id, user.NoticationsInterval) && !(user.NightModeEnable && !NightTime(
+            if (!useInterval || UpdateIntervalExpired(user.Id, user.NoticationsInterval) && !(user.NightModeEnable && !NightTime(
                     user.NightModeStartTime, user.NightModeEndsTime,
                     dateTimenow.Hour * 60 + dateTimenow.Minute)))
             {

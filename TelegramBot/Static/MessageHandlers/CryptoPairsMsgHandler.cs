@@ -425,7 +425,7 @@ namespace TelegramBot.Static.MessageHandlers
                 var user = await BotApi.GetUserSettings(update);
                 var procent = !string.IsNullOrWhiteSpace(match.Groups["procent"].Value) ? int.Parse(match.Groups["procent"].Value) : 2;
                 var appDbContext = new AppDbContext();
-                var pairs = await MonitorLoop.UserTasksToNotify(user, appDbContext);
+                var pairs = await MonitorLoop.UserTasksToNotify(user, appDbContext, false);
                 foreach (var pair in pairs)
                 {
                     if (pair.Item1.GainOrFall && pair.Item1.Price < pair.Item2)
