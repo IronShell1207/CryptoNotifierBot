@@ -70,7 +70,7 @@ namespace TelegramBot.Static.MessageHandlers
                         }
                     }
                 }
-                else
+                else 
                 {
                     var pairbase = match.Groups["base"].Value.ToUpper();
                     var pairquote = match.Groups["quote"].Value.ToUpper();
@@ -84,6 +84,11 @@ namespace TelegramBot.Static.MessageHandlers
                     {
                         var strMessage = CultureTextRequest.GetMessageString("CPEditbySymbol", user.Language);
                         ListMatchingTasks(pairbase, user, CallbackDataPatterns.EditPair, strMessage);
+                    }
+                    else
+                    {
+                        BotApi.SendMessage(user.TelegramId, CultureTextRequest.GetMessageString("CPEditEmpty", user.Language));
+                        
                     }
                 }
             }
@@ -209,10 +214,14 @@ namespace TelegramBot.Static.MessageHandlers
                         var strMessage = CultureTextRequest.GetMessageString("cryptoPairRemoveBySymbol", user.Language);
                         ListMatchingTasks(pairbase, user, CallbackDataPatterns.DeletePair, strMessage);
                     }
+                    else
+                    {
+                        BotApi.SendMessage(user.TelegramId, CultureTextRequest.GetMessageString("CPRemoveEmpty", user.Language));
 
-                   
-                        
-                    
+                    }
+
+
+
                 }
                 //PairsManager.TempObjects?.Remove(pair);
             }
@@ -349,8 +358,6 @@ namespace TelegramBot.Static.MessageHandlers
                 BotApi.SendMessage(BotApi.GetTelegramIdFromUpdate(update).Identifier, formatedmsg, ParseMode.Html);
             }
         }
-
-
 
         public async void ListMatchingTasks(TradingPair pair, UserConfig user, string datapattern, string Message)
         {

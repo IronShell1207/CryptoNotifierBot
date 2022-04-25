@@ -97,6 +97,15 @@ namespace TelegramBot {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to To edit any task send command with task id or symbol name. For example: /edit 210 34000 or /edit BTC/USDT or /edit BTC.
+        /// </summary>
+        internal static string CPEditEmpty {
+            get {
+                return ResourceManager.GetString("CPEditEmpty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to To edit price of {0} pair with id {1} please send new price with this message attached!.
         /// </summary>
         internal static string CPEditPair {
@@ -124,6 +133,15 @@ namespace TelegramBot {
         internal static string CPEditTaskCreated {
             get {
                 return ResourceManager.GetString("CPEditTaskCreated", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to To remove any task send command with task id or symbol name. For example: /remove 51 or /remove BTC/USDT or /remove ETH.
+        /// </summary>
+        internal static string CPRemoveEmpty {
+            get {
+                return ResourceManager.GetString("CPRemoveEmpty", resourceCulture);
             }
         }
         

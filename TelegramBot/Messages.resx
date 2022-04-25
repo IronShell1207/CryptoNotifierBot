@@ -198,4 +198,10 @@ For get all available commands 🔎 send: /help</value>
 
 </value>
   </data>
+  <data name="CPEditEmpty" xml:space="preserve">
+    <value>To edit any task send command with task id or symbol name. For example: /edit 210 34000 or /edit BTC/USDT or /edit BTC</value>
+  </data>
+  <data name="CPRemoveEmpty" xml:space="preserve">
+    <value>To remove any task send command with task id or symbol name. For example: /remove 51 or /remove BTC/USDT or /remove ETH</value>
+  </data>
 </root>
