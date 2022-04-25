@@ -62,9 +62,13 @@ namespace TelegramBot.Static
 
             if (update.Type == UpdateType.Message && update.Message != null)
             {
-                var user = GetUserSettings(update.Message?.Chat?.Id);
+                var user = await GetUserSettings(update.Message?.Chat?.Id);
                 if (RegexCombins.CommandPattern.IsMatch(update.Message?.Text))
                     CommandsHandler(bot, update, canceltoken);
+
+                else if (CommandsRegex.MonitoringTaskCommands.ShiftTasks.IsMatch(update.Message.Text))
+                    using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
+                        msgHandler.DropEverythingByProcent(update);
 
                 else if (CommandsRegex.MonitoringTaskCommands.CreatePair.IsMatch(update.Message.Text))
                     using (CryptoPairsMsgHandler msghandler = new CryptoPairsMsgHandler())
@@ -102,6 +106,10 @@ namespace TelegramBot.Static
                 using (BreakoutPairsMsgHandler msghandler = new BreakoutPairsMsgHandler())
                     msghandler.SubNewUserBreakouts(update);
 
+            else if (CommandsRegex.MonitoringTaskCommands.ShiftTasks.IsMatch(update.Message.Text))
+                using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
+                    msgHandler.DropEverythingByProcent(update);
+
             else if (update.Message?.Text == Commands.SubSettings)
                 using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler())
                     msgHandler.SubSettings(update);
@@ -127,10 +135,6 @@ namespace TelegramBot.Static
             if (update.Message.ReplyToMessage.Text == Messages.newPairRequestingForPair)
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
                     msgh.CreatingPairStageCP(update);
-            
-            else if (CommandsRegex.MonitoringTaskCommands.ShiftTasks.IsMatch(update.Message.Text))
-                using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
-                    msgHandler.DropEverythingByProcent(update);
 
             else if (update.Message.ReplyToMessage.Text == Messages.newPairWrongPrice)
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
@@ -336,7 +340,7 @@ namespace TelegramBot.Static
             var userid = GetTelegramIdFromUpdate(update);
             using (AppDbContext db = new AppDbContext())
             {
-                var user = db.BannedUsers.FirstOrDefault(x => x.TelegramId == userid);
+                var user = db.BannedUsers?.ToList().FirstOrDefault(x => x.TelegramId == userid);
                 if (user == null)
                     return false;
                 SendMessage(userid, "You are banned!");

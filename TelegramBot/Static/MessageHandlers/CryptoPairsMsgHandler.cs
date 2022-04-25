@@ -11,6 +11,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TelegramBot.Constants;
 using TelegramBot.Objects;
+using TelegramBot.Static.BotLoops;
 using TelegramBot.Static.DbOperations;
 
 namespace TelegramBot.Static.MessageHandlers
@@ -68,7 +69,7 @@ namespace TelegramBot.Static.MessageHandlers
                                 BotApi.SendMessage(user.TelegramId, msg, true);
                             }
                         }
-                    }
+                    } 
                 }
                 else 
                 {
@@ -88,7 +89,6 @@ namespace TelegramBot.Static.MessageHandlers
                     else
                     {
                         BotApi.SendMessage(user.TelegramId, CultureTextRequest.GetMessageString("CPEditEmpty", user.Language));
-                        
                     }
                 }
             }
@@ -422,9 +422,19 @@ namespace TelegramBot.Static.MessageHandlers
             var match = CommandsRegex.MonitoringTaskCommands.ShiftTasks.Match(update.Message.Text);
             if (match.Success)
             {
-                var procent = string.IsNullOrWhiteSpace(match.Groups["procent"].Value)
-                    ? int.Parse(match.Groups["procent"].Value)
-                    : 2;
+                var user = await BotApi.GetUserSettings(update);
+                var procent = !string.IsNullOrWhiteSpace(match.Groups["procent"].Value) ? int.Parse(match.Groups["procent"].Value) : 2;
+                var appDbContext = new AppDbContext();
+                var pairs = await MonitorLoop.UserTasksToNotify(user, appDbContext);
+                foreach (var pair in pairs)
+                {
+                    if (pair.Item1.GainOrFall && pair.Item1.Price < pair.Item2)
+                        pair.Item1.Price = pair.Item2 * (procent+100)/100;
+                    else if (!pair.Item1.GainOrFall && pair.Item1.Price > pair.Item2)
+                        pair.Item1.Price = pair.Item2 * (100 - procent) / 100;
+                }
+                appDbContext.SaveChangesAsync();
+                BotApi.SendMessage(user.TelegramId, "Saved!");
 
             }
         }
