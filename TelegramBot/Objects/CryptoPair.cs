@@ -45,7 +45,7 @@ namespace TelegramBot.Objects
         public string TaskStatus()
         {
             var enabled = Enabled ? "✅" : "⛔️";
-            var rofl = GainOrFall ? "&#62;" : "&#60;";
+            var rofl = GainOrFall ? ">" : "<";
             return $"{enabled} #{Id} {this.ToString()} {rofl}{Price}";
         }
         public string TaskStatusWithLink()

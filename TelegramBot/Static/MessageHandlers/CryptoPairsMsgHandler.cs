@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using CryptoApi.Objects;
+using Telegram.Bot.Requests;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using TelegramBot.Constants;
@@ -71,23 +72,23 @@ namespace TelegramBot.Static.MessageHandlers
                 }
                 else
                 {
-                    TradingPair pair = new TradingPair(match.Groups["base"].Value.ToUpper(),
-                        match.Groups["quote"].Value.ToUpper());
-
-                    if (!string.IsNullOrWhiteSpace(pair.ToString()))
+                    var pairbase = match.Groups["base"].Value.ToUpper();
+                    var pairquote = match.Groups["quote"].Value.ToUpper();
+                    if (!string.IsNullOrWhiteSpace(pairbase) && !string.IsNullOrWhiteSpace(pairquote))
                     {
+                        TradingPair pair = new TradingPair(pairbase, pairquote);
                         var strMessage = CultureTextRequest.GetMessageString("CPEditbySymbol", user.Language);
                         ListMatchingTasks(pair, user, CallbackDataPatterns.EditPair, strMessage);
                     }
-                    else
+                    else if (!string.IsNullOrWhiteSpace(pairbase))
                     {
-                        BotApi.SendMessage(user.TelegramId,
-                            CultureTextRequest.GetMessageString("CPCantFindAnyPairsMatching", user.Language));
+                        var strMessage = CultureTextRequest.GetMessageString("CPEditbySymbol", user.Language);
+                        ListMatchingTasks(pairbase, user, CallbackDataPatterns.EditPair, strMessage);
                     }
                 }
             }
         }
-        public void EditUserTaskReplyHandler(Update update, UserConfig user)
+        public async void EditUserTaskReplyHandler(Update update, UserConfig user)
         { 
             var editPriceMsgRegex =
                 CommandsRegex.ConvertMessageToRegex(CultureTextRequest.GetMessageString("CPEditPair", user.Language),
@@ -105,7 +106,7 @@ namespace TelegramBot.Static.MessageHandlers
                         var pair =  dbHandler.GetPairFromId(id, user.Id);
                         if (pair != null)
                         {
-                            dbHandler.SetNewPriceFromPair(pair, price);
+                           var e=  await dbHandler.SetNewPriceFromPair(pair, price);
                             var msg = string.Format(
                                 CultureTextRequest.GetMessageString("CPEditTaskComplete", user.Language),
                                 pair.FullTaskInfo());
@@ -132,7 +133,7 @@ namespace TelegramBot.Static.MessageHandlers
                         var pair = dbHandler.GetPairFromId(Id, userId);
                         if (pair != null)
                         {
-                            var msg = CultureTextRequest.GetMessageString(string.Format("CPEditPair",pair.ToString(), pair.Id), user.Language);
+                            var msg = string.Format(CultureTextRequest.GetMessageString("CPEditPair", user.Language), pair.ToString(), pair.Id);
                             BotApi.SendMessage(user.TelegramId, msg, true);
                         }
                         
@@ -195,14 +196,23 @@ namespace TelegramBot.Static.MessageHandlers
                 }
                 else
                 {
-                    TradingPair pair = new TradingPair(match.Groups["base"].Value.ToUpper(),
-                        match.Groups["quote"].Value.ToUpper());
-
-                    if (!string.IsNullOrWhiteSpace(pair.ToString()))
+                    var pairbase = match.Groups["base"].Value.ToUpper();
+                    var pairquote = match.Groups["quote"].Value.ToUpper();
+                    if (!string.IsNullOrWhiteSpace(pairbase) && !string.IsNullOrWhiteSpace(pairquote))
                     {
+                        TradingPair pair = new TradingPair(pairbase, pairquote);
                         var strMessage = CultureTextRequest.GetMessageString("cryptoPairRemoveBySymbol", user.Language);
                         ListMatchingTasks(pair, user, CallbackDataPatterns.DeletePair, strMessage);
                     }
+                    else if (!string.IsNullOrWhiteSpace(pairbase))
+                    {
+                        var strMessage = CultureTextRequest.GetMessageString("cryptoPairRemoveBySymbol", user.Language);
+                        ListMatchingTasks(pairbase, user, CallbackDataPatterns.DeletePair, strMessage);
+                    }
+
+                   
+                        
+                    
                 }
                 //PairsManager.TempObjects?.Remove(pair);
             }
@@ -353,6 +363,24 @@ namespace TelegramBot.Static.MessageHandlers
                     BotApi.SendMessage(user.TelegramId, Message, replyMarkup: kb);
                 }
                 else BotApi.SendMessage(user.TelegramId, CultureTextRequest.GetMessageString("CPCantFindAnyPairsMatching", user.Language));
+            }
+        }
+
+        public async void ListMatchingTasks(string SymbolBase, UserConfig user, string datapattern, string Message)
+        {
+            using (AppDbContext dbContext = new AppDbContext())
+            {
+                var tasks = dbContext.CryptoPairs.Where(x => x.OwnerId == user.Id && x.PairBase == SymbolBase).ToList();
+                if (tasks != null && tasks.Any())
+                {
+                    var kb = Keyboards.PairsSelectingKeyboardMarkup(tasks, datapattern);
+                    BotApi.SendMessage(user.TelegramId, Message, replyMarkup: kb);
+                }
+                else
+                {
+                    BotApi.SendMessage(user.TelegramId,
+                        CultureTextRequest.GetMessageString("CPCantFindAnyPairsMatching", user.Language));
+                }
             }
         }
 
