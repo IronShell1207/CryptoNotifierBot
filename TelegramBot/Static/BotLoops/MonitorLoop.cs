@@ -53,7 +53,7 @@ namespace TelegramBot.Static.BotLoops
                 {
                     var price = await ExchangesCheckerForUpdates.GetCurrentPrice(
                         new TradingPair(pair.PairBase, pair.PairQuote), pair.ExchangePlatform);
-                    if (price > pair.Price && pair.GainOrFall || price < pair.Price && !pair.GainOrFall)
+                    if (price>0 &&( price > pair.Price && pair.GainOrFall || price < pair.Price && !pair.GainOrFall))
                     {
                         tasks.Add(new(pair, price));
                     }
