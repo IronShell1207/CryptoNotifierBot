@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CryptoApi.Objects;
+using Telegram.Bot.Types;
 using TelegramBot.Objects;
 
 namespace TelegramBot.Static.BotLoops
@@ -16,36 +18,48 @@ namespace TelegramBot.Static.BotLoops
         {
             while (MonitorLoopCancellationToken)
             {
-                DateTime dateTimenow = DateTime.Now;
+
                 using (AppDbContext dbContext = new AppDbContext())
                 {
                     foreach (UserConfig user in dbContext.Users)
                     {
-                        if (UpdateIntervalExpired(user.Id, user.NoticationsInterval) && !(user.NightModeEnable && !NightTime(user.NightModeStartTime, user.NightModeEndsTime,
-                                dateTimenow.Hour * 60 + dateTimenow.Minute)))
+                        StringBuilder sb = new StringBuilder();
+                        List<(CryptoPair, double)> pairs = await UserTasksToNotify(user, dbContext);
+                        if (pairs.Any())
                         {
-                            var pairs = dbContext.CryptoPairs.Where(x => x.OwnerId == user.Id && x.Enabled).ToList();
-                            StringBuilder sb = new StringBuilder();
                             foreach (var pair in pairs)
-                            {
-                                var price = await ExchangesCheckerForUpdates.GetCurrentPrice(
-                                    new TradingPair(pair.PairBase, pair.PairQuote), pair.ExchangePlatform);
-                                if (price > pair.Price && pair.GainOrFall || price < pair.Price && !pair.GainOrFall)
-                                {
-                                    //var formated = user.CryptoNotifyStyle != null ? user.CryptoNotifyStyle.Format(user.CryptoNotifyStyle, pair.PairBase=>"pBase", pair.PairQuote=>"pQuote" );
-                                    sb.AppendLine(FormatNotifyEntryStock(pair, price));
-                                }
-                            }
-                            if (sb.Length > 0)
-                            {
-                                lastUpdateUsers.Add(new IntervaledUsersHistory(user.Id, dateTimenow));
-                                await BotApi.SendMessage(user.TelegramId, sb.ToString());
-                            }
+                                sb.AppendLine(FormatNotifyEntryStock(pair.Item1, pair.Item2));
+
+                            lastUpdateUsers.Add(new IntervaledUsersHistory(user.Id, DateTime.Now));
+                            await BotApi.SendMessage(user.TelegramId, sb.ToString());
+
                         }
                     }
                 }
-                Thread.Sleep(1420);
             }
+            Thread.Sleep(1420);
+        }
+
+        public static async Task<List<(CryptoPair, double)>> UserTasksToNotify(UserConfig user, AppDbContext dbContext)
+        {
+            List<(CryptoPair, double)> tasks = new List<(CryptoPair, double)>();
+            DateTime dateTimenow = DateTime.Now;
+            if (UpdateIntervalExpired(user.Id, user.NoticationsInterval) && !(user.NightModeEnable && !NightTime(
+                    user.NightModeStartTime, user.NightModeEndsTime,
+                    dateTimenow.Hour * 60 + dateTimenow.Minute)))
+            {
+                var pairs = dbContext.CryptoPairs.Where(x => x.OwnerId == user.Id && x.Enabled).ToList();
+                foreach (var pair in pairs)
+                {
+                    var price = await ExchangesCheckerForUpdates.GetCurrentPrice(
+                        new TradingPair(pair.PairBase, pair.PairQuote), pair.ExchangePlatform);
+                    if (price > pair.Price && pair.GainOrFall || price < pair.Price && !pair.GainOrFall)
+                    {
+                        tasks.Add(new(pair, price));
+                    }
+                }
+            }
+            return tasks;
         }
 
         private static string FormatNotifyEntryStock(CryptoPair pair, double newprice)
@@ -81,7 +95,7 @@ namespace TelegramBot.Static.BotLoops
             return true;
         }
     }
-    
+
     public class IntervaledUsersHistory
     {
         public int UserId { get; set; }

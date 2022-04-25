@@ -313,7 +313,7 @@ namespace TelegramBot.Static
 
         #endregion
 
-        #region UsersStuff
+         #region UsersStuff
 
         public static async Task<UserConfig> GetUserSettings(Update update) =>
             GetUserSettings(GetTelegramIdFromUpdate(update)).Result;
