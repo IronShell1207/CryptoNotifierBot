@@ -23,6 +23,7 @@ namespace TelegramBot.Static
             Task.Run(ExchangesCheckerForUpdates.ExchangesUpdaterLoop);
             Task.Run(BreakoutMonitor.BreakoutLoop);
             Task.Run(BotLoops.MonitorLoop.Loop);
+            Task.Run(MorningReport.MorningSpread);
         }
     }
 }

@@ -204,4 +204,7 @@ For get all available commands 🔎 send: /help</value>
   <data name="CPRemoveEmpty" xml:space="preserve">
     <value>To remove any task send command with task id or symbol name. For example: /remove 51 or /remove BTC/USDT or /remove ETH</value>
   </data>
+  <data name="CPAddComment" xml:space="preserve">
+    <value>To add comment for task with id {0} for pair {1} send your comment in next message with this attached.</value>
+  </data>
 </root>

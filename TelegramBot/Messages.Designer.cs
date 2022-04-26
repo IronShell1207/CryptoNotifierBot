@@ -79,6 +79,15 @@ namespace TelegramBot {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to To add comment for task with id {0} for pair {1} send your comment in next message with this attached..
+        /// </summary>
+        internal static string CPAddComment {
+            get {
+                return ResourceManager.GetString("CPAddComment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to I can&apos;t find any pairs matching your request!.
         /// </summary>
         internal static string CPCantFindAnyPairsMatching {

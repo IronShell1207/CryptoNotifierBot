@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
@@ -436,6 +437,45 @@ namespace TelegramBot.Static.MessageHandlers
                 appDbContext.SaveChangesAsync();
                 BotApi.SendMessage(user.TelegramId, "Saved!");
 
+            }
+        }
+
+        public async void AddCommentForTask(Update update)
+        {
+            var match = CommandsRegex.MonitoringTaskCommands.AddComment.Match(update.Message.Text);
+            if (match.Success)
+            {
+                var id = int.Parse(match.Groups["id"].Value);
+                var user = await BotApi.GetUserSettings(update);
+                var task = new CryptoPairDbHandler().GetPairFromId(id, user.Id);
+                if (task != null)
+                {
+                    var msg = string.Format(CultureTextRequest.GetMessageString("CPAddComment", user.Language), task.Id, task.ToString());
+                    BotApi.SendMessage(user.TelegramId, msg, true);
+                }
+                else
+                {
+                    BotApi.SendMessage(user.TelegramId, "Task not exists, or not yours!");
+                }
+            }
+        }
+
+        public async void AddCommentForTaskReplyHandler(Update update)
+        {
+            var user = await BotApi.GetUserSettings(update);
+            var msgRegex = CommandsRegex.ConvertMessageToRegex(CultureTextRequest.GetMessageString("CPAddComment", user.Language), new List<string>()
+            {
+                @"(?<id>[0-9]*)", @"(?<base>[a-zA-Z0-9]{2,9})(\s+|/)(?<quote>[a-zA-Z0-9]{2,6})"
+            });
+            var match = msgRegex.Match(update.Message.ReplyToMessage.Text);
+            if (match.Success)
+            {
+                var id = int.Parse(match.Groups["id"].Value);
+                var task = new CryptoPairDbHandler().GetPairFromId(id, user.Id);
+                if (task != null)
+                {
+                    task.Note = update.Message.Text;
+                }
             }
         }
     }
