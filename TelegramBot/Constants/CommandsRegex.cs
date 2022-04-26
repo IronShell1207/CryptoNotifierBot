@@ -26,7 +26,7 @@ namespace TelegramBot.Constants
                 new Regex(  
                     @"/(delete|remove)\s*((((?<id>[0-9]+)\s*)|((?<base>[a-zA-Z0-9]{2,9})((\s+|/)(?<quote>[a-zA-Z]{2,9})|)))|)");
 
-            public static Regex ShiftTasks = new Regex(@"(/movetasks)|(\s*(?<procent>[0-9]+))");
+            public static Regex ShiftTasks = new Regex(@"(/movetasks)(\s*(?<procent>[0-9]+)|)");
             public List<string> Commands
             {
                 get
