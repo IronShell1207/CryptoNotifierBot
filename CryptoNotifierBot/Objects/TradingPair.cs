@@ -9,6 +9,8 @@ namespace CryptoApi.Objects
 {
     public class TradingPair
     {
+        public int Id { get; set; }
+        public int DbId { get; set; }
         public string Name { get; set; }
         public string Quote { get; set; }
         public string Exchange { get; set; }
