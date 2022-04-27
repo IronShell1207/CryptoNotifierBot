@@ -13,6 +13,8 @@ namespace TelegramBot.Constants
         public const string Subscribe = "/subscribe";
         public const string SubSettings = "/subsets";
         public const string SubStop = "/substop";
+        public const string FlipTasks = "/fliptasks";
+        public const string ShiftTasks = "/movetasks";
     }
 
     public class AdminCommands
