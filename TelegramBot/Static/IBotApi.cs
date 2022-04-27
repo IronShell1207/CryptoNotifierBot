@@ -109,8 +109,12 @@ namespace TelegramBot.Static
             if (update.Message?.Text == Commands.Subscribe)
                 using (BreakoutPairsMsgHandler msghandler = new BreakoutPairsMsgHandler())
                     msghandler.SubNewUserBreakouts(update);
+            
+            else if (update.Message.Text.Contains(Commands.FlipTasks))
+                using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
+                    msgHandler.FlipTriggeredTasks(update);
 
-            else if (CommandsRegex.MonitoringTaskCommands.ShiftTasks.IsMatch(update.Message.Text))
+            else if (update.Message.Text.Contains(Commands.ShiftTasks))
                 using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
                     msgHandler.DropEverythingByProcent(update);
 

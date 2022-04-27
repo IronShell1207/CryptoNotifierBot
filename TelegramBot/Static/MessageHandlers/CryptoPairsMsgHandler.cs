@@ -440,6 +440,23 @@ namespace TelegramBot.Static.MessageHandlers
             }
         }
 
+        public async void FlipTriggeredTasks(Update update)
+        {
+            using (AppDbContext dbContext = new AppDbContext())
+            {
+                var user = dbContext.Users.FirstOrDefault(x => x.TelegramId == update.Message.Chat.Id);
+                var pairs = await MonitorLoop.UserTasksToNotify(user, dbContext, false);
+                StringBuilder sb = new StringBuilder();
+                foreach (var pair in pairs)
+                {
+                    pair.Item1.GainOrFall = !pair.Item1.GainOrFall;
+                    sb.AppendLine($"Trigger flipped for task id {pair.Item1.Id} {pair.Item1.TaskStatus()}");
+                }
+                dbContext.SaveChangesAsync();
+                BotApi.SendMessage(user.TelegramId, sb.ToString());
+            }
+        }
+
         public async void AddCommentForTask(Update update)
         {
             var match = CommandsRegex.MonitoringTaskCommands.AddComment.Match(update.Message.Text);
