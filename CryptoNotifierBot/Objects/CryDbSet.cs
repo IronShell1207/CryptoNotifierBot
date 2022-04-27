@@ -14,9 +14,13 @@ namespace CryptoApi.Objects
 
         public DateTime GetDateTime()
         {
-            return Convert.ToDateTime(Date + Time);
+            return Convert.ToDateTime($"{Date} {Time}");
         }
 
+        public CryDbSet()
+        {
+
+        }
         public CryDbSet(DateTime dateTime)
         {
             Date = dateTime.ToLongDateString();

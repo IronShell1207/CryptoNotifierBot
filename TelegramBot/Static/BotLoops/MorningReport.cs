@@ -45,30 +45,30 @@ namespace TelegramBot.Static
                     mReport.AppendLine("Morning report. Prices changed by 8 and 24 hours:");
                     if (timingHours == dateNow.Hour && (timingMins - 1 < dateNow.Minute && dateNow.Minute < timingMins + 1))
                     {
-                        var pricesNow = ExchangesCheckerForUpdates.MarketData.LastOrDefault();
-                        var prices8hAgo = ExchangesCheckerForUpdates.MarketData.Where(
-                            x => x[0].CreationTime + TimeSpan.FromMinutes(((7 * 60) + 58)) < dateNow &&
-                                 dateNow < x[0].CreationTime + TimeSpan.FromMinutes(((8 * 60) + 1))).FirstOrDefault();
-                        var prices24hAgo = ExchangesCheckerForUpdates.MarketData.Where(
-                            x => x[0].CreationTime + TimeSpan.FromMinutes(((23 * 60) + 58)) < dateNow &&
-                                 dateNow < x[0].CreationTime + TimeSpan.FromMinutes(((24 * 60) + 1))).FirstOrDefault();
+                        //var pricesNow = ExchangesCheckerForUpdates.MarketData.LastOrDefault();
+                        //var prices8hAgo = ExchangesCheckerForUpdates.MarketData.Where(
+                        //    x => x[0].CreationTime + TimeSpan.FromMinutes(((7 * 60) + 58)) < dateNow &&
+                        //         dateNow < x[0].CreationTime + TimeSpan.FromMinutes(((8 * 60) + 1))).FirstOrDefault();
+                        //var prices24hAgo = ExchangesCheckerForUpdates.MarketData.Where(
+                        //    x => x[0].CreationTime + TimeSpan.FromMinutes(((23 * 60) + 58)) < dateNow &&
+                        //         dateNow < x[0].CreationTime + TimeSpan.FromMinutes(((24 * 60) + 1))).FirstOrDefault();
                        
-                        foreach (TradingPair pair in MorningPairs)
-                        {
-                            var priceNow = pricesNow[0].Pairs.First(x => x.Symbol == pair);
-                            var price8hAge = prices8hAgo?[0].Pairs.First(x => x.Symbol == pair);
-                            var price24hAge = prices24hAgo?[0].Pairs.First(x => x.Symbol == pair);
-                            var Trend8H = priceNow.Price > price8hAge.Price ? "📈 raises " : "📉 falls";
-                            var Trend24H = priceNow.Price > price24hAge.Price ? "📈 raises" : "📉 falls";
-                            if (price8hAge != null)
-                                mReport.AppendLine(
-                                    $"{pair.ToString()} {Trend8H} from {price8hAge.Price}->{priceNow.Price} in 8H");
-                            if (price24hAge != null)
-                                mReport.AppendLine(
-                                    $"{pair.ToString()} {Trend24H} from {price24hAge.Price}->{priceNow.Price} in 24H");
-                        }
-                        NotifiedUsers.Add(user);
-                        BotApi.SendMessage(user.TelegramId, mReport.ToString());
+                        //foreach (TradingPair pair in MorningPairs)
+                        //{
+                        //    var priceNow = pricesNow[0].Pairs.First(x => x.Symbol == pair);
+                        //    var price8hAge = prices8hAgo?[0].Pairs.First(x => x.Symbol == pair);
+                        //    var price24hAge = prices24hAgo?[0].Pairs.First(x => x.Symbol == pair);
+                        //    var Trend8H = priceNow.Price > price8hAge.Price ? "📈 raises " : "📉 falls";
+                        //    var Trend24H = priceNow.Price > price24hAge.Price ? "📈 raises" : "📉 falls";
+                        //    if (price8hAge != null)
+                        //        mReport.AppendLine(
+                        //            $"{pair.ToString()} {Trend8H} from {price8hAge.Price}->{priceNow.Price} in 8H");
+                        //    if (price24hAge != null)
+                        //        mReport.AppendLine(
+                        //            $"{pair.ToString()} {Trend24H} from {price24hAge.Price}->{priceNow.Price} in 24H");
+                        //}
+                        //NotifiedUsers.Add(user);
+                        //BotApi.SendMessage(user.TelegramId, mReport.ToString());
                     }
                     
                 }

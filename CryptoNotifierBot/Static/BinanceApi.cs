@@ -19,16 +19,16 @@ namespace CryptoApi.Static
     public class BinanceApi : TheDisposable, ITradingApi
     {
 
-        public List<CryptoExchangePairInfo> ExchangePairsConverter(List<BinancePair> list)
+        public List<PricedTradingPair> ExchangePairsConverter(List<BinancePair> list)
         {
-            var listReturner = new List<CryptoExchangePairInfo>();
+            var listReturner = new List<PricedTradingPair>();
             if (list != null)
             {
                 foreach (BinancePair pair in list)
                 {
                     var pairSymbol = SplitSymbolConverter(pair.symbol);
                     if (pairSymbol != null)
-                        listReturner.Add(new CryptoExchangePairInfo(pairSymbol, pair.price));
+                        listReturner.Add(new PricedTradingPair(pairSymbol, pair.price));
                 }
             }
 
@@ -44,13 +44,15 @@ namespace CryptoApi.Static
             {
                 crp.Name = match.Groups["name"].Value;
                 crp.Quote = match.Groups["quote"].Value;
+                crp.Exchange = Exchanges.Binance;
                 if (Diff.AllowedQuotes.Contains(crp.Quote))
                     return crp;
             }
             return null;
 
         }
-        public async Task<SymbolTimedExInfo> GetExchangeData()
+
+        public async Task<List<BinancePair>> GetTickerData()
         {
             using (var restRequester = new RestRequester())
             {
@@ -62,19 +64,16 @@ namespace CryptoApi.Static
                         serializer.Deserialize<List<BinancePair>>(
                             new JsonTextReader(new StringReader(response.Content)));
                     var pairs = ExchangePairsConverter(pairsSerialized);
-                    return new SymbolTimedExInfo()
-                    {
-                        CreationTime = DateTime.Now,
-                        Pairs = pairs,
-                        Exchange = Exchanges.Binance
-                    };
                 }
-
                 Console.WriteLine($"[{DateTime.Now.ToString()}] Binance api request failed. Status code: {response?.StatusCode}, {response?.ErrorMessage}");
                 Thread.Sleep(4000);
-                return GetExchangeData().Result;
-
+                return await GetTickerData();
             }
+        }
+
+        public async Task GetExchangeData()
+        {
+            var pairs = ExchangePairsConverter(await GetTickerData());
         }
 
         public BinanceSymbolsData GetFullData()

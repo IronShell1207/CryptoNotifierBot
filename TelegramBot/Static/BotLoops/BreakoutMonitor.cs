@@ -51,32 +51,32 @@ namespace TelegramBot.Static
                 var latestData = ExchangesCheckerForUpdates.MarketData.LastOrDefault();
                 for (var index = ExchangesCheckerForUpdates.MarketData.Count - 1; index >= 0; index--)
                 {
-                    if (index > ExchangesCheckerForUpdates.MarketData.Count) break;
-                    List<SymbolTimedExInfo> data = ExchangesCheckerForUpdates.MarketData[index];
-                    for (var iTi = 0; iTi < ListTimings.Count; iTi++)
-                    {
-                        int timeIn = ListTimings[iTi];
-                        if (data[0].CreationTime + TimeSpan.FromMinutes(timeIn) < datetimeNow &&
-                            datetimeNow < data[0].CreationTime + TimeSpan.FromMinutes(timeIn + 1) &&
-                            listDateTimes[iTi] + TimeSpan.FromMinutes(timeIn) < datetimeNow)
-                        {
-                            listDateTimes[iTi] = datetimeNow;
-                            index -= timeIn - 1;
-                            for (int i = 0; i < data.Count; i++)
-                            {
-                                SymbolTimedExInfo dataExchange = data[i];
-                                var compairedPairs = CompairedPairs(dataExchange.Pairs, latestData[i].Pairs,
-                                    procentsDifference[iTi], ListTimings[iTi], dataExchange.Exchange);
-                                Console.WriteLine(
-                                    $"[{datetimeNow.ToString()}] {data[i].Exchange}: {compairedPairs.Count} Time: {timeIn}");
-                                if (compairedPairs.Count > 0)
-                                {
-                                    SpreadBreakoutNotify(compairedPairs, data[i].Exchange, timeIn);
-                                    Thread.Sleep(25);
-                                }
-                            }
-                        }
-                    }
+                    //if (index > ExchangesCheckerForUpdates.MarketData.Count) break;
+                    //List<PricedTradingPair> data = ExchangesCheckerForUpdates.MarketData[index];
+                    //for (var iTi = 0; iTi < ListTimings.Count; iTi++)
+                    //{
+                    //    int timeIn = ListTimings[iTi];
+                    //    if (data[0].CreationTime + TimeSpan.FromMinutes(timeIn) < datetimeNow &&
+                    //        datetimeNow < data[0].CreationTime + TimeSpan.FromMinutes(timeIn + 1) &&
+                    //        listDateTimes[iTi] + TimeSpan.FromMinutes(timeIn) < datetimeNow)
+                    //    {
+                    //        listDateTimes[iTi] = datetimeNow;
+                    //        index -= timeIn - 1;
+                    //        for (int i = 0; i < data.Count; i++)
+                    //        {
+                    //            SymbolTimedExInfo dataExchange = data[i];
+                    //            var compairedPairs = CompairedPairs(dataExchange.Pairs, latestData[i].Pairs,
+                    //                procentsDifference[iTi], ListTimings[iTi], dataExchange.Exchange);
+                    //            Console.WriteLine(
+                    //                $"[{datetimeNow.ToString()}] {data[i].Exchange}: {compairedPairs.Count} Time: {timeIn}");
+                    //            if (compairedPairs.Count > 0)
+                    //            {
+                    //                SpreadBreakoutNotify(compairedPairs, data[i].Exchange, timeIn);
+                    //                Thread.Sleep(25);
+                    //            }
+                    //        }
+                    //    }
+                    //}
                 }
             loopend:
                 count = countNow;
@@ -147,13 +147,13 @@ namespace TelegramBot.Static
             }
             await BotApi.SendMessage(sub.TelegramId, sb.ToString());
         }
-        private static List<BreakoutPair> CompairedPairs(List<CryptoExchangePairInfo> oldData, List<CryptoExchangePairInfo> freshData, double procent, double time = 0, string exchange = "Binance")
+        private static List<BreakoutPair> CompairedPairs(List<PricedTradingPair> oldData, List<PricedTradingPair> freshData, double procent, double time = 0, string exchange = "Binance")
         {
             List<BreakoutPair> changedData = new List<BreakoutPair>() { };
             foreach (var data in oldData)
             {
-                var fresh = freshData.FirstOrDefault(x => x.Symbol.ToString() == data.Symbol.ToString());
-                if (fresh == null || fresh.Symbol.ToString() == "/") break;
+                var fresh = freshData.FirstOrDefault(x => x.ToString() == data.ToString());
+                if (fresh == null || fresh.ToString() == "/") break;
                 var diff = ((data.Price / fresh.Price) * 100) - 100;
                 var proc = data.Price < 0.0000009 ? 6 : procent;
                 if (diff > proc || diff < -proc)
@@ -161,7 +161,7 @@ namespace TelegramBot.Static
                     {
                         newPrice = fresh.Price,
                         oldPrice = data.Price,
-                        Symbol = fresh.Symbol,
+                        Symbol = fresh,
                         Time = time,
                         Exchange = exchange
                     });

@@ -11,7 +11,7 @@ namespace CryptoApi.Static.DataHandler
     {
         public void UpdateAllData()
         {
-            foreach (string exchange in )
+           // foreach (string exchange in )
         }
     }
 }

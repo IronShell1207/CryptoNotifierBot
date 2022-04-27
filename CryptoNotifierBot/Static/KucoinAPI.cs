@@ -16,16 +16,16 @@ namespace CryptoApi.Static
 {
     public class KucoinAPI : TheDisposable, ITradingApi
     {
-        public List<CryptoExchangePairInfo>PairsListConverter(List<KucoinData.Ticker> list)
+        public List<PricedTradingPair> PairsListConverter(List<KucoinData.Ticker> list)
         {
-            var listReturner = new List<CryptoExchangePairInfo>();
+            var listReturner = new List<PricedTradingPair>();
             if (list != null)
             {
                 foreach (KucoinData.Ticker pair in list)
                 {
                     var pairSymbol = SplitSymbolConverter(pair.symbol);
                     if (pairSymbol != null)
-                        listReturner.Add(new CryptoExchangePairInfo(pairSymbol, double.Parse(pair.last, new CultureInfo("en"))));
+                        listReturner.Add(new PricedTradingPair(pairSymbol, double.Parse(pair.last, new CultureInfo("en"))));
                     // listReturner.Add(new CryptoExchangePairInfo(SplitSymbolConverter(pair.symbol), double.Parse(pair.last)));
                 }
             }
@@ -41,13 +41,14 @@ namespace CryptoApi.Static
                 return new TradingPair()
                 {
                     Name = name,
-                    Quote = quote
+                    Quote = quote,
+                    Exchange = Exchanges.Kucoin
                 };
             }
             return null;
         }
 
-        public async Task<List<KucoinData.Ticker>> GetTickerFullData()
+        public async Task<List<KucoinData.Ticker>> GetTickerData()
         {
             using (var restRequester = new RestRequester())
             {
@@ -66,16 +67,15 @@ namespace CryptoApi.Static
             {
             };
         }
-        public async Task<SymbolTimedExInfo> GetExchangeData()
+        public async Task GetExchangeData()
         {
-            var data = await GetTickerFullData();
-            var pairs = PairsListConverter(data);
-            return new SymbolTimedExInfo()
-            {
-                CreationTime = DateTime.Now,
-                Pairs = pairs,
-                Exchange = Exchanges.Kucoin
-            };
+            var pairs = PairsListConverter(await GetTickerData());
+            //return new SymbolTimedExInfo()
+            //{
+            //    CreationTime = DateTime.Now,
+            //    Pairs = pairs,
+            //    Exchange = Exchanges.Kucoin
+            //};
 
         }
     }

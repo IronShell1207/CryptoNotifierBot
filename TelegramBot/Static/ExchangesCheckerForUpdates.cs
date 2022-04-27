@@ -16,14 +16,9 @@ namespace TelegramBot.Static
     {
         public static bool DataAvailable { get; set; } = false;
         public static bool DataUpdating { get; set; } = true;
-        public static SymbolTimedExInfo binancePairsData { get; set; }
-        public static SymbolTimedExInfo gateioPairsData { get; set; }
-        public static SymbolTimedExInfo okxPairsData { get; set; }
-        public static SymbolTimedExInfo kucoinPairsData { get; set; }
-        public static SymbolTimedExInfo bitgetPairsData { get; set; }
 
-        private static List<List<SymbolTimedExInfo>> _marketData = new List<List<SymbolTimedExInfo>>();
-        public static List<List<SymbolTimedExInfo>> MarketData
+        private static List<List<CryDbSet>> _marketData = new List<List<CryDbSet>>();
+        public static List<List<CryDbSet>> MarketData
         {
             get
             {
@@ -39,45 +34,45 @@ namespace TelegramBot.Static
 
         public static async void ExchangesUpdaterLoop()
         {
-            var binanceApi = new BinanceApi();
-            var gateIOApi = new GateioApi();
-            var okxApi = new OkxApi();
-            var kucoinApi = new KucoinAPI();
-            var bitgetApi = new BitgetApi();
-            while (DataUpdating)
-            {
-                try
-                {
-                    binancePairsData = await binanceApi.GetExchangeData();
-                    gateioPairsData = await gateIOApi.GetExchangeData();
-                    okxPairsData = await okxApi.GetExchangeData();
-                    kucoinPairsData = await kucoinApi.GetExchangeData();
-                    bitgetPairsData = await bitgetApi.GetExchangeData();
-                    var list = new List<SymbolTimedExInfo>()
-                    {binancePairsData, gateioPairsData, okxPairsData, kucoinPairsData, bitgetPairsData};
-                    MarketData.Add(list);
-                    Console.WriteLine($"[{DateTime.Now.ToString()}] Market data updated. BTC: {binancePairsData.Pairs.FirstOrDefault(x=>x.Symbol.ToString()== "BTC/USDT").Price}$ Binance: {binancePairsData.Pairs.Count} GateIO: {gateioPairsData.Pairs.Count} Okx: {okxPairsData.Pairs.Count} Kucoin: {kucoinPairsData.Pairs.Count} Bitget: {bitgetPairsData.Pairs.Count}");
-                    DataAvailable = true;
-                    Thread.Sleep(30000);
-                }
-                catch (Exception ex)
-                {
-                    throw;
-                }
-            }
+            //var binanceApi = new BinanceApi();
+            //var gateIOApi = new GateioApi();
+            //var okxApi = new OkxApi();
+            //var kucoinApi = new KucoinAPI();
+            //var bitgetApi = new BitgetApi();
+            //while (DataUpdating)
+            //{
+            //    try
+            //    {
+            //        binanceApi = await binanceApi.GetExchangeData();
+            //        gateioPairsData = await gateIOApi.GetExchangeData();
+            //        okxPairsData = await okxApi.GetExchangeData();
+            //        kucoinPairsData = await kucoinApi.GetExchangeData();
+            //        bitgetPairsData = await bitgetApi.GetExchangeData();
+            //        var list = new List<CryDbSet>()
+            //        {binanceApi, gateioPairsData, okxPairsData, kucoinPairsData, bitgetPairsData};
+            //        MarketData.Add(list);
+            //        Console.WriteLine($"[{DateTime.Now.ToString()}] Market data updated. BTC: {binancePairsData.Pairs.FirstOrDefault(x=>x.Symbol.ToString()== "BTC/USDT").Price}$ Binance: {binancePairsData.Pairs.Count} GateIO: {gateioPairsData.Pairs.Count} Okx: {okxPairsData.Pairs.Count} Kucoin: {kucoinPairsData.Pairs.Count} Bitget: {bitgetPairsData.Pairs.Count}");
+            //        DataAvailable = true;
+            //        Thread.Sleep(30000);
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        throw;
+            //    }
+            //}
         }
 
         public static async Task<double> GetCurrentPrice(TradingPair pair, string exchange = "")
         {
             if (DataAvailable)
             {
-                var mData = MarketData.LastOrDefault();
-                if (string.IsNullOrWhiteSpace(exchange))
-                    exchange = GetExchangesForPair(pair).Result.FirstOrDefault();
-                SymbolTimedExInfo sData = mData.FirstOrDefault(x => x.Exchange == exchange);
-                var pricedPair = sData.Pairs.FirstOrDefault(x => x.Symbol.ToString() == pair.ToString());
-                if (pricedPair != null)
-                    return (double)pricedPair.Price;
+                //var mData = MarketData.LastOrDefault();
+                //if (string.IsNullOrWhiteSpace(exchange))
+                //    exchange = GetExchangesForPair(pair).Result.FirstOrDefault();
+                //List<PricedTradingPair> sData = mData.FirstOrDefault(x => x.Exchange == exchange);
+                //var pricedPair = sData.FirstOrDefault(x => x.Symbol.ToString() == pair.ToString());
+                //if (pricedPair != null)
+                //    return (double)pricedPair.Price;
             }
             else
             {
@@ -97,17 +92,17 @@ namespace TelegramBot.Static
             {
                 if (DataAvailable)
                 {
-                    if (binancePairsData.Pairs.Exists(x => x.Symbol.ToString() == pair.ToString()))
-                        exchanges.Add(CryptoApi.Constants.Exchanges.Binance);
-                    if (gateioPairsData.Pairs.Exists(x => x.Symbol.ToString() == pair.ToString()))
-                        exchanges.Add(CryptoApi.Constants.Exchanges.GateIO);
-                    if (okxPairsData.Pairs.Exists(x => x.Symbol.ToString() == pair.ToString()))
-                        exchanges.Add(CryptoApi.Constants.Exchanges.Okx);
-                    if (kucoinPairsData.Pairs.Exists(x => x.Symbol.ToString() == pair.ToString()))
-                        exchanges.Add(CryptoApi.Constants.Exchanges.Kucoin);
-                    if (bitgetPairsData.Pairs.Exists(x=>x.Symbol.ToString() == pair.ToString()))
-                        exchanges.Add(CryptoApi.Constants.Exchanges.Bitget);
-                    return exchanges;
+                    //if (binancePairsData.Pairs.Exists(x => x.Symbol.ToString() == pair.ToString()))
+                    //    exchanges.Add(CryptoApi.Constants.Exchanges.Binance);
+                    //if (gateioPairsData.Pairs.Exists(x => x.Symbol.ToString() == pair.ToString()))
+                    //    exchanges.Add(CryptoApi.Constants.Exchanges.GateIO);
+                    //if (okxPairsData.Pairs.Exists(x => x.Symbol.ToString() == pair.ToString()))
+                    //    exchanges.Add(CryptoApi.Constants.Exchanges.Okx);
+                    //if (kucoinPairsData.Pairs.Exists(x => x.Symbol.ToString() == pair.ToString()))
+                    //    exchanges.Add(CryptoApi.Constants.Exchanges.Kucoin);
+                    //if (bitgetPairsData.Pairs.Exists(x=>x.Symbol.ToString() == pair.ToString()))
+                    //    exchanges.Add(CryptoApi.Constants.Exchanges.Bitget);
+                    //return exchanges;
                 }
                 else
                 {

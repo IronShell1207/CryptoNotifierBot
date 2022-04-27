@@ -15,16 +15,16 @@ namespace CryptoApi.Static
 {
     public class OkxApi : TheDisposable, ITradingApi
     {
-        public List<CryptoExchangePairInfo> PairsListConverter(List<OkxPairsInfo> list)
+        public List<PricedTradingPair> PairsListConverter(List<OkxPairsInfo> list)
         {
-            var listReturner = new List<CryptoExchangePairInfo>();
+            var listReturner = new List<PricedTradingPair>();
             if (list != null)
             {
                 foreach (OkxPairsInfo pair in list)
                 {
                     var pairSymbol = SplitSymbolConverter(pair.instId);
                     if (pairSymbol != null)
-                        listReturner.Add(new CryptoExchangePairInfo(pairSymbol, double.Parse(pair.last, new CultureInfo("en"))));
+                        listReturner.Add(new PricedTradingPair(pairSymbol, double.Parse(pair.last, new CultureInfo("en"))));
                     // listReturner.Add(new CryptoExchangePairInfo(SplitSymbolConverter(pair.instId), double.Parse(pair.last)));
                 }
             }
@@ -41,13 +41,14 @@ namespace CryptoApi.Static
                 return new TradingPair()
                 {
                     Name = name,
-                    Quote = quote
+                    Quote = quote,
+                    Exchange = Exchanges.Okx
                 };
             }
             return null;
         }
 
-        public async Task<List<OkxPairsInfo>> GetTickerFullData()
+        public async Task<List<OkxPairsInfo>> GetTickerData()
         {
             using (var restRequester = new RestRequester())
             {
@@ -63,15 +64,15 @@ namespace CryptoApi.Static
             return new List<OkxPairsInfo>();
         }
 
-        public async Task<SymbolTimedExInfo> GetExchangeData()
+        public async Task GetExchangeData()
         {
-            var pairs = PairsListConverter(await GetTickerFullData());
-            return new SymbolTimedExInfo()
-            {
-                CreationTime = DateTime.Now,
-                Pairs = pairs,
-                Exchange = Exchanges.Okx
-            };
+            var pairs = PairsListConverter(await GetTickerData());
+            //return new SymbolTimedExInfo()
+            //{
+            //    CreationTime = DateTime.Now,
+            //    Pairs = pairs,
+            //    Exchange = Exchanges.Okx
+            //};
 
         }
 

@@ -12,7 +12,7 @@ namespace CryptoApi.Static.DataHandler
     public class DataBaseContext : DbContext
     {
         public DbSet<CryDbSet> DataSet { get; set; }
-        public DbSet<TradingPair> TradingPairs { get; set; }
+        public DbSet<PricedTradingPair> TradingPairs { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             string dbPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"/Tcryptobot/";

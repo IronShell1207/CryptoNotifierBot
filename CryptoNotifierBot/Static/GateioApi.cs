@@ -16,16 +16,16 @@ namespace CryptoApi.Static
 {
     public class GateioApi : TheDisposable, ITradingApi
     {
-        public List<CryptoExchangePairInfo> ExchangePairsConverter(List<GateIOData> list)
+        public List<PricedTradingPair> ExchangePairsConverter(List<GateIOData> list)
         {
-            var listReturner = new List<CryptoExchangePairInfo>();
+            var listReturner = new List<PricedTradingPair>();
             if (list != null)
             {
                 foreach (GateIOData pair in list)
                 {
                     var pairSymbol = SplitSymbolConverter(pair.currency_pair);
                     if (pairSymbol != null)
-                        listReturner.Add(new CryptoExchangePairInfo(pairSymbol, double.Parse(pair.last, new CultureInfo("en"))));
+                        listReturner.Add(new PricedTradingPair(pairSymbol, double.Parse(pair.last, new CultureInfo("en"))));
                     //listReturner.Add(new CryptoExchangePairInfo(SplitSymbolConverter(pair.currency_pair), double.Parse(pair.last)));
                 }
             }
@@ -42,7 +42,8 @@ namespace CryptoApi.Static
                 return new TradingPair()
                 {
                     Name = name,
-                    Quote = quote
+                    Quote = quote,
+                    Exchange = Exchanges.GateIO
                 };
             }
             return null;
@@ -66,16 +67,9 @@ namespace CryptoApi.Static
 
             };
         }
-        public async Task<SymbolTimedExInfo> GetExchangeData()
+        public async Task GetExchangeData()
         {
             var pairs = ExchangePairsConverter(await GetTickerFullData());
-            return new SymbolTimedExInfo()
-            {
-                CreationTime = DateTime.Now,
-                Pairs = pairs,
-                Exchange = Exchanges.GateIO
-            };
-
         }
     }
 }
