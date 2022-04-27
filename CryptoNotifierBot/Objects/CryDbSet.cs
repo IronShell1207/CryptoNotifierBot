@@ -11,6 +11,7 @@ namespace CryptoApi.Objects
         public int Id { get; set; }
         public string Date { get; set; }
         public string Time { get; set; }
+        public string Exchange { get; set; }
 
         public DateTime GetDateTime()
         {
@@ -21,9 +22,10 @@ namespace CryptoApi.Objects
         {
 
         }
-        public CryDbSet(DateTime dateTime)
+        public CryDbSet(DateTime dateTime, string exchange)
         {
-            Date = dateTime.ToLongDateString();
+            Date = dateTime.ToShortDateString();
+            Exchange = exchange;
             Time = dateTime.ToLongTimeString();
         }
     }

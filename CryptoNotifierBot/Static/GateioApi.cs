@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using CryptoApi.Constants;
 using CryptoApi.Objects;
 using CryptoApi.Objects.ExchangesPairs;
+using CryptoApi.Static.DataHandler;
 using Newtonsoft.Json;
 using RestSharp;
 
@@ -67,9 +68,22 @@ namespace CryptoApi.Static
 
             };
         }
+        public void SavePairsToDb(string exchange, List<PricedTradingPair> pairs)
+        {
+            using (DataBaseContext dbContext = new DataBaseContext())
+            {
+                var dbSet = new CryDbSet(DateTime.Now, exchange);
+                dbContext.DataSet.Add(dbSet);
+                dbContext.SaveChanges();
+                pairs.ForEach(x => x.DbId = dbSet.Id);
+                dbContext.TradingPairs.AddRange(pairs);
+                dbContext.SaveChanges();
+            }
+        }
         public async Task GetExchangeData()
         {
             var pairs = ExchangePairsConverter(await GetTickerFullData());
+            SavePairsToDb(Exchanges.GateIO, pairs);
         }
     }
 }
