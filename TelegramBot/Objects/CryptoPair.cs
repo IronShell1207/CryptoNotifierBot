@@ -38,7 +38,7 @@ namespace TelegramBot.Objects
         {
             var linkExh = CryptoApi.Constants.ExchangesSpotLinks.GetSpotLink(this.ExchangePlatform);
             var link =
-            $"<a href='{linkExh}{ExchangesSpotLinks.GetPairConverted(this.ExchangePlatform, this.PairBase, this.PairQuote)}'>{this.ToString()}</a>";
+            $"<a href='{ExchangesSpotLinks.GetPairLink(this.ExchangePlatform, this.PairBase, this.PairQuote)}'>{this.ToString()}</a>";
             return link;
         }
 
@@ -59,9 +59,8 @@ namespace TelegramBot.Objects
         {
             var enableSymbol = CultureTextRequest.GetSettingsMsgString("enabled", lang);
             var disableSymbol = CultureTextRequest.GetSettingsMsgString("disabled", lang);
-            var linkExh = CryptoApi.Constants.ExchangesSpotLinks.GetSpotLink(this.ExchangePlatform);
             var link =
-                $"<a href='{linkExh}{ExchangesSpotLinks.GetPairConverted(this.ExchangePlatform, this.PairBase, this.PairQuote)}'>{this.ToString()}</a>";
+                $"<a href='{ExchangesSpotLinks.GetPairLink(this.ExchangePlatform, this.PairBase, this.PairQuote)}'>{this.ToString()}</a>";
             string enable = Enabled ? enableSymbol : disableSymbol;
             string lessOrGreater = GainOrFall ? "&#62;" : "&#60;";
             string lessOrGreaterSymbol = GainOrFall ? "📈" : "📉";
