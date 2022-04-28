@@ -58,12 +58,15 @@ namespace CryptoApi.Static
         {
             using (DataBaseContext dbContext = new DataBaseContext())
             {
-                var dbSet = new CryDbSet(DateTime.Now, exchange);
-                dbContext.DataSet.Add(dbSet);
-                dbContext.SaveChanges();
-                pairs.ForEach(x => x.DbId = dbSet.Id);
-                dbContext.TradingPairs.AddRange(pairs);
-                dbContext.SaveChanges();
+                if (pairs.Any())
+                {
+                    var dbSet = new CryDbSet(DateTime.Now, exchange);
+                    dbContext.DataSet.Add(dbSet);
+                    dbContext.SaveChanges();
+                    pairs.ForEach(x => x.DbId = dbSet.Id);
+                    dbContext.TradingPairs.AddRange(pairs);
+                    dbContext.SaveChanges();
+                }
             }
         }
         public async Task<List<BitgetTicker>> GetTickerData()
@@ -79,6 +82,8 @@ namespace CryptoApi.Static
                     if (data.msg == "success")
                         return data.data.ToList();
                 }
+                else if (response?.StatusCode == null)
+                    return null;
             }
 
             return new List<BitgetTicker>()

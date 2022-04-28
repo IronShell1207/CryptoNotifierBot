@@ -25,6 +25,11 @@ namespace CryptoApi.Static
                 request.Timeout = 6000;
                 var client = new RestClient();
                 var result = await client.ExecuteAsync(request);
+                if (result.StatusCode == 0)
+                {
+                    Console.WriteLine("No connection while requesting binance ticker data");
+                    return null;
+                }
                 if (!result.IsSuccessful)
                     client = new RestClient(ProxyClient(Link));
                 result = await client.ExecuteAsync(request);

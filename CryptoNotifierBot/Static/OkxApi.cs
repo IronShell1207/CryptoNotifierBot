@@ -60,6 +60,8 @@ namespace CryptoApi.Static
                     var data = serializer.Deserialize<OkxData>(new JsonTextReader(new StringReader(response.Content)));
                     return data.data.ToList();
                 }
+                else if (response?.StatusCode == null)
+                    return null;
             }
 
             return new List<OkxPairsInfo>();
@@ -68,12 +70,15 @@ namespace CryptoApi.Static
         {
             using (DataBaseContext dbContext = new DataBaseContext())
             {
-                var dbSet = new CryDbSet(DateTime.Now, exchange);
-                dbContext.DataSet.Add(dbSet);
-                dbContext.SaveChanges();
-                pairs.ForEach(x => x.DbId = dbSet.Id);
-                dbContext.TradingPairs.AddRange(pairs);
-                dbContext.SaveChanges();
+                if (pairs.Any())
+                {
+                    var dbSet = new CryDbSet(DateTime.Now, exchange);
+                    dbContext.DataSet.Add(dbSet);
+                    dbContext.SaveChanges();
+                    pairs.ForEach(x => x.DbId = dbSet.Id);
+                    dbContext.TradingPairs.AddRange(pairs);
+                    dbContext.SaveChanges();
+                }
             }
         }
         public async Task GetExchangeData()

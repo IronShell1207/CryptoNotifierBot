@@ -61,6 +61,8 @@ namespace CryptoApi.Static
                     return serializer.Deserialize<List<GateIOData>>(
                         new JsonTextReader(new StringReader(response.Content)));
                 }
+                else if (response?.StatusCode == null)
+                    return null;
             }
 
             return new List<GateIOData>()
@@ -72,12 +74,15 @@ namespace CryptoApi.Static
         {
             using (DataBaseContext dbContext = new DataBaseContext())
             {
-                var dbSet = new CryDbSet(DateTime.Now, exchange);
-                dbContext.DataSet.Add(dbSet);
-                dbContext.SaveChanges();
-                pairs.ForEach(x => x.DbId = dbSet.Id);
-                dbContext.TradingPairs.AddRange(pairs);
-                dbContext.SaveChanges();
+                if (pairs.Any())
+                {
+                    var dbSet = new CryDbSet(DateTime.Now, exchange);
+                    dbContext.DataSet.Add(dbSet);
+                    dbContext.SaveChanges();
+                    pairs.ForEach(x => x.DbId = dbSet.Id);
+                    dbContext.TradingPairs.AddRange(pairs);
+                    dbContext.SaveChanges();
+                }
             }
         }
         public async Task GetExchangeData()

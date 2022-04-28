@@ -62,8 +62,9 @@ namespace CryptoApi.Static
                             new JsonTextReader(new StringReader(response.Content)));
                     return kudata.data.ticker.ToList();
                 }
+                else if (response?.StatusCode == null)
+                    return null;
             }
-
             return new List<KucoinData.Ticker>()
             {
             };
@@ -72,25 +73,21 @@ namespace CryptoApi.Static
         {
             using (DataBaseContext dbContext = new DataBaseContext())
             {
-                var dbSet = new CryDbSet(DateTime.Now, exchange);
-                dbContext.DataSet.Add(dbSet);
-                dbContext.SaveChanges();
-                pairs.ForEach(x => x.DbId = dbSet.Id);
-                dbContext.TradingPairs.AddRange(pairs);
-                dbContext.SaveChanges();
+                if (pairs.Any())
+                {
+                    var dbSet = new CryDbSet(DateTime.Now, exchange);        
+                    dbContext.DataSet.Add(dbSet);
+                    dbContext.SaveChanges();
+                    pairs.ForEach(x => x.DbId = dbSet.Id);
+                    dbContext.TradingPairs.AddRange(pairs);
+                    dbContext.SaveChanges();
+                }
             }
         }
         public async Task GetExchangeData()
         {
             var pairs = PairsListConverter(await GetTickerData());
             SavePairsToDb(Exchanges.Kucoin, pairs);
-            //return new SymbolTimedExInfo()
-            //{
-            //    CreationTime = DateTime.Now,
-            //    Pairs = pairs,
-            //    Exchange = Exchanges.Kucoin
-            //};
-
         }
     }
 }
