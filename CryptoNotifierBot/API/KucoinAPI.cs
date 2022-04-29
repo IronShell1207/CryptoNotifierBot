@@ -9,14 +9,18 @@ using System.Threading.Tasks;
 using CryptoApi.Constants;
 using CryptoApi.Objects;
 using CryptoApi.Objects.ExchangesPairs;
+using CryptoApi.Static;
 using CryptoApi.Static.DataHandler;
 using Newtonsoft.Json;
 using RestSharp;
 
-namespace CryptoApi.Static
+namespace CryptoApi.API
 {
     public class KucoinAPI : TheDisposable, ITradingApi
     {
+        public string ApiName => Exchanges.Kucoin;
+        public int PairsCount { get; private set; }
+        public DateTime LastUpdate { get; private set; }
         public List<PricedTradingPair> PairsListConverter(List<KucoinData.Ticker> list)
         {
             var listReturner = new List<PricedTradingPair>();
@@ -43,7 +47,7 @@ namespace CryptoApi.Static
                 {
                     Name = name,
                     Quote = quote,
-                    Exchange = Exchanges.Kucoin
+                    Exchange = ApiName
                 };
             }
             return null;
@@ -60,6 +64,8 @@ namespace CryptoApi.Static
                     var kudata =
                         serializer.Deserialize<KucoinData.Rootobject>(
                             new JsonTextReader(new StringReader(response.Content)));
+                    PairsCount = kudata.data.ticker.ToList().Count;
+                    LastUpdate = DateTime.Now;
                     return kudata.data.ticker.ToList();
                 }
                 else if (response?.StatusCode == null)
@@ -78,7 +84,7 @@ namespace CryptoApi.Static
                     var dbSet = new CryDbSet(DateTime.Now, exchange);        
                     dbContext.DataSet.Add(dbSet);
                     dbContext.SaveChanges();
-                    pairs.ForEach(x => x.DbId = dbSet.Id);
+                    pairs.ForEach(x => x.CryDbSetId = dbSet.Id);
                     dbContext.TradingPairs.AddRange(pairs);
                     dbContext.SaveChanges();
                 }

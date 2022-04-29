@@ -20,7 +20,6 @@ namespace TelegramBot.Static
     {
         public static async void MainLoop()
         {
-            Task.Run(ExchangesCheckerForUpdates.ExchangesUpdaterLoop);
             Task.Run(BreakoutMonitor.BreakoutLoop);
             Task.Run(BotLoops.MonitorLoop.Loop);
             Task.Run(MorningReport.MorningSpread);

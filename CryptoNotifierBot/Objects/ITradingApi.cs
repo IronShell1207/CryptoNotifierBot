@@ -6,12 +6,15 @@ using System.Threading.Tasks;
 using CryptoApi.Constants;
 using CryptoApi.Static.DataHandler;
 
+
 namespace CryptoApi.Objects
 {
     public interface ITradingApi 
     {
         public Task GetExchangeData();
-
+        public string ApiName { get; }
+        public int PairsCount { get; }
+        public DateTime LastUpdate { get; }
         
         //  public  List<CryptoExchangePairInfo> ExchangePairsConverter(List<object> list);
     }

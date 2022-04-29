@@ -33,6 +33,7 @@ namespace TelegramBot.Static
         public AppDbContext()
         {
             //remove this for create migrations
+#if DEBUG
             var migr = Database.GetPendingMigrations();
             var appl = Database.GetAppliedMigrations();
             if (migr.Any())
@@ -40,6 +41,7 @@ namespace TelegramBot.Static
                 Console.WriteLine("Migration");
                 Database.Migrate();
             }
+#endif
         }
     }
 }

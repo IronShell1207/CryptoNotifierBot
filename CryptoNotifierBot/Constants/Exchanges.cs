@@ -8,16 +8,21 @@ namespace CryptoApi.Constants
 {
     public class Exchanges
     {
-        public static string GateIO = "GateIO";
-        public static string Okx = "Okx";
-        public static string Binance = "Binance";
-        public static string Kucoin = "Kucoin";
-        public static string Bitget = "Bitget";
+        public const string GateIO = "GateIO";
+        public const string Okx = "Okx";
+        public const string Binance = "Binance";
+        public const string Kucoin = "Kucoin";
+        public const string Bitget = "Bitget";
         public static bool Contains(string name)
         {
-            if (name == GateIO || name == Okx || name == Binance || name == Kucoin)
+            if (name is GateIO or Okx or Binance or Kucoin)
                 return true;
             return false;   
         }
+
+        public static List<string> ExchangeList = new List<string>()
+        {
+            GateIO,Okx,Bitget,Binance,Kucoin
+        };
     }
 }

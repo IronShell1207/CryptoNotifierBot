@@ -164,34 +164,34 @@ namespace TelegramBot.Static.MessageHandlers
 
         public async void AddPairToBlackList(Update update, string Pairbase, string Pairquote)
         {
-            bool isValid = ExchangesCheckerForUpdates.GetCurrentPrice(new TradingPair(Pairbase, Pairquote)).Result > 0;
-            if (isValid)
-            {
-                var user = BotApi.GetUserSettings(update.Message.Chat.Id).Result;
-                using (AppDbContext dbContext = new AppDbContext())
-                {
-                    var blackPairEx = dbContext.BlackListedPairs.FirstOrDefault(x =>
-                        x.Base == Pairbase && x.Quote == Pairquote && x.OwnerId == user.Id);
-                    if (blackPairEx == null)
-                    {
-                        BlackListedPairs badPair = new BlackListedPairs()
-                        {
-                            Base = Pairbase,
-                            Quote = Pairquote,
-                            OwnerId = user.Id
-                        };
-                        dbContext.BlackListedPairs.Add(badPair);
-                        dbContext.SaveChangesAsync();
-                        BotApi.SendMessage(user.TelegramId, string.Format(
-                            CultureTextRequest.GetMessageString("blacklistPairAdded", user.Language), badPair.ToString()));
-                    }
-                    else
-                    {
-                        BotApi.SendMessage(user.TelegramId,string.Format(
-                            CultureTextRequest.GetMessageString("blacklistPairExists", user.Language), blackPairEx.ToString()));
-                    }
-                }
-            }
+           //bool isValid = ExchangesCheckerForUpdates.GetCurrentPrice(new TradingPair(Pairbase, Pairquote)).;
+            //if (isValid)
+            //{
+            //    var user = BotApi.GetUserSettings(update.Message.Chat.Id).Result;
+            //    using (AppDbContext dbContext = new AppDbContext())
+            //    {
+            //        var blackPairEx = dbContext.BlackListedPairs.FirstOrDefault(x =>
+            //            x.Base == Pairbase && x.Quote == Pairquote && x.OwnerId == user.Id);
+            //        if (blackPairEx == null)
+            //        {
+            //            BlackListedPairs badPair = new BlackListedPairs()
+            //            {
+            //                Base = Pairbase,
+            //                Quote = Pairquote,
+            //                OwnerId = user.Id
+            //            };
+            //            dbContext.BlackListedPairs.Add(badPair);
+            //            dbContext.SaveChangesAsync();
+            //            BotApi.SendMessage(user.TelegramId, string.Format(
+            //                CultureTextRequest.GetMessageString("blacklistPairAdded", user.Language), badPair.ToString()));
+            //        }
+            //        else
+            //        {
+            //            BotApi.SendMessage(user.TelegramId,string.Format(
+            //                CultureTextRequest.GetMessageString("blacklistPairExists", user.Language), blackPairEx.ToString()));
+            //        }
+            //    }
+            //}
 
         }
 

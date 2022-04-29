@@ -2,6 +2,7 @@
 using CryptoApi.Static.DataHandler;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -9,9 +10,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CryptoApi.Migrations
 {
     [DbContext(typeof(DataBaseContext))]
-    partial class DataBaseContextModelSnapshot : ModelSnapshot
+    [Migration("20220428141657_changed-TradingPair")]
+    partial class changedTradingPair
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.4");
@@ -42,7 +44,7 @@ namespace CryptoApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("CryDbSetId")
+                    b.Property<int>("DbId")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("Exchange")
@@ -59,20 +61,7 @@ namespace CryptoApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CryDbSetId");
-
                     b.ToTable("TradingPairs");
-                });
-
-            modelBuilder.Entity("CryptoApi.Objects.PricedTradingPair", b =>
-                {
-                    b.HasOne("CryptoApi.Objects.CryDbSet", "CryDbSet")
-                        .WithMany()
-                        .HasForeignKey("CryDbSetId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CryDbSet");
                 });
 #pragma warning restore 612, 618
         }

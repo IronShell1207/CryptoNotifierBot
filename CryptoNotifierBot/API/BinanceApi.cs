@@ -11,14 +11,18 @@ using System.Threading.Tasks;
 using CryptoApi.Constants;
 using CryptoApi.Objects;
 using CryptoApi.Objects.ExchangesPairs;
+using CryptoApi.Static;
 using CryptoApi.Static.DataHandler;
 using Newtonsoft.Json;
 using RestSharp;
 
-namespace CryptoApi.Static
+namespace CryptoApi.API
 {
     public class BinanceApi : TheDisposable, ITradingApi
     {
+        public string ApiName => Exchanges.Binance;
+        public int PairsCount { get; private set; }
+        public DateTime LastUpdate { get; private set; }
 
         public List<PricedTradingPair> ExchangePairsConverter(List<BinancePair> list)
         {
@@ -44,7 +48,7 @@ namespace CryptoApi.Static
             {
                 crp.Name = match.Groups["name"].Value;
                 crp.Quote = match.Groups["quote"].Value;
-                crp.Exchange = Exchanges.Binance;
+                crp.Exchange = ApiName;
                 if (Diff.AllowedQuotes.Contains(crp.Quote))
                     return crp;
             }
@@ -62,6 +66,8 @@ namespace CryptoApi.Static
                     var pairsSerialized =
                         serializer.Deserialize<List<BinancePair>>(
                             new JsonTextReader(new StringReader(response.Content)));
+                    PairsCount = pairsSerialized.Count;
+                    LastUpdate = DateTime.Now;
                     return pairsSerialized;
                 }
                 else if (response?.StatusCode == null)
@@ -90,7 +96,7 @@ namespace CryptoApi.Static
                     var dbSet = new CryDbSet(DateTime.Now, exchange);
                     dbContext.DataSet.Add(dbSet);
                     dbContext.SaveChanges();
-                    pairs.ForEach(x => x.DbId = dbSet.Id);
+                    pairs.ForEach(x => x.CryDbSet = dbSet);
                     dbContext.TradingPairs.AddRange(pairs);
                     dbContext.SaveChanges();
                 }

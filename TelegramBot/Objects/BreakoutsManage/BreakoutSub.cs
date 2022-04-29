@@ -13,6 +13,8 @@ namespace TelegramBot.Objects
         
         public int Id { get; set; }
         public long TelegramId { get; set; }
+        public UserConfig? User { get; set; }
+        public int UserId { get; set; }
         public bool BlackListEnable { get; set; } = false;
         public bool Subscribed { get; set; } = true;
         public bool GateioSub { get; set; } = true;

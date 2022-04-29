@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using System.Linq;
@@ -23,6 +24,8 @@ namespace TelegramBot.Objects
         public bool TriggerOnce { get; set; } = false;
         public string? Screenshot { get; set; }
         public string? Note { get; set; }
+        [ForeignKey(nameof(OwnerId))]
+        public UserConfig? User { get; set; }
 
         public CryptoPair(){}
         public CryptoPair(int owner)

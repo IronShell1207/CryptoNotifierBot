@@ -3,6 +3,7 @@ using CryptoApi.Static.DataHandler;
 using NUnit.Framework;
 using System.Linq;
 using System.Threading.Tasks;
+using CryptoApi.API;
 using CryptoApi.Constants;
 using CryptoApi.Objects.ExchangesPairs;
 
@@ -52,9 +53,9 @@ namespace CryptoApi.Tests
             using (DataBaseContext dbContext = new DataBaseContext())
             {
                 var dbset = dbContext.DataSet.OrderBy(x => x.Id).LastOrDefault(x => x.Exchange == exchange);
-                var pairs = dbContext.TradingPairs.Where(x => x.DbId == dbset.Id);
+                var pairs = dbContext.TradingPairs.Where(x => x.CryDbSetId == dbset.Id);
                 var btc = pairs.First(x => x.Name == "BTC" && x.Quote == "USDT");
-                if (btc?.DbId == dbset.Id)
+                if (btc?.CryDbSetId == dbset.Id)
                     return $"{btc.ToString()}: {btc.Price} created in {dbset.GetDateTime().ToString()} from {btc.Exchange}";
                 else Assert.Fail(pairs.Count().ToString());
             }

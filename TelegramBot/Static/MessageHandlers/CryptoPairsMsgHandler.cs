@@ -246,15 +246,15 @@ namespace TelegramBot.Static.MessageHandlers
                         pair.Price = double.Parse(priceStr, new CultureInfo("en"));
                     }
 
-                    var exchangesForPair =
-                        ExchangesCheckerForUpdates.GetExchangesForPair(
-                            new CryptoApi.Objects.TradingPair(pair.PairBase, pair.PairQuote));
-                    if (exchangesForPair.Result.Any())
-                    {
-                        var kbexchanges = Keyboards.ExchangeSelectingKeyboardMarkup(exchangesForPair.Result);
-                        await BotApi.SendMessage(update.Message.Chat.Id, "Select crypto exchanges for your pair: ", kbexchanges);
-                    }
-                    else await BotApi.SendMessage(update.Message.Chat.Id, "Wrong pair!");
+                    //var exchangesForPair =
+                    //    ExchangesCheckerForUpdates.GetExchangesForPair(
+                    //        new CryptoApi.Objects.TradingPair(pair.PairBase, pair.PairQuote));
+                    //if (exchangesForPair.Result.Any())
+                    //{
+                    //    var kbexchanges = Keyboards.ExchangeSelectingKeyboardMarkup(exchangesForPair.Result);
+                    //    await BotApi.SendMessage(update.Message.Chat.Id, "Select crypto exchanges for your pair: ", kbexchanges);
+                    //}
+                    //else await BotApi.SendMessage(update.Message.Chat.Id, "Wrong pair!");
                 }
                 else
                 {
@@ -271,15 +271,15 @@ namespace TelegramBot.Static.MessageHandlers
                 var pair = GetTempUserTask(update).Result;
                 pair.PairBase = match.Groups["base"].Value.ToUpper();
                 pair.PairQuote = match.Groups["quote"].Value.ToUpper();
-                var exchangesForPair =
-                    ExchangesCheckerForUpdates.GetExchangesForPair(
-                        new CryptoApi.Objects.TradingPair(pair.PairBase, pair.PairQuote));
-                if (exchangesForPair.Result.Any())
-                {
-                    var kbexchanges = Keyboards.ExchangeSelectingKeyboardMarkup(exchangesForPair.Result);
-                    await BotApi.SendMessage(update.Message.Chat.Id, "Select crypto exchanges for your pair: ", kbexchanges);
-                }
-                else await BotApi.SendMessage(update.Message.Chat.Id, "Wrong pair!");
+                //var exchangesForPair =
+                //    ExchangesCheckerForUpdates.GetExchangesForPair(
+                //        new CryptoApi.Objects.TradingPair(pair.PairBase, pair.PairQuote));
+                //if (exchangesForPair.Result.Any())
+                //{
+                //    var kbexchanges = Keyboards.ExchangeSelectingKeyboardMarkup(exchangesForPair.Result);
+                //    await BotApi.SendMessage(update.Message.Chat.Id, "Select crypto exchanges for your pair: ", kbexchanges);
+                //}
+                //else await BotApi.SendMessage(update.Message.Chat.Id, "Wrong pair!");
             }
             else
             {
@@ -316,10 +316,10 @@ namespace TelegramBot.Static.MessageHandlers
             }
             else
             {
-                var curprice = ExchangesCheckerForUpdates.GetCurrentPrice(new TradingPair(
-                    pair.PairBase, pair.PairQuote), pair.ExchangePlatform);
-                pair.GainOrFall = curprice.Result < pair.Price;
-                SaveNewTaskToDB(update, user);
+                //var curprice = ExchangesCheckerForUpdates.GetCurrentPrice(new TradingPair(
+                //    pair.PairBase, pair.PairQuote), pair.ExchangePlatform);
+                //pair.GainOrFall = curprice.Result < pair.Price;
+                //SaveNewTaskToDB(update, user);
             }
         }
 

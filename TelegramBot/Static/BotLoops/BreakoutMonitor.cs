@@ -35,22 +35,22 @@ namespace TelegramBot.Static
         private static List<double> procentsDifference = new List<double>() { 2.5, 3, 4, 5, 5, 5, 5, 5, 6, 6, 8 };
         public static async void BreakoutLoop()
         {
-            var count = ExchangesCheckerForUpdates.MarketData.Count();
-            while (true)
-            {
+            //var count = ExchangesCheckerForUpdates.MarketData.Count();
+            //while (true)
+            //{
 
-                if (count > 3000)
-                    ExchangesCheckerForUpdates.MarketData.RemoveRange(1500, 500);
-                var countNow = ExchangesCheckerForUpdates.MarketData.Count();
-                if (countNow <= count)
-                {
-                    goto loopend;
-                }
+            //    if (count > 3000)
+            //        ExchangesCheckerForUpdates.MarketData.RemoveRange(1500, 500);
+            //    var countNow = ExchangesCheckerForUpdates.MarketData.Count();
+            //    if (countNow <= count)
+            //    {
+            //        goto loopend;
+            //    }
 
-                var datetimeNow = DateTime.Now;
-                var latestData = ExchangesCheckerForUpdates.MarketData.LastOrDefault();
-                for (var index = ExchangesCheckerForUpdates.MarketData.Count - 1; index >= 0; index--)
-                {
+            //    var datetimeNow = DateTime.Now;
+            //    var latestData = ExchangesCheckerForUpdates.MarketData.LastOrDefault();
+            //    for (var index = ExchangesCheckerForUpdates.MarketData.Count - 1; index >= 0; index--)
+            //    {
                     //if (index > ExchangesCheckerForUpdates.MarketData.Count) break;
                     //List<PricedTradingPair> data = ExchangesCheckerForUpdates.MarketData[index];
                     //for (var iTi = 0; iTi < ListTimings.Count; iTi++)
@@ -76,12 +76,12 @@ namespace TelegramBot.Static
                     //            }
                     //        }
                     //    }
-                    //}
-                }
-            loopend:
-                count = countNow;
-                Thread.Sleep(30000);
-            }
+            //        //}
+            //    }
+            //loopend:
+            //    count = countNow;
+            //    Thread.Sleep(30000);
+            //}
 
 
         }

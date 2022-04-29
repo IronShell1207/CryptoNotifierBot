@@ -10,14 +10,18 @@ using System.Threading.Tasks;
 using CryptoApi.Constants;
 using CryptoApi.Objects;
 using CryptoApi.Objects.ExchangesPairs;
+using CryptoApi.Static;
 using CryptoApi.Static.DataHandler;
 using Newtonsoft.Json;
 using RestSharp;
 
-namespace CryptoApi.Static
+namespace CryptoApi.API
 {
     public class BitgetApi : TheDisposable, ITradingApi
     {
+        public string ApiName => Exchanges.Bitget;
+        public int PairsCount { get; private set; }
+        public DateTime LastUpdate { get; private set; }
         public List<PricedTradingPair> ExchangePairsConverter(List<BitgetTicker> list)
         {
             var listReturner = new List<PricedTradingPair>();
@@ -43,7 +47,7 @@ namespace CryptoApi.Static
             {
                 crp.Name = match.Groups["name"].Value;
                 crp.Quote = match.Groups["quote"].Value;
-                crp.Exchange = Exchanges.Bitget;
+                crp.Exchange = ApiName;
                 if (Diff.AllowedQuotes.Contains(crp.Quote))
                     return crp;
             }
@@ -63,7 +67,7 @@ namespace CryptoApi.Static
                     var dbSet = new CryDbSet(DateTime.Now, exchange);
                     dbContext.DataSet.Add(dbSet);
                     dbContext.SaveChanges();
-                    pairs.ForEach(x => x.DbId = dbSet.Id);
+                    pairs.ForEach(x => x.CryDbSetId = dbSet.Id);
                     dbContext.TradingPairs.AddRange(pairs);
                     dbContext.SaveChanges();
                 }
@@ -80,7 +84,11 @@ namespace CryptoApi.Static
                     var data = serializer.Deserialize<BitgetData>(
                         new JsonTextReader(new StringReader(response.Content)));
                     if (data.msg == "success")
+                    {
+                        PairsCount = data.data.ToList().Count;
+                        LastUpdate = DateTime.Now;
                         return data.data.ToList();
+                    }
                 }
                 else if (response?.StatusCode == null)
                     return null;

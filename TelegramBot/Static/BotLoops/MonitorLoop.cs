@@ -51,12 +51,12 @@ namespace TelegramBot.Static.BotLoops
                 var pairs = dbContext.CryptoPairs.Where(x => x.OwnerId == user.Id && x.Enabled).ToList();
                 foreach (var pair in pairs)
                 {
-                    var price = await ExchangesCheckerForUpdates.GetCurrentPrice(
-                        new TradingPair(pair.PairBase, pair.PairQuote), pair.ExchangePlatform);
-                    if (price>0 &&( price > pair.Price && pair.GainOrFall || price < pair.Price && !pair.GainOrFall))
-                    {
-                        tasks.Add(new(pair, price));
-                    }
+                    ////var price = await ExchangesCheckerForUpdates.GetCurrentPrice(
+                    ////    new TradingPair(pair.PairBase, pair.PairQuote), pair.ExchangePlatform);
+                    //if (price>0 &&( price > pair.Price && pair.GainOrFall || price < pair.Price && !pair.GainOrFall))
+                    //{
+                    //    tasks.Add(new(pair, price));
+                    //}
                 }
             }
             return tasks;

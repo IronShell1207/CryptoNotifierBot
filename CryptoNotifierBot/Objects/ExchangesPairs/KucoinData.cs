@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CryptoApi.Objects.ExchangesPairs
 {
-    public class KucoinData
+    public class KucoinData 
     {
         public class Rootobject
         {

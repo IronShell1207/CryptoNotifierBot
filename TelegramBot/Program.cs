@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Threading.Tasks;
+using CryptoApi.Static.DataHandler;
 using Telegram.Bot;
 using TelegramBot;
 using TelegramBot.Constants;
@@ -13,6 +14,7 @@ namespace TelegramBot
 {
     internal class Program
     {
+        public static DataRequester cryptoData { get; private set; }
         static void Main(string[] args)
         {
             CultureInfo ci = new CultureInfo("en");
@@ -27,8 +29,11 @@ namespace TelegramBot
             {
                 ConsoleCommandsHandler.SetAdminId().Wait();
             }
-            Task.Run(() => NotifyLoops.MainLoop());
+            
             Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] Bot has been started!");
+            cryptoData = new DataRequester();
+            Task.Run(cryptoData.UpdateDataLoop);
+            Task.Run(() => NotifyLoops.MainLoop());
             while (true)
             {
                 var reader = Console.ReadLine();
