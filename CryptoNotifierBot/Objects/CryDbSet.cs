@@ -16,6 +16,7 @@ namespace CryptoApi.Objects
         public DateTime DateTime { get; set; }
         public Guid IdGuid { get; set; }
         public string Exchange { get; set; }
+        public List<PricedTradingPair> pairs { get; set; } = new();
         public CryDbSet()
         {
 

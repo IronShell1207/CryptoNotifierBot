@@ -78,27 +78,16 @@ namespace CryptoApi.Static.DataHandler
             }
         }
 
-        public async Task<List<CryDbSet>> GetLatestDataSets(int minutesOffset)
+        public async Task<List<CryDbSet>> GetLatestDataSets(int minutesOffset = 0)
         {
             using (DataBaseContext dbContext = new DataBaseContext())
             {
-                var latestData = dbContext.DataSet.OrderByDescending(x => x.Id).FirstOrDefault(x=>x.DateTime > DateTime.Now.AddMinutes(-minutesOffset) );
-               // var la = dbContext.DataSet.OrderBy(x=>x.Id).Where(x=> x.DateTime)
-               var lastdataSets = dbContext.DataSet.OrderByDescending(x => x.Id)
+                
+                var latestData = minutesOffset == 0 ? dbContext.DataSet.OrderByDescending(x=>x.Id).FirstOrDefault() :
+                    dbContext.DataSet.OrderByDescending(x => x.Id).FirstOrDefault(x => x.DateTime > DateTime.Now.AddMinutes(-minutesOffset));
+                var lastdataSets = dbContext.DataSet.OrderByDescending(x => x.Id)
                    .Where(x => x.IdGuid == latestData.IdGuid);
-               //var lastDataSets = dbContext.DataSet.OrderBy(x => x.Id).Where(x =>
-               //    (x.DateTime < latestData.DateTime + TimeSpan.FromSeconds(10) &&
-               //     latestData.DateTime - TimeSpan.FromSeconds(10) < x.DateTime) ||
-               //    (latestData.DateTime - TimeSpan.FromSeconds(10) < x.DateTime &&
-               //     x.DateTime < latestData.DateTime + TimeSpan.FromSeconds(10)));
-                //var lastDataSets = dbContext.DataSet.OrderBy(x => x.Id).Where(x =>
-                //    (x.DateTime.Month == latestData.DateTime.Month && 
-                //    x.DateTime.Day == latestData.DateTime.Day &&
-                //    x.DateTime.Hour == latestData.DateTime.Hour &&
-                //    x.DateTime.Minute == latestData.DateTime.Minute) && 
-                //    ((x.DateTime.Second - 10 < latestData.DateTime.Second && latestData.DateTime.Second < x.DateTime.Second + 10) 
-                //     ||(latestData.DateTime.Second - 10 < x.DateTime.Second && x.DateTime.Second < latestData.DateTime.Second + 10)));
-                return lastdataSets.ToList();
+                return lastdataSets?.ToList();
             }
         }
 
@@ -115,9 +104,9 @@ namespace CryptoApi.Static.DataHandler
             using (DataBaseContext dbContext = new DataBaseContext())
             {
 
-                   var dbSet = dbContext.DataSet.OrderBy(x => x.Id).LastOrDefault(x => x.Exchange == exchange);
+                var dbSet = dbContext.DataSet.OrderBy(x => x.Id).LastOrDefault(x => x.Exchange == exchange);
                 //
-                 //   dbSet = dbContext.DataSet.OrderBy(x => x.Id);
+                //   dbSet = dbContext.DataSet.OrderBy(x => x.Id);
                 var pair = dbContext.TradingPairs.FirstOrDefault(x =>
                     x.CryDbSetId == dbSet.Id &&
                     x.Exchange == exchange &&
