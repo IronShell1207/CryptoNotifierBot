@@ -207,4 +207,7 @@ For get all available commands 🔎 send: /help</value>
   <data name="CPAddComment" xml:space="preserve">
     <value>To add comment for task with id {0} for pair {1} send your comment in next message with this attached.</value>
   </data>
+  <data name="CPShowTasks" xml:space="preserve">
+    <value>There is your tasks with matching request: </value>
+  </data>
 </root>

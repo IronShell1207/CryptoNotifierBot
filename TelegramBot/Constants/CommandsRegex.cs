@@ -25,6 +25,9 @@ namespace TelegramBot.Constants
             public static Regex DeletePair =
                 new Regex(  
                     @"/(delete|remove)\s*((((?<id>[0-9]+)\s*)|((?<base>[a-zA-Z0-9]{2,9})((\s+|/)(?<quote>[a-zA-Z]{2,9})|)))|)");
+            public static Regex ShowPair =
+                new Regex(
+                    @"/(show|display)\s*((((?<id>[0-9]+)\s*)|((?<base>[a-zA-Z0-9]{2,9})((\s+|/)(?<quote>[a-zA-Z]{2,9})|)))|)");
 
             public static Regex ShiftTasks = new Regex(@"(/movetasks)(\s*(?<procent>[0-9]+)|)");
             public static Regex AddComment = new Regex(@"/((addcom)|(addcomment))\s*(?<id>[0-9]*)");

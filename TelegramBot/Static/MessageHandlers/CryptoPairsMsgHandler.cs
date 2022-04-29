@@ -66,13 +66,13 @@ namespace TelegramBot.Static.MessageHandlers
                             else
                             {
                                 var msg = string.Format(
-                                    CultureTextRequest.GetMessageString("CPEditPair", user.Language), task.ToString(), task.Id );
+                                    CultureTextRequest.GetMessageString("CPEditPair", user.Language), task.TaskStatus(), task.Id);
                                 BotApi.SendMessage(user.TelegramId, msg, true);
                             }
                         }
-                    } 
+                    }
                 }
-                else 
+                else
                 {
                     var pairbase = match.Groups["base"].Value.ToUpper();
                     var pairquote = match.Groups["quote"].Value.ToUpper();
@@ -95,7 +95,7 @@ namespace TelegramBot.Static.MessageHandlers
             }
         }
         public async void EditUserTaskReplyHandler(Update update, UserConfig user)
-        { 
+        {
             var editPriceMsgRegex =
                 CommandsRegex.ConvertMessageToRegex(CultureTextRequest.GetMessageString("CPEditPair", user.Language),
                     new List<string>() { @"(?<base>[a-zA-Z0-9]{2,9})(\s+|/)(?<quote>[a-zA-Z0-9]{2,6})", "(?<id>[0-9]+)" });
@@ -109,17 +109,17 @@ namespace TelegramBot.Static.MessageHandlers
                 {
                     using (CryptoPairDbHandler dbHandler = new CryptoPairDbHandler())
                     {
-                        var pair =  dbHandler.GetPairFromId(id, user.Id);
+                        var pair = dbHandler.GetPairFromId(id, user.Id);
                         if (pair != null)
                         {
-                           var e=  await dbHandler.SetNewPriceFromPair(pair, price);
+                            var e = await dbHandler.SetNewPriceFromPair(pair, price);
                             var msg = string.Format(
                                 CultureTextRequest.GetMessageString("CPEditTaskComplete", user.Language),
                                 pair.FullTaskInfo());
                             BotApi.SendMessage(user.TelegramId, msg, ParseMode.Html);
                         }
                     }
-                } 
+                }
             }
 
         }
@@ -131,7 +131,7 @@ namespace TelegramBot.Static.MessageHandlers
             {
                 var Id = int.Parse(match.Groups["id"].Value);
                 var userId = int.Parse(match.Groups["ownerId"].Value);
-               
+
                 if (userId == user.Id)
                 {
                     using (CryptoPairDbHandler dbHandler = new CryptoPairDbHandler())
@@ -142,7 +142,7 @@ namespace TelegramBot.Static.MessageHandlers
                             var msg = string.Format(CultureTextRequest.GetMessageString("CPEditPair", user.Language), pair.ToString(), pair.Id);
                             BotApi.SendMessage(user.TelegramId, msg, true);
                         }
-                        
+
                     }
                 }
             }
@@ -163,7 +163,7 @@ namespace TelegramBot.Static.MessageHandlers
                         if (dbh.DeletePair(pair))
                         {
                             var strMessage = CultureTextRequest.GetMessageString("cryptoPairRemoved", user.Language);
-                            BotApi.SendMessage(user.TelegramId, string.Format(strMessage, arg0: pair.ToString(), arg1: pair.Id));
+                            BotApi.SendMessage(user.TelegramId, string.Format(strMessage, arg0: pair.TaskStatus(), arg1: pair.Id));
                         }
                         else
                         {
@@ -220,9 +220,66 @@ namespace TelegramBot.Static.MessageHandlers
                         BotApi.SendMessage(user.TelegramId, CultureTextRequest.GetMessageString("CPRemoveEmpty", user.Language));
 
                     }
+                }
+                //PairsManager.TempObjects?.Remove(pair);
+            }
+        }
 
-
-
+        public void ShowTaskInfo(Update update)
+        {
+            var match = CommandsRegex.MonitoringTaskCommands.ShowPair.Match(update.Message.Text);
+            if (match.Success)
+            {
+                var user = BotApi.GetUserSettings(update.Message.Chat.Id).Result;
+                var strId = match.Groups["id"].Value;
+                if (!string.IsNullOrWhiteSpace(strId))
+                {
+                    int id = int.Parse(strId);
+                    using (CryptoPairDbHandler dbh = new CryptoPairDbHandler())
+                    {
+                        var pair = dbh.GetPairFromId(id, user.Id);
+                        BotApi.SendMessage(user.TelegramId, pair.FullTaskInfo(), ParseMode.Html);
+                    }
+                }
+                else
+                {
+                    var pairbase = match.Groups["base"].Value.ToUpper();
+                    var pairquote = match.Groups["quote"].Value.ToUpper();
+                    if (!string.IsNullOrWhiteSpace(pairbase) && !string.IsNullOrWhiteSpace(pairquote))
+                    {
+                        TradingPair pair = new TradingPair(pairbase, pairquote);
+                        StringBuilder sb = new StringBuilder();
+                        sb.AppendLine(CultureTextRequest.GetMessageString("CPShowTasks", user.Language));
+                        using (AppDbContext dbContext = new AppDbContext())
+                        {
+                            var pairs = dbContext.CryptoPairs.Where(x =>
+                                x.OwnerId == user.Id && x.PairBase == pair.Name && x.PairQuote == pair.Quote).ToList();
+                            foreach (var pairz in pairs)
+                            {
+                                sb.AppendLine(pairz.TaskStatusWithLink());
+                            }
+                        }
+                        BotApi.SendMessage(user.TelegramId, sb.ToString(), ParseMode.Html);
+                    }
+                    else if (!string.IsNullOrWhiteSpace(pairbase))
+                    {
+                        StringBuilder sb = new StringBuilder();
+                        sb.AppendLine(CultureTextRequest.GetMessageString("CPShowTasks", user.Language));
+                        using (AppDbContext dbContext = new AppDbContext())
+                        {
+                            var pairs = dbContext.CryptoPairs.Where(x =>
+                                x.OwnerId == user.Id && x.PairBase == pairbase).ToList();
+                            foreach (var pairz in pairs)
+                            {
+                                sb.AppendLine(pairz.TaskStatusWithLink());
+                            }
+                        }
+                        BotApi.SendMessage(user.TelegramId, sb.ToString(), ParseMode.Html);
+                    }
+                    else
+                    {
+                       // BotApi.SendMessage(user.TelegramId, CultureTextRequest.GetMessageString("CPRemoveEmpty", user.Language));
+                    }
                 }
                 //PairsManager.TempObjects?.Remove(pair);
             }
@@ -312,7 +369,7 @@ namespace TelegramBot.Static.MessageHandlers
             {
                 BotApi.EditMessage(update.Message.Chat.Id, BotApi.GetMessageIdFromUpdateTask(update).Result,
                     "Task creating expired. Start again");
-               // BotApi.SendMessage(update.Message.Chat.Id, );
+                // BotApi.SendMessage(update.Message.Chat.Id, );
             }
             else
             {
@@ -351,7 +408,7 @@ namespace TelegramBot.Static.MessageHandlers
                     pair.Enabled = true;
                     db.CryptoPairs.Add(pair);
                     PairsManager.TempObjects?.Remove(pair);
-                     db.SaveChangesAsync();
+                    db.SaveChangesAsync();
                 }
 
                 var msg = CultureTextRequest.GetSettingsMsgString("CPEditTaskCreated", user.Language);
@@ -430,7 +487,7 @@ namespace TelegramBot.Static.MessageHandlers
                 foreach (var pair in pairs)
                 {
                     if (pair.Item1.GainOrFall && pair.Item1.Price < pair.Item2)
-                        pair.Item1.Price = pair.Item2 * (procent+100)/100;
+                        pair.Item1.Price = pair.Item2 * (procent + 100) / 100;
                     else if (!pair.Item1.GainOrFall && pair.Item1.Price > pair.Item2)
                         pair.Item1.Price = pair.Item2 * (100 - procent) / 100;
                 }
