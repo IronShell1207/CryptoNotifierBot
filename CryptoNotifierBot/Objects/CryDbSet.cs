@@ -11,24 +11,21 @@ namespace CryptoApi.Objects
     {
         
         public int Id { get; set; }
+        
         [DataType(DataType.DateTime)]
-        public string DateTime { get; set; }
-
+        public DateTime DateTime { get; set; }
+        public Guid IdGuid { get; set; }
         public string Exchange { get; set; }
-
-        public DateTime GetDateTime()
-        {
-            return Convert.ToDateTime(DateTime);
-        }
-
         public CryDbSet()
         {
 
         }
-        public CryDbSet(DateTime dateTime, string exchange)
-        { 
-            this.DateTime = dateTime.ToString();
-            Exchange = exchange;
+        public CryDbSet(DateTime dt, string exch, Guid guid)
+        {
+            this.DateTime = dt;
+            Exchange = exch;
+            IdGuid = guid;
         }
+
     }
 }

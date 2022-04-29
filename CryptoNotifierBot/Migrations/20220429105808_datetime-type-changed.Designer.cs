@@ -3,6 +3,7 @@ using System;
 using CryptoApi.Static.DataHandler;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CryptoApi.Migrations
 {
     [DbContext(typeof(DataBaseContext))]
-    partial class DataBaseContextModelSnapshot : ModelSnapshot
+    [Migration("20220429105808_datetime-type-changed")]
+    partial class datetimetypechanged
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.4");
@@ -27,9 +29,6 @@ namespace CryptoApi.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Exchange")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("IdGuid")
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

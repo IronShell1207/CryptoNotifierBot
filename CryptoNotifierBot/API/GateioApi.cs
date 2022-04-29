@@ -78,13 +78,13 @@ namespace CryptoApi.API
 
             };
         }
-        public void SavePairsToDb(string exchange, List<PricedTradingPair> pairs)
+        public void SavePairsToDb(string exchange, List<PricedTradingPair> pairs, Guid guid)
         {
             using (DataBaseContext dbContext = new DataBaseContext())
             {
                 if (pairs.Any())
                 {
-                    var dbSet = new CryDbSet(DateTime.Now, exchange);
+                    var dbSet = new CryDbSet(DateTime.Now, exchange, guid);
                     dbContext.DataSet.Add(dbSet);
                     dbContext.SaveChanges();
                     pairs.ForEach(x => x.CryDbSetId = dbSet.Id);
@@ -93,10 +93,10 @@ namespace CryptoApi.API
                 }
             }
         }
-        public async Task GetExchangeData()
+        public async Task GetExchangeData(Guid guid = default(Guid))
         {
             var pairs = ExchangePairsConverter(await GetTickerFullData());
-            SavePairsToDb(Exchanges.GateIO, pairs);
+            SavePairsToDb(Exchanges.GateIO, pairs, guid);
         }
     }
 }

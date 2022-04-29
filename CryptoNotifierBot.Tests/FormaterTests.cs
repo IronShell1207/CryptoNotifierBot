@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CryptoApi.Constants;
+using CryptoApi.Static;
 using NUnit.Framework;
 using TelegramBot;
 using TelegramBot.Constants;
@@ -97,6 +98,22 @@ namespace CryptoNotifierBot.Tests
                 Price = 43241
             };
             pair.FullTaskInfo();
+        }
+
+        [Test]
+        public void DtTest()
+        {
+            var date1 = DateTime.Now;
+            var date2 = date1 + TimeSpan.FromSeconds(5);
+            var eq = DTHelper.DatesNearEqual(date1, date2);
+            Assert.IsTrue(eq);
+        }
+
+        [Test]
+        public void DguidTest()
+        {
+            var d = Guid.NewGuid();
+            Assert.Pass(d.ToString());
         }
     }
 }

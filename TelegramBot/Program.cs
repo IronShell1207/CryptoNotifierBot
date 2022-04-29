@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using CryptoApi.Static.DataHandler;
 using Telegram.Bot;
@@ -41,6 +42,8 @@ namespace TelegramBot
                 {
                     ConsoleCommandsHandler.ChangeTokenAsync();
                 }
+                else if ( reader.ToString() == "/exit")
+                    Environment.Exit(0);
             }
         }
 

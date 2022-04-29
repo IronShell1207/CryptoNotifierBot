@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CryptoApi.API;
 using CryptoApi.Constants;
+using CryptoApi.Objects;
 using CryptoApi.Objects.ExchangesPairs;
 
 namespace CryptoApi.Tests
@@ -56,11 +57,32 @@ namespace CryptoApi.Tests
                 var pairs = dbContext.TradingPairs.Where(x => x.CryDbSetId == dbset.Id);
                 var btc = pairs.First(x => x.Name == "BTC" && x.Quote == "USDT");
                 if (btc?.CryDbSetId == dbset.Id)
-                    return $"{btc.ToString()}: {btc.Price} created in {dbset.GetDateTime().ToString()} from {btc.Exchange}";
+                    return $"{btc.ToString()}: {btc.Price} created in {dbset.DateTime.ToString()} from {btc.Exchange}";
                 else Assert.Fail(pairs.Count().ToString());
             }
 
             return "";
+        }
+        [Test]
+        public async Task GetCurrentPrice()
+        {
+            using (DataRequester dreq = new DataRequester())
+            {
+                var pair = new TradingPair("ETH", "USDT");
+               // dreq.GetCurrentPricePairByName()
+                
+            }
+        }
+
+        [Test]
+        public async Task GetLatestDataSets()
+        {
+            using (DataRequester dreq = new DataRequester())
+            {
+                var data = await dreq.GetLatestDataSets(45);
+                if (data.Count == Exchanges.ExchangeList.Count) Assert.Pass(data.Count.ToString()); 
+                else Assert.Fail();
+            }
         }
     }
 }

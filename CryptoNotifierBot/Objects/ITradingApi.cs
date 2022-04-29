@@ -11,7 +11,7 @@ namespace CryptoApi.Objects
 {
     public interface ITradingApi 
     {
-        public Task GetExchangeData();
+        public Task GetExchangeData(Guid guid);
         public string ApiName { get; }
         public int PairsCount { get; }
         public DateTime LastUpdate { get; }
