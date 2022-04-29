@@ -238,7 +238,7 @@ namespace TelegramBot.Static.MessageHandlers
                     using (CryptoPairDbHandler dbh = new CryptoPairDbHandler())
                     {
                         var pair = dbh.GetPairFromId(id, user.Id);
-                        BotApi.SendMessage(user.TelegramId, pair.TaskStatusWithLink(), ParseMode.Html);
+                        BotApi.SendMessage(user.TelegramId, pair.FullTaskInfo(), ParseMode.Html);
                     }
                 }
                 else
@@ -256,7 +256,7 @@ namespace TelegramBot.Static.MessageHandlers
                                 x.OwnerId == user.Id && x.PairBase == pair.Name && x.PairQuote == pair.Quote).ToList();
                             foreach (var pairz in pairs)
                             {
-                                sb.AppendLine(pairz.FullTaskInfo());
+                                sb.AppendLine(pairz.TaskStatusWithLink());
                             }
                         }
                         BotApi.SendMessage(user.TelegramId, sb.ToString(), ParseMode.Html);
