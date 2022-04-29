@@ -30,14 +30,27 @@ namespace CryptoApi.Static.DataHandler
             }
             Console.WriteLine(sb.ToString());
         }
+
+        public void RemoveOldData()
+        {
+            var date = DateTime.Now - TimeSpan.FromDays(2);
+            using (DataBaseContext dbContext = new DataBaseContext())
+                if (dbContext.DataSet.Any(x => Convert.ToDateTime(x.DateTime) < date))
+                {
+                   var rows = dbContext.Database.ExecuteSqlRaw(
+                        $"DELETE FROM DataSet Where Id in (SELECT Id FROM DataSet Where date <= \"{date.ToString()}\" ORDER BY Id LIMIT 500)");
+                   Console.WriteLine($"[{DateTime.Now}] Rows deleted {rows} for data older {date}");
+                }
+        }
         public async Task UpdateDataLoop()
         {
+            RemoveOldData();
             if (DataDownloadedCounter >3000)
                 using (DataBaseContext dbContext = new DataBaseContext())
                 {
-                    var firstRows =
-                        dbContext.DataSet.FromSqlRaw(
-                            "DELETE FROM DataSet WHERE Id in (SELECT Id FROM DataSet ORDER BY Id LIMIT 4)");
+                   var rows = dbContext.Database.ExecuteSqlRaw(
+                            "DELETE FROM DataSet WHERE Id in (SELECT Id FROM DataSet ORDER BY Id LIMIT 200)");
+                    Console.WriteLine($"[{DateTime.Now}] Rows deleted {rows} for data when storage overflow");
                 }
             while (UpdaterLive)
             {   
