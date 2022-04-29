@@ -24,8 +24,16 @@ namespace CryptoApi.Static.DataHandler
         public DataBaseContext()
         {
             //remove this for create migrations
-
+#if DEBUG
+            var migr = Database.GetPendingMigrations();
+            var appl = Database.GetAppliedMigrations();
+            if (migr.Any())
+            {
+                Console.WriteLine("Migration");
+                Database.Migrate();
+            }
+#endif
         }
-        
+
     }
 }

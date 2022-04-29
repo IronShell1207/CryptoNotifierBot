@@ -81,11 +81,9 @@ namespace CryptoApi.API
             {
                 if (pairs.Any())
                 {
-                    var dbSet = new CryDbSet(DateTime.Now, exchange, guid);        
+                    var dbSet = new CryDbSet(DateTime.Now, exchange, guid);
+                    dbSet.pairs = pairs;
                     dbContext.DataSet.Add(dbSet);
-                    dbContext.SaveChanges();
-                    pairs.ForEach(x => x.CryDbSetId = dbSet.Id);
-                    dbContext.TradingPairs.AddRange(pairs);
                     dbContext.SaveChanges();
                 }
             }

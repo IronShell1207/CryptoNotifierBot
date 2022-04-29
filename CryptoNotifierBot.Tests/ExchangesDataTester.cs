@@ -1,3 +1,4 @@
+using System;
 using CryptoApi.Static;
 using CryptoApi.Static.DataHandler;
 using NUnit.Framework;
@@ -12,11 +13,12 @@ namespace CryptoApi.Tests
 {
     public class ExchangesDataTester
     {
+        private Guid gid = Guid.NewGuid();
         [Test]
         public async Task BitgetTest()
         {
             using (BitgetApi API = new BitgetApi())
-                await API.GetExchangeData();
+                await API.GetExchangeData(gid);
             Assert.Pass(await GetBtcPrice(Exchanges.Bitget));
            
         }
@@ -24,28 +26,28 @@ namespace CryptoApi.Tests
         public async Task BinanceTest()
         {
             using (BinanceApi API = new BinanceApi())
-                await API.GetExchangeData();
+                await API.GetExchangeData(gid);
             Assert.Pass( await GetBtcPrice(Exchanges.Binance));
         }
         [Test]
         public async Task OkxTest()
         {
             using (OkxApi API = new OkxApi())
-                await API.GetExchangeData();
+                await API.GetExchangeData(gid);
             Assert.Pass(await GetBtcPrice(Exchanges.Okx));
         }
         [Test]
         public async Task KucoinTest()
         {
             using (KucoinAPI API = new KucoinAPI())
-                await API.GetExchangeData();
+                await API.GetExchangeData(gid);
             Assert.Pass(await GetBtcPrice(Exchanges.Kucoin));
         }
         [Test]
         public async Task GateioTest()
         {
             using (GateioApi API = new GateioApi())
-                await API.GetExchangeData();
+                await API.GetExchangeData(gid);
             Assert.Pass(await GetBtcPrice(Exchanges.GateIO));
         }
 
@@ -74,14 +76,42 @@ namespace CryptoApi.Tests
             }
         }
 
+       
+
         [Test]
-        public async Task GetLatestDataSets()
+        public async Task GetBtcPrice2()
+        {
+            var btcusdt = new TradingPair("BTC", "USDT");
+            var expectedPrice = 29000;
+            using (DataRequester dreq = new DataRequester())
+            {
+                var priced = await dreq.GetCurrentPricePairByName(btcusdt);
+                var getDbSet = priced.CryDbSet;
+                if (priced.Price > expectedPrice) Assert.Pass($"{priced.ToString()}: {priced.Price} from {priced.Exchange} loaded in {getDbSet.DateTime.ToString()}");
+            }
+
+
+        }
+        [Test]
+        public async Task ZGetLatestDataSets()
         {
             using (DataRequester dreq = new DataRequester())
             {
                 var data = await dreq.GetLatestDataSets(45);
-                if (data.Count == Exchanges.ExchangeList.Count) Assert.Pass(data.Count.ToString()); 
-                else Assert.Fail();
+                if (data.Count == Exchanges.ExchangeList.Count) Assert.Pass(data.Count.ToString());
+                else Assert.Fail(data.Count.ToString());
+            }
+        }
+
+        [Test]
+        public async Task ZGetExchangesForPairTest()
+        {
+            using (DataRequester dreq = new DataRequester())
+            {
+                var pair = new TradingPair("ETH", "USDT");
+                var exh = await dreq.GetExchangesForPair(pair);
+                if (exh.Count == Exchanges.ExchangeList.Count) Assert.Pass(exh.Count.ToString());
+                else Assert.Fail(exh.Count.ToString());
             }
         }
     }

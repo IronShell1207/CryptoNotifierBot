@@ -21,7 +21,6 @@ namespace TelegramBot.Static.DbOperations
                     dbContext.SaveChangesAsync();
                     return true;
                 }
-
                 return false;
             }
         }

@@ -10,6 +10,7 @@ using CryptoApi.Constants;
 using CryptoApi.Objects;
 using CryptoApi.Objects.ExchangesPairs;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace CryptoApi.Static.DataHandler
 {
@@ -43,12 +44,21 @@ namespace CryptoApi.Static.DataHandler
         {
             var date = DateTime.Now - TimeSpan.FromDays(2);
             using (DataBaseContext dbContext = new DataBaseContext())
-                if (dbContext.DataSet.Any(x => x.DateTime < date))
+            {if (dbContext.DataSet.Any(x => x.DateTime < date))
                 {
                     var rows = dbContext.Database.ExecuteSqlRaw(
                          $"DELETE FROM DataSet Where Id in (SELECT Id FROM DataSet Where date <= \"{date.ToString()}\" ORDER BY Id LIMIT 500)");
                     Console.WriteLine($"[{DateTime.Now}] Rows deleted {rows} for data older {date}");
                 }
+
+                if (dbContext.DataSet.Any(x => x.IdGuid == new Guid()))
+                {
+                    var rows = dbContext.Database.ExecuteSqlRaw(
+                        $"DELETE FROM DataSet Where Id in (SELECT Id FROM DataSet Where IdGuid = \"{default(Guid)}\" ORDER BY Id LIMIT 500)");
+                    Console.WriteLine($"[{DateTime.Now}] Rows deleted {rows} for data older {date}");
+                }
+
+            }
         }
         public async Task UpdateDataLoop()
         {
@@ -103,10 +113,9 @@ namespace CryptoApi.Static.DataHandler
         {
             using (DataBaseContext dbContext = new DataBaseContext())
             {
-
+                if (string.IsNullOrEmpty(exchange))
+                    exchange = GetExchangesForPair(pairname).Result.FirstOrDefault();
                 var dbSet = dbContext.DataSet.OrderBy(x => x.Id).LastOrDefault(x => x.Exchange == exchange);
-                //
-                //   dbSet = dbContext.DataSet.OrderBy(x => x.Id);
                 var pair = dbContext.TradingPairs.FirstOrDefault(x =>
                     x.CryDbSetId == dbSet.Id &&
                     x.Exchange == exchange &&
@@ -115,23 +124,21 @@ namespace CryptoApi.Static.DataHandler
                 return pair ?? null;
             }
         }
-        public static void GetExchangesForPair(TradingPair pair)
+        public async Task<List<String>> GetExchangesForPair(TradingPair pair)
         {
             List<string> exchanges = new List<string>();
+            var dataSets = await GetLatestDataSets();
             using (DataBaseContext dbContext = new DataBaseContext())
             {
-                //var latestDataId = dbContext.DataSet.OrderBy(x => x.Id).LastOrDefault().Id;
-                //if (binancePairsData.Pairs.Exists(x => x.Symbol.ToString() == pair.ToString()))
-                //    exchanges.Add(CryptoApi.Constants.Exchanges.Binance);
-                //if (gateioPairsData.Pairs.Exists(x => x.Symbol.ToString() == pair.ToString()))
-                //    exchanges.Add(CryptoApi.Constants.Exchanges.GateIO);
-                //if (okxPairsData.Pairs.Exists(x => x.Symbol.ToString() == pair.ToString()))
-                //    exchanges.Add(CryptoApi.Constants.Exchanges.Okx);
-                //if (kucoinPairsData.Pairs.Exists(x => x.Symbol.ToString() == pair.ToString()))
-                //    exchanges.Add(CryptoApi.Constants.Exchanges.Kucoin);
-                //if (bitgetPairsData.Pairs.Exists(x => x.Symbol.ToString() == pair.ToString()))
-                //    exchanges.Add(CryptoApi.Constants.Exchanges.Bitget);
-                //return exchanges;
+                foreach (var dbSet in dataSets)
+                {
+                    if  (dbContext.TradingPairs.OrderByDescending(x => x.Id).FirstOrDefault(
+                                  z => z.CryDbSet == dbSet &&
+                                       z.Name == pair.Name &&
+                                       z.Quote == pair.Quote) != null)
+                        exchanges.Add(dbSet.Exchange);
+                }
+                return exchanges;
             }
 
         }

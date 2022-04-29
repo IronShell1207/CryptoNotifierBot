@@ -18,7 +18,6 @@ namespace TelegramBot.Static.BotLoops
         {
             while (MonitorLoopCancellationToken)
             {
-
                 using (AppDbContext dbContext = new AppDbContext())
                 {
                     foreach (UserConfig user in dbContext.Users)
@@ -32,7 +31,6 @@ namespace TelegramBot.Static.BotLoops
 
                             lastUpdateUsers.Add(new IntervaledUsersHistory(user.Id, DateTime.Now));
                             await BotApi.SendMessage(user.TelegramId, sb.ToString());
-
                         }
                     }
                 }
@@ -51,12 +49,9 @@ namespace TelegramBot.Static.BotLoops
                 var pairs = dbContext.CryptoPairs.Where(x => x.OwnerId == user.Id && x.Enabled).ToList();
                 foreach (var pair in pairs)
                 {
-                    ////var price = await ExchangesCheckerForUpdates.GetCurrentPrice(
-                    ////    new TradingPair(pair.PairBase, pair.PairQuote), pair.ExchangePlatform);
-                    //if (price>0 &&( price > pair.Price && pair.GainOrFall || price < pair.Price && !pair.GainOrFall))
-                    //{
-                    //    tasks.Add(new(pair, price));
-                    //}
+                    var price = await Program.cryptoData.GetCurrentPricePairByName(new TradingPair(pair.PairBase, pair.PairQuote), pair.ExchangePlatform);
+                    if (price.Price > 0 &&( price.Price > pair.Price && pair.GainOrFall || price.Price < pair.Price && !pair.GainOrFall))
+                        tasks.Add(new(pair, price.Price));
                 }
             }
             return tasks;
@@ -70,7 +65,6 @@ namespace TelegramBot.Static.BotLoops
             var plusic = pair.GainOrFall ? "+" : "";
             return $"{enabledSymbol} {pair.Id} {pair.PairBase}/{pair.PairQuote} {plusic}{string.Format("{0:##0.00#}", priceDiff)}% {gainOrFallSymbol} {pair.Price}->{newprice}";
         }
-        // Пока не доделываю (нужно разобраться с gain и fall price, мб сделать отдельные формации под них)
         private static string FormatNotifyEntryByUserFormat(string formater, CryptoPair pair, double newPrice)
         {
             var enabledSymbol = pair.Enabled ? "✅" : "🛑";
@@ -100,7 +94,6 @@ namespace TelegramBot.Static.BotLoops
     {
         public int UserId { get; set; }
         public DateTime LastUpdateDateTime { get; set; }
-
         public IntervaledUsersHistory(int userid, DateTime datetime)
         {
             UserId = userid;

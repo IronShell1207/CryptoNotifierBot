@@ -24,66 +24,55 @@ namespace TelegramBot.Static
         private static DateTime br480MinLastDateTime { get; set; } = DateTime.Now;
         private static DateTime br960MinLastDateTime { get; set; } = DateTime.Now;
         private static DateTime br1920MinLastDateTime { get; set; } = DateTime.Now;
-        private static List<int> ListTimings = new List<int>() { 2, 5, 15, 30, 45, 60, 120, 240, 480, 960, 1920 };
+        private static List<int> ListTimings = new() { 2, 5, 15, 30, 45, 60, 120, 240, 480, 960, 1920 };
 
-        private static List<DateTime> listDateTimes = new List<DateTime>()
+        private static List<DateTime> listDateTimes = new()
         {   br2MinLastDateTime,
             br5MinLastDateTime,br15MinLastDateTime, br30MinLastDateTime, br45MinLastDateTime, br60MinLastDateTime,
             br120MinLastDateTime,br240MinLastDateTime, br480MinLastDateTime, br960MinLastDateTime, br1920MinLastDateTime
         };
 
-        private static List<double> procentsDifference = new List<double>() { 2.5, 3, 4, 5, 5, 5, 5, 5, 6, 6, 8 };
+        private static List<double> procentsDifference = new() { 2.5, 3, 4, 5, 5, 5, 5, 5, 6, 6, 8 };
         public static async void BreakoutLoop()
         {
-            //var count = ExchangesCheckerForUpdates.MarketData.Count();
-            //while (true)
-            //{
+            while (true)
+            {
+                //var datetimeNow = DateTime.Now;
+                //var latestData = Program.cryptoData.GetLatestDataSets();
+                //for (var index = Program.cryptoData.DataDownloadedCounter; index >= 0; index--)
+                //{
+                //    if (index > Program.cryptoData.DataDownloadedCounter) break;
+                //    for (var iTi = 0; iTi < ListTimings.Count; iTi++)
+                //    {
+                //        int timeIn = ListTimings[iTi];
+                //        if (data[0].CreationTime + TimeSpan.FromMinutes(timeIn) < datetimeNow &&
+                //            datetimeNow < data[0].CreationTime + TimeSpan.FromMinutes(timeIn + 1) &&
+                //            listDateTimes[iTi] + TimeSpan.FromMinutes(timeIn) < datetimeNow)
+                //        {
+                //            listDateTimes[iTi] = datetimeNow;
+                //            index -= timeIn - 1;
+                //            for (int i = 0; i < data.Count; i++)
+                //            {
+                //                SymbolTimedExInfo dataExchange = data[i];
+                //                var compairedPairs = CompairedPairs(dataExchange.Pairs, latestData[i].Pairs,
+                //                    procentsDifference[iTi], ListTimings[iTi], dataExchange.Exchange);
+                //                Console.WriteLine(
+                //                    $"[{datetimeNow.ToString()}] {data[i].Exchange}: {compairedPairs.Count} Time: {timeIn}");
+                //                if (compairedPairs.Count > 0)
+                //                {
+                //                    SpreadBreakoutNotify(compairedPairs, data[i].Exchange, timeIn);
+                //                    Thread.Sleep(25);
+                //                }
+                //            }
+                //        }
+                //        //}
+                //    }
+                //loopend:
+                //    count = countNow;
+                //    Thread.Sleep(30000);
+                //}
 
-            //    if (count > 3000)
-            //        ExchangesCheckerForUpdates.MarketData.RemoveRange(1500, 500);
-            //    var countNow = ExchangesCheckerForUpdates.MarketData.Count();
-            //    if (countNow <= count)
-            //    {
-            //        goto loopend;
-            //    }
-
-            //    var datetimeNow = DateTime.Now;
-            //    var latestData = ExchangesCheckerForUpdates.MarketData.LastOrDefault();
-            //    for (var index = ExchangesCheckerForUpdates.MarketData.Count - 1; index >= 0; index--)
-            //    {
-                    //if (index > ExchangesCheckerForUpdates.MarketData.Count) break;
-                    //List<PricedTradingPair> data = ExchangesCheckerForUpdates.MarketData[index];
-                    //for (var iTi = 0; iTi < ListTimings.Count; iTi++)
-                    //{
-                    //    int timeIn = ListTimings[iTi];
-                    //    if (data[0].CreationTime + TimeSpan.FromMinutes(timeIn) < datetimeNow &&
-                    //        datetimeNow < data[0].CreationTime + TimeSpan.FromMinutes(timeIn + 1) &&
-                    //        listDateTimes[iTi] + TimeSpan.FromMinutes(timeIn) < datetimeNow)
-                    //    {
-                    //        listDateTimes[iTi] = datetimeNow;
-                    //        index -= timeIn - 1;
-                    //        for (int i = 0; i < data.Count; i++)
-                    //        {
-                    //            SymbolTimedExInfo dataExchange = data[i];
-                    //            var compairedPairs = CompairedPairs(dataExchange.Pairs, latestData[i].Pairs,
-                    //                procentsDifference[iTi], ListTimings[iTi], dataExchange.Exchange);
-                    //            Console.WriteLine(
-                    //                $"[{datetimeNow.ToString()}] {data[i].Exchange}: {compairedPairs.Count} Time: {timeIn}");
-                    //            if (compairedPairs.Count > 0)
-                    //            {
-                    //                SpreadBreakoutNotify(compairedPairs, data[i].Exchange, timeIn);
-                    //                Thread.Sleep(25);
-                    //            }
-                    //        }
-                    //    }
-            //        //}
-            //    }
-            //loopend:
-            //    count = countNow;
-            //    Thread.Sleep(30000);
-            //}
-
-
+            }
         }
 
         public static async void SpreadBreakoutNotify(List<BreakoutPair> pairs, string platform, int timing)

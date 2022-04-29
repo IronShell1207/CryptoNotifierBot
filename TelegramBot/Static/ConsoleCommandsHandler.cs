@@ -11,7 +11,6 @@ namespace TelegramBot.Static
 {
     public class ConsoleCommandsHandler
     {
-
         public static async Task ChangeTokenAsync()
         {
             setbottoken:
@@ -30,7 +29,6 @@ namespace TelegramBot.Static
                 Console.WriteLine("Token invalid. Try again");
                 goto setbottoken;
             }
-
         }
 
         public static async Task StartBotAsync()
