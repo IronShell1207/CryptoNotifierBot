@@ -155,6 +155,15 @@ namespace TelegramBot {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There is your tasks with matching request: .
+        /// </summary>
+        internal static string CPShowTasks {
+            get {
+                return ResourceManager.GetString("CPShowTasks", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ✅ New monitoring task has been created.\nDetails of your task:\n{0}.
         /// </summary>
         internal static string cryptoPairAdded {

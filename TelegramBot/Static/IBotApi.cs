@@ -69,6 +69,10 @@ namespace TelegramBot.Static
                 else if (CommandsRegex.MonitoringTaskCommands.ShiftTasks.IsMatch(update.Message.Text))
                     using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
                         msgHandler.DropEverythingByProcent(update);
+
+                else if (CommandsRegex.MonitoringTaskCommands.ShowPair.IsMatch(update.Message.Text))
+                    using (CryptoPairsMsgHandler msgHanlder = new CryptoPairsMsgHandler())
+                        msgHanlder.ShowTaskInfo(update);
                 
                 else if (CommandsRegex.MonitoringTaskCommands.AddComment.IsMatch(update.Message.Text))
                     using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
