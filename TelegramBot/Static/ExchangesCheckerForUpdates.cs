@@ -67,6 +67,8 @@ namespace TelegramBot.Static
             }
         }
 
+        public static async Task<double> GetCurrentPrice(string pbase, string pquote, string exchange = "") =>
+            await GetCurrentPrice(new TradingPair(pbase, pquote), exchange);
         public static async Task<double> GetCurrentPrice(TradingPair pair, string exchange = "")
         {
             if (DataAvailable)

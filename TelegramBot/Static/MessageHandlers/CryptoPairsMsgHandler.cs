@@ -225,7 +225,7 @@ namespace TelegramBot.Static.MessageHandlers
             }
         }
 
-        public void ShowTaskInfo(Update update)
+        public async void ShowTaskInfo(Update update)
         {
             var match = CommandsRegex.MonitoringTaskCommands.ShowPair.Match(update.Message.Text);
             if (match.Success)
@@ -238,7 +238,9 @@ namespace TelegramBot.Static.MessageHandlers
                     using (CryptoPairDbHandler dbh = new CryptoPairDbHandler())
                     {
                         var pair = dbh.GetPairFromId(id, user.Id);
-                        BotApi.SendMessage(user.TelegramId, pair.FullTaskInfo(), ParseMode.Html);
+                        var pairCurrentPrice = await ExchangesCheckerForUpdates.GetCurrentPrice(pair.PairBase, pair.PairQuote, pair.ExchangePlatform);
+
+                        BotApi.SendMessage(user.TelegramId,pair.FullTaskInfo() + $"\nCurrent price: {pairCurrentPrice} {pair.PairQuote}", ParseMode.Html);
                     }
                 }
                 else
@@ -259,7 +261,8 @@ namespace TelegramBot.Static.MessageHandlers
                                 sb.AppendLine(pairz.TaskStatusWithLink());
                             }
                         }
-                        BotApi.SendMessage(user.TelegramId, sb.ToString(), ParseMode.Html);
+                        var pairCurrentPrice = await ExchangesCheckerForUpdates.GetCurrentPrice(pairbase, pairquote);
+                        BotApi.SendMessage(user.TelegramId, sb.ToString() + $"\nCurrent price: {pairCurrentPrice} {pairquote}", ParseMode.Html);
                     }
                     else if (!string.IsNullOrWhiteSpace(pairbase))
                     {
@@ -274,7 +277,8 @@ namespace TelegramBot.Static.MessageHandlers
                                 sb.AppendLine(pairz.TaskStatusWithLink());
                             }
                         }
-                        BotApi.SendMessage(user.TelegramId, sb.ToString(), ParseMode.Html);
+                        var pairCurrentPrice = await ExchangesCheckerForUpdates.GetCurrentPrice(pairbase, "USDT");
+                        BotApi.SendMessage(user.TelegramId, sb.ToString() + $"\nCurrent price: {pairCurrentPrice} USDT", ParseMode.Html);
                     }
                     else
                     {
