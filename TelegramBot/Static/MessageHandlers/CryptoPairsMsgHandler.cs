@@ -256,7 +256,7 @@ namespace TelegramBot.Static.MessageHandlers
                                 x.OwnerId == user.Id && x.PairBase == pair.Name && x.PairQuote == pair.Quote).ToList();
                             foreach (var pairz in pairs)
                             {
-                                sb.AppendLine(pairz.TaskStatusWithLink());
+                                sb.AppendLine(pairz.FullTaskInfo());
                             }
                         }
                         BotApi.SendMessage(user.TelegramId, sb.ToString(), ParseMode.Html);
