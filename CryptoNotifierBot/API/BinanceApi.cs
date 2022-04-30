@@ -59,7 +59,7 @@ namespace CryptoApi.API
         {
             using (var restRequester = new RestRequester())
             {
-                RestResponse response = await restRequester.GetRequest(new Uri(ExchangesApiLinks.BinanceClearTicker));
+                RestResponse response = await restRequester.GetRequest(new Uri(ExchangesApiLinks.BinanceClearTicker), ApiName);
                 JsonSerializer serializer = new JsonSerializer();
                 if (response?.StatusCode == HttpStatusCode.OK)
                 {
@@ -74,8 +74,8 @@ namespace CryptoApi.API
                     return null;
                 else
                 {
-                    Console.WriteLine(
-                        $"[{DateTime.Now.ToString()}] Binance api request failed. Status code: {response?.StatusCode}, {response?.ErrorMessage}");
+                    Diff.LogWrite(
+                        $"Binance api request failed. Status code: {response?.StatusCode}, {response?.ErrorMessage}");
                     Thread.Sleep(4000);
                     return await GetTickerData();
                 }
@@ -106,7 +106,7 @@ namespace CryptoApi.API
             using (var restRequester = new RestRequester())
             {
                 RestResponse response = restRequester
-                    .GetRequest(new Uri(ExchangesApiLinks.BinanceFullExchangeInfoTicker)).Result;
+                    .GetRequest(new Uri(ExchangesApiLinks.BinanceFullExchangeInfoTicker), ApiName).Result;
                 JsonSerializer serializer = new JsonSerializer();
                 var pairsSetialized =
                     serializer.Deserialize<BinanceSymbolsData>(new JsonTextReader(new StringReader(response.Content)));

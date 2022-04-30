@@ -38,7 +38,8 @@ namespace TelegramBot.Static
             var appl = Database.GetAppliedMigrations();
             if (migr.Any())
             {
-                Console.WriteLine("Migration");
+                foreach (var migration in migr.ToList())
+                    ConsoleCommandsHandler.LogWrite($"Migration applying: {migration}");
                 Database.Migrate();
             }
 #endif

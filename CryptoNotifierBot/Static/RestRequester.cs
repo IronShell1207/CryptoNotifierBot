@@ -16,7 +16,7 @@ namespace CryptoApi.Static
 {
     public class RestRequester : TheDisposable
     {
-        public async Task<RestResponse> GetRequest(Uri Link)
+        public async Task<RestResponse> GetRequest(Uri Link, string exchange)
         {
             try
             {
@@ -27,7 +27,7 @@ namespace CryptoApi.Static
                 var result = await client.ExecuteAsync(request);
                 if (result.StatusCode == 0)
                 {
-                    Console.WriteLine("No connection while requesting binance ticker data");
+                    Diff.LogWrite($"No connection while requesting {exchange} ticker data. Status code: {result.StatusCode}. {result.Content}");
                     return null;
                 }
                 if (!result.IsSuccessful)
@@ -86,7 +86,11 @@ namespace CryptoApi.Static
                 var msg = new HttpRequestMessage(HttpMethod.Get, "https://google.com");
                 var result  = await client.SendAsync(msg);
                 if (result.IsSuccessStatusCode)
+                {
+                    Diff.LogWrite($"Proxy connected");
                     return true;
+                }
+
                 return false;
             }
             catch (HttpRequestException ex)

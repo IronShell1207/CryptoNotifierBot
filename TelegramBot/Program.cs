@@ -20,7 +20,7 @@ namespace TelegramBot
         {
             CultureInfo ci = new CultureInfo("en");
             Thread.CurrentThread.CurrentCulture = ci;
-            Console.WriteLine("Crypto notifications bot loading...");
+            ConsoleCommandsHandler.LogWrite("Crypto notifications bot loading...");
             if (string.IsNullOrWhiteSpace(AppSettingsStatic.Settings.TelegramBotToken))
             {
                 ConsoleCommandsHandler.ChangeTokenAsync();
@@ -30,11 +30,12 @@ namespace TelegramBot
             {
                 ConsoleCommandsHandler.SetAdminId().Wait();
             }
-            
-            Console.WriteLine($"[{DateTime.Now.ToLongTimeString()}] Bot has been started!");
+
+            ConsoleCommandsHandler.LogWrite($"Bot has been started!");
             cryptoData = new DataRequester();
             Task.Run(cryptoData.UpdateDataLoop);
             Task.Run(() => NotifyLoops.MainLoop());
+            ConsoleCommandsHandler.LogWrite("Crypto exchanges data updater loop has been started");
             while (true)
             {
                 var reader = Console.ReadLine();

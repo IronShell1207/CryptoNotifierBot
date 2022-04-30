@@ -10,6 +10,7 @@ using CryptoApi.Constants;
 using CryptoApi.Objects;
 using CryptoApi.Objects.ExchangesPairs;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace CryptoApi.Static.DataHandler
@@ -30,32 +31,33 @@ namespace CryptoApi.Static.DataHandler
         public void UpdateAllData()
         {
             var datenow = DateTime.Now;
-            StringBuilder sb = new StringBuilder($"[{datenow}] Market data updated: ");
+            StringBuilder sb = new StringBuilder($"Market data updated: ");
             var guid = Guid.NewGuid();
             foreach (var api in apis)
             {
                 api.GetExchangeData(guid);
                 sb.Append($"{api.ApiName}: {api.PairsCount} ");
             }
-            Console.WriteLine(sb.ToString());
+            Diff.LogWrite(sb.ToString());
         }
 
         public void RemoveOldData()
         {
             var date = DateTime.Now - TimeSpan.FromDays(2);
             using (DataBaseContext dbContext = new DataBaseContext())
-            {if (dbContext.DataSet.Any(x => x.DateTime < date))
+            {
+                if (dbContext.DataSet.Any(x => x.DateTime < date))
                 {
                     var rows = dbContext.Database.ExecuteSqlRaw(
                          $"DELETE FROM DataSet Where Id in (SELECT Id FROM DataSet Where date <= \"{date.ToString()}\" ORDER BY Id LIMIT 500)");
-                    Console.WriteLine($"[{DateTime.Now}] Rows deleted {rows} for data older {date}");
+                    Diff.LogWrite($"Rows deleted {rows} for data older {date}");
                 }
 
                 if (dbContext.DataSet.Any(x => x.IdGuid == new Guid()))
                 {
                     var rows = dbContext.Database.ExecuteSqlRaw(
                         $"DELETE FROM DataSet Where Id in (SELECT Id FROM DataSet Where IdGuid = \"{default(Guid)}\" ORDER BY Id LIMIT 500)");
-                    Console.WriteLine($"[{DateTime.Now}] Rows deleted {rows} for data older {date}");
+                    Diff.LogWrite($"Rows deleted {rows} for data older {date}");
                 }
 
             }
@@ -68,7 +70,7 @@ namespace CryptoApi.Static.DataHandler
                 {
                     var rows = dbContext.Database.ExecuteSqlRaw(
                              "DELETE FROM DataSet WHERE Id in (SELECT Id FROM DataSet ORDER BY Id LIMIT 200)");
-                    Console.WriteLine($"[{DateTime.Now}] Rows deleted {rows} for data when storage overflow");
+                    Diff.LogWrite($"Rows deleted {rows} for data when storage overflow");
                 }
             while (UpdaterLive)
             {
@@ -92,9 +94,12 @@ namespace CryptoApi.Static.DataHandler
         {
             using (DataBaseContext dbContext = new DataBaseContext())
             {
-                
-                var latestData = minutesOffset == 0 ? dbContext.DataSet.OrderByDescending(x=>x.Id).FirstOrDefault() :
-                    dbContext.DataSet.OrderByDescending(x => x.Id).FirstOrDefault(x => x.DateTime > DateTime.Now.AddMinutes(-minutesOffset));
+
+                var latestData = minutesOffset == 0 ? dbContext.DataSet.OrderByDescending(x => x.Id).FirstOrDefault() :
+                    dbContext.DataSet.OrderByDescending(x => x.Id).FirstOrDefault(x => 
+                        x.DateTime > DateTime.Now.AddMinutes(-minutesOffset) &&
+                        DateTime.Now.AddMinutes(-minutesOffset+1) > x.DateTime);
+                if (latestData == null) return null;
                 var lastdataSets = dbContext.DataSet.OrderByDescending(x => x.Id)
                    .Where(x => x.IdGuid == latestData.IdGuid);
                 return lastdataSets?.ToList();
@@ -109,16 +114,20 @@ namespace CryptoApi.Static.DataHandler
             }
         }
 
-        public async Task<PricedTradingPair> GetCurrentPricePairByName(TradingPair pairname, string exchange = "")
+        public async Task<PricedTradingPair> GetCurrentPricePairByName(string baseName, string quoteName,
+            string exchange = "") =>
+            await GetCurrentPricePairByName(new TradingPair(baseName, quoteName, exchange));
+
+        public async Task<PricedTradingPair> GetCurrentPricePairByName(TradingPair pairname)
         {
             using (DataBaseContext dbContext = new DataBaseContext())
             {
-                if (string.IsNullOrEmpty(exchange))
-                    exchange = GetExchangesForPair(pairname).Result.FirstOrDefault();
-                var dbSet = dbContext.DataSet.OrderBy(x => x.Id).LastOrDefault(x => x.Exchange == exchange);
+                if (string.IsNullOrEmpty(pairname.Exchange))
+                    pairname.Exchange = GetExchangesForPair(pairname).Result.FirstOrDefault();
+                var dbSet = dbContext.DataSet.OrderBy(x => x.Id).LastOrDefault(x => x.Exchange == pairname.Exchange);
                 var pair = dbContext.TradingPairs.FirstOrDefault(x =>
                     x.CryDbSetId == dbSet.Id &&
-                    x.Exchange == exchange &&
+                    x.Exchange == pairname.Exchange &&
                     x.Name == pairname.Name &&
                     x.Quote == pairname.Quote);
                 return pair ?? null;
@@ -132,7 +141,7 @@ namespace CryptoApi.Static.DataHandler
             {
                 foreach (var dbSet in dataSets)
                 {
-                    if  (dbContext.TradingPairs.OrderByDescending(x => x.Id).FirstOrDefault(
+                    if (dbContext.TradingPairs.OrderByDescending(x => x.Id).FirstOrDefault(
                                   z => z.CryDbSet == dbSet &&
                                        z.Name == pair.Name &&
                                        z.Quote == pair.Quote) != null)

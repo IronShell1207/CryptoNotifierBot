@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using CryptoApi.Constants;
 using CryptoApi.Objects;
+using CryptoApi.Static.DataHandler;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using TelegramBot.Objects;
 
 namespace TelegramBot.Static
@@ -24,12 +26,21 @@ namespace TelegramBot.Static
         private static DateTime br480MinLastDateTime { get; set; } = DateTime.Now;
         private static DateTime br960MinLastDateTime { get; set; } = DateTime.Now;
         private static DateTime br1920MinLastDateTime { get; set; } = DateTime.Now;
-        private static List<int> ListTimings = new() { 2, 5, 15, 30, 45, 60, 120, 240, 480, 960, 1920 };
+        private static List<int> ListTimings = new() { 3, 5, 15, 30, 45, 60, 120, 240, 480, 960, 1920 };
 
         private static List<DateTime> listDateTimes = new()
-        {   br2MinLastDateTime,
-            br5MinLastDateTime,br15MinLastDateTime, br30MinLastDateTime, br45MinLastDateTime, br60MinLastDateTime,
-            br120MinLastDateTime,br240MinLastDateTime, br480MinLastDateTime, br960MinLastDateTime, br1920MinLastDateTime
+        {
+            br2MinLastDateTime,
+            br5MinLastDateTime,
+            br15MinLastDateTime,
+            br30MinLastDateTime,
+            br45MinLastDateTime,
+            br60MinLastDateTime,
+            br120MinLastDateTime,
+            br240MinLastDateTime,
+            br480MinLastDateTime,
+            br960MinLastDateTime,
+            br1920MinLastDateTime
         };
 
         private static List<double> procentsDifference = new() { 2.5, 3, 4, 5, 5, 5, 5, 5, 6, 6, 8 };
@@ -37,6 +48,40 @@ namespace TelegramBot.Static
         {
             while (true)
             {
+                var datetimeNow = DateTime.Now;
+                StringBuilder sb = new StringBuilder();
+                var latestData = await Program.cryptoData.GetLatestDataSets();
+                for (var indexTiming = 0; indexTiming < ListTimings.Count; indexTiming++)
+                {
+                    int timing = ListTimings[indexTiming];
+                    if (listDateTimes[indexTiming] + TimeSpan.FromMinutes(timing) < datetimeNow)
+                    {
+                        var oldData = await Program.cryptoData.GetLatestDataSets(timing);
+                        if (oldData != null)
+                            for (int i = 0; i < oldData.Count; i++)
+                            {
+                                var oldExchangeData = oldData[i];
+                                var freshExchangeData =
+                                    latestData.FirstOrDefault(x => x.Exchange == oldExchangeData.Exchange);
+                                if (freshExchangeData != null)
+                                {
+                                    var compairedPairs =
+                                        CompairedPairs(oldExchangeData, freshExchangeData,
+                                            procentsDifference[indexTiming],
+                                            timing, oldExchangeData.Exchange);
+                                    if (compairedPairs.Any())
+                                    {
+                                        listDateTimes[indexTiming] = datetimeNow;
+                                        sb.Append("{data[i].Exchange}: {compairedPairs.Count} Time: {timeIn} ");
+                                        SpreadBreakoutNotify(compairedPairs, oldExchangeData.Exchange, timing);
+                                    }
+                                }
+                            }
+                    }
+                }
+                if (sb.Length > 0)
+                    ConsoleCommandsHandler.LogWrite("Breakouts: " + sb.ToString());
+                Thread.Sleep(10000);
                 //var datetimeNow = DateTime.Now;
                 //var latestData = Program.cryptoData.GetLatestDataSets();
                 //for (var index = Program.cryptoData.DataDownloadedCounter; index >= 0; index--)
@@ -77,7 +122,7 @@ namespace TelegramBot.Static
 
         public static async void SpreadBreakoutNotify(List<BreakoutPair> pairs, string platform, int timing)
         {
-            Console.WriteLine($"[{DateTime.Now.ToString()}] Breakout bot sending notify");
+            ConsoleCommandsHandler.LogWrite($"Breakout bot sending notify");
             using (AppDbContext db = new AppDbContext())
             {
                 foreach (BreakoutSub sub in db.BreakoutSubs.ToList())
@@ -99,10 +144,10 @@ namespace TelegramBot.Static
                             if ((platform == Exchanges.Binance && sub.BinanceSub)
                                 || (platform == Exchanges.Kucoin && sub.KucoinSub)
                                 || (platform == Exchanges.Okx && sub.OkxSub)
-                                || (platform == Exchanges.GateIO && sub.GateioSub) 
+                                || (platform == Exchanges.GateIO && sub.GateioSub)
                                 || (platform == Exchanges.Bitget && sub.BitgetSub))
                             {
-                                Console.WriteLine($"{sub.TelegramId}");
+                                ConsoleCommandsHandler.LogWrite($"{sub.TelegramId}");
                                 StringBuilder sb = new StringBuilder($"Updated data from {platform}:\n");
                                 var blackList = db.BlackListedPairs.Where(x => x.OwnerId == sub.Id).ToList();
                                 if (blackList.Any())
@@ -136,26 +181,35 @@ namespace TelegramBot.Static
             }
             await BotApi.SendMessage(sub.TelegramId, sb.ToString());
         }
-        private static List<BreakoutPair> CompairedPairs(List<PricedTradingPair> oldData, List<PricedTradingPair> freshData, double procent, double time = 0, string exchange = "Binance")
+        private static List<BreakoutPair> CompairedPairs(CryDbSet oldExchangeData, CryDbSet freshExchangeData, double procent, double time = 0, string exchange = "Binance")
         {
             List<BreakoutPair> changedData = new List<BreakoutPair>() { };
-            foreach (var data in oldData)
+            DataBaseContext dbContext = new DataBaseContext();
+            var oldPairs = dbContext.TradingPairs.OrderByDescending(x => x.Id)
+                .Where(z => z.CryDbSet == oldExchangeData).ToList();
+            var freshPairs = dbContext.TradingPairs.OrderByDescending(x => x.Id)
+                .Where(z => z.CryDbSet == freshExchangeData).ToList();
+            dbContext.Dispose();
+            for (int pairIndex = 0; pairIndex < oldPairs.Count; pairIndex++)
             {
-                var fresh = freshData.FirstOrDefault(x => x.ToString() == data.ToString());
-                if (fresh == null || fresh.ToString() == "/") break;
-                var diff = ((data.Price / fresh.Price) * 100) - 100;
-                var proc = data.Price < 0.0000009 ? 6 : procent;
-                if (diff > proc || diff < -proc)
-                    changedData.Add(new BreakoutPair()
-                    {
-                        newPrice = fresh.Price,
-                        oldPrice = data.Price,
-                        Symbol = fresh,
-                        Time = time,
-                        Exchange = exchange
-                    });
-                //var grp = diff > 0 ? "📈" : "📉";
-                //string compairedStr = $"{grp} {data.Symbol.ToString()} {diff} 1.60500 => 1.64300  0.77 m!";
+                var oldPairData = oldPairs[pairIndex];
+                var freshPairData = freshPairs.FirstOrDefault(x => x.ToString() == oldPairData.ToString());
+                if (freshPairData != null)
+                {
+                    var diff = ((oldPairData.Price / freshPairData.Price) * 100) - 100;
+                    var proc = oldPairData.Price < 0.0000009 ? 6 : procent;
+                    if (diff > proc || diff < -proc)
+                        changedData.Add(new BreakoutPair()
+                        {
+                            newPrice = freshPairData.Price,
+                            oldPrice = oldPairData.Price,
+                            Symbol = freshPairData,
+                            Time = time,
+                            Exchange = exchange
+                        });
+                    //var grp = diff > 0 ? "📈" : "📉";
+                    //string compairedStr = $"{grp} {data.Symbol.ToString()} {diff} 1.60500 => 1.64300  0.77 m!";
+                }
             }
 
             return changedData;

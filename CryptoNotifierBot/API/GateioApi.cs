@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using CryptoApi.Constants;
 using CryptoApi.Objects;
@@ -55,11 +56,11 @@ namespace CryptoApi.API
             return null;
         }
 
-        public async Task<List<GateIOData>> GetTickerFullData()
+        public async Task<List<GateIOData>> GetTickerData()
         {
             using (var restRequester = new RestRequester())
             {
-                RestResponse response = await restRequester.GetRequest(new Uri(ExchangesApiLinks.GateIOSpotTicker));
+                RestResponse response = await restRequester.GetRequest(new Uri(ExchangesApiLinks.GateIOSpotTicker), ApiName);
                 if (response?.StatusCode == HttpStatusCode.OK)
                 {
                     JsonSerializer serializer = new JsonSerializer();
@@ -71,6 +72,13 @@ namespace CryptoApi.API
                 }
                 else if (response?.StatusCode == null)
                     return null;
+                else
+                {
+                    Diff.LogWrite(
+                        $"{ApiName} api request failed. Status code: {response?.StatusCode}, {response?.ErrorMessage}");
+                    Thread.Sleep(4000);
+                    return await GetTickerData();
+                }
             }
 
             return new List<GateIOData>()
@@ -93,7 +101,7 @@ namespace CryptoApi.API
         }
         public async Task GetExchangeData(Guid guid = default(Guid))
         {
-            var pairs = ExchangePairsConverter(await GetTickerFullData());
+            var pairs = ExchangePairsConverter(await GetTickerData());
             SavePairsToDb(Exchanges.GateIO, pairs, guid);
         }
     }

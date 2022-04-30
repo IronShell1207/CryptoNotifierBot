@@ -49,7 +49,7 @@ namespace TelegramBot.Static.BotLoops
                 var pairs = dbContext.CryptoPairs.Where(x => x.OwnerId == user.Id && x.Enabled).ToList();
                 foreach (var pair in pairs)
                 {
-                    var price = await Program.cryptoData.GetCurrentPricePairByName(new TradingPair(pair.PairBase, pair.PairQuote), pair.ExchangePlatform);
+                    var price = await Program.cryptoData.GetCurrentPricePairByName(new TradingPair(pair.PairBase, pair.PairQuote, pair.ExchangePlatform));
                     if (price.Price > 0 &&( price.Price > pair.Price && pair.GainOrFall || price.Price < pair.Price && !pair.GainOrFall))
                         tasks.Add(new(pair, price.Price));
                 }

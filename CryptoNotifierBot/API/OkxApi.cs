@@ -4,6 +4,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 using CryptoApi.Constants;
 using CryptoApi.Objects;
@@ -57,7 +58,7 @@ namespace CryptoApi.API
         {
             using (var restRequester = new RestRequester())
             {
-                RestResponse response = await restRequester.GetRequest(new Uri(ExchangesApiLinks.OkxSpotTicker));
+                RestResponse response = await restRequester.GetRequest(new Uri(ExchangesApiLinks.OkxSpotTicker), ApiName);
                 if (response?.StatusCode == HttpStatusCode.OK)
                 {
                     JsonSerializer serializer = new JsonSerializer();
@@ -68,6 +69,13 @@ namespace CryptoApi.API
                 }
                 else if (response?.StatusCode == null)
                     return null;
+                else
+                {
+                    Diff.LogWrite(
+                        $"{ApiName} api request failed. Status code: {response?.StatusCode}, {response?.ErrorMessage}");
+                    Thread.Sleep(4000);
+                    return await GetTickerData();
+                }
             }
 
             return new List<OkxPairsInfo>();

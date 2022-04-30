@@ -185,7 +185,7 @@ namespace TelegramBot.Static
 
         public static Task ErrorHandler(ITelegramBotClient botClient, Exception ex, CancellationToken csToken)
         {
-            Console.WriteLine(ex.Message);
+            ConsoleCommandsHandler.LogWrite(ex.Message);
             return Task.CompletedTask;
         }
 
@@ -217,7 +217,7 @@ namespace TelegramBot.Static
                         {
                             dbContext.Users.Remove(baduser);
                             dbContext.SaveChangesAsync();
-                            Console.WriteLine($"Bad user {chatId.Identifier}. Removed from the database");
+                            ConsoleCommandsHandler.LogWrite($"Bad user {chatId.Identifier}. Removed from the database");
                         }
                     }
                 }
@@ -248,7 +248,7 @@ namespace TelegramBot.Static
                         {
                             dbContext.Users.Remove(baduser);
                             dbContext.SaveChangesAsync();
-                            Console.WriteLine($"Bad user {chatId.Identifier}. Removed from the database");
+                            ConsoleCommandsHandler.LogWrite($"Bad user {chatId.Identifier}. Removed from the database");
                         }
                     }
                 }
@@ -279,7 +279,7 @@ namespace TelegramBot.Static
                     {
                         var baduser = dbContext.Users.FirstOrDefault(x => x.TelegramId == chatId.Identifier);
                         if (baduser != null) dbContext.Users.Remove(baduser);
-                        Console.WriteLine($"Bad user {chatId.Identifier}. Removed from the database");
+                        ConsoleCommandsHandler.LogWrite($"Bad user {chatId.Identifier}. Removed from the database");
                     }
                 }
             }
@@ -299,7 +299,7 @@ namespace TelegramBot.Static
                     {
                         var baduser = dbContext.Users.FirstOrDefault(x => x.TelegramId == chatId.Identifier);
                         if (baduser != null) dbContext.Users.Remove(baduser);
-                        Console.WriteLine($"Bad user {chatId.Identifier}. Removed from the database");
+                        ConsoleCommandsHandler.LogWrite($"Bad user {chatId.Identifier}. Removed from the database");
                     }
                 }
             }

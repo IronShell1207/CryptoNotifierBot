@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CryptoApi.Constants;
 using CryptoApi.Objects;
 using Microsoft.EntityFrameworkCore;
 
@@ -29,7 +30,8 @@ namespace CryptoApi.Static.DataHandler
             var appl = Database.GetAppliedMigrations();
             if (migr.Any())
             {
-                Console.WriteLine("Migration");
+                foreach (var migration in migr.ToList())
+                    Diff.LogWrite($"Migration applying: {migration}");
                 Database.Migrate();
             }
 #endif

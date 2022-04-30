@@ -237,7 +237,7 @@ namespace TelegramBot.Static.MessageHandlers
                     using (CryptoPairDbHandler dbh = new CryptoPairDbHandler())
                     {
                         var pair = dbh.GetPairFromId(id, user.Id);
-                        var pairCurrentPrice = await ExchangesCheckerForUpdates.GetCurrentPrice(pair.PairBase, pair.PairQuote, pair.ExchangePlatform);
+                        var pairCurrentPrice = await Program.cryptoData.GetCurrentPricePairByName(pair.PairBase, pair.PairQuote, pair.ExchangePlatform);
 
                         BotApi.SendMessage(user.TelegramId,pair.FullTaskInfo() + $"\nCurrent price: {pairCurrentPrice} {pair.PairQuote}", ParseMode.Html);
                     }
@@ -260,7 +260,7 @@ namespace TelegramBot.Static.MessageHandlers
                                 sb.AppendLine(pairz.TaskStatusWithLink());
                             }
                         }
-                        var pairCurrentPrice = await ExchangesCheckerForUpdates.GetCurrentPrice(pairbase, pairquote);
+                        var pairCurrentPrice = await Program.cryptoData.GetCurrentPricePairByName(pairbase, pairquote);
                         BotApi.SendMessage(user.TelegramId, sb.ToString() + $"\nCurrent price: {pairCurrentPrice} {pairquote}", ParseMode.Html);
                     }
                     else if (!string.IsNullOrWhiteSpace(pairbase))
@@ -276,7 +276,7 @@ namespace TelegramBot.Static.MessageHandlers
                                 sb.AppendLine(pairz.TaskStatusWithLink());
                             }
                         }
-                        var pairCurrentPrice = await ExchangesCheckerForUpdates.GetCurrentPrice(pairbase, "USDT");
+                        var pairCurrentPrice = await Program.cryptoData.GetCurrentPricePairByName(pairbase, "USDT");
                         BotApi.SendMessage(user.TelegramId, sb.ToString() + $"\nCurrent price: {pairCurrentPrice} USDT", ParseMode.Html);
                     }
                     else
@@ -376,7 +376,7 @@ namespace TelegramBot.Static.MessageHandlers
             }
             else
             {
-                var curprice = await Program.cryptoData.GetCurrentPricePairByName(new TradingPair(pair.PairBase, pair.PairQuote), pair.ExchangePlatform);
+                var curprice = await Program.cryptoData.GetCurrentPricePairByName(new TradingPair(pair.PairBase, pair.PairQuote, pair.ExchangePlatform));
                 pair.GainOrFall = curprice.Price < pair.Price;
                 SaveNewTaskToDB(update, user);
             }
