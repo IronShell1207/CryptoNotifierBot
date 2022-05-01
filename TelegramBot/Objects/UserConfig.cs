@@ -29,10 +29,8 @@ namespace TelegramBot.Objects
         /// Compact pairs notifications for true value, and full info for false
         /// </summary>
         public string? CryptoNotifyStyle { get; set; }
-
         public string Language { get; set; } = "en";
         public bool DisplayTaskEditButtonsInNotifications { get; set; } = true;
-
         public bool NightModeEnable { get; set; } = false;
         /// <summary>
         /// Time in minutes (23*60 by default)
@@ -46,13 +44,10 @@ namespace TelegramBot.Objects
         /// Shows Pumps and Dumps info in notifications
         /// </summary>
         public bool ShowMarketEvents { get; set; } = true;
-
         /// <summary>
         /// Spreads notify of selected pairs of changes in 24h and 8h in selected time
         /// </summary>
         public int? MorningReport { get; set; } = null;
-
-
 
 
     }

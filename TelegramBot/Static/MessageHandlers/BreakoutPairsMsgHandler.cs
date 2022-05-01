@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CryptoApi.Objects;
+using Microsoft.EntityFrameworkCore;
 using Telegram.Bot.Types;
 using TelegramBot.Constants;
 using TelegramBot.Objects;
@@ -30,32 +32,42 @@ namespace TelegramBot.Static.MessageHandlers
         }
         public async void SubNewUserBreakouts(Update update)
         {
-            var user = new BreakoutSub()
-            {
-                TelegramId = update.Message.Chat.Id
-            };
+            
             using (AppDbContext db = new AppDbContext())
             {
-                var sub = db.BreakoutSubs.ToList().FirstOrDefault(x => x.TelegramId == update.Message.Chat.Id);
+                var user = await BotApi.GetUserSettings(update);
+                var sub = db.BreakoutSubs?.OrderBy(x => x.Id).FirstOrDefault(x =>x.TelegramId == user.TelegramId);
                 if (sub == null)
                 {
-                    db.BreakoutSubs.Add(user);
+                    sub = new BreakoutSub()
+                    {
+                        Subscribed = true,
+                        TelegramId = user.TelegramId,
+                        BinanceSub = true,
+                        BitgetSub = true,
+                        BlackListEnable = false,
+                        GateioSub =false,
+                        KucoinSub = true,
+                        OkxSub = true
+                    };
+                    db.BreakoutSubs.Add(sub);
                     db.SaveChangesAsync();
                     await BotApi.SendMessage(update.Message.Chat.Id, string.Format(Messages.subscribedSucs,
-                        $"\nGate IO platform: {user.GateioSub}\nBinance platform: {user.BinanceSub}\nOkx platfrom: {user.OkxSub}\nKucoin platform: {user.KucoinSub}"));
+                        $"\nGate IO platform: {sub.GateioSub}\nBinance platform: {sub.BinanceSub}\nOkx platfrom: {sub.OkxSub}\nKucoin platform: {sub.KucoinSub}"));
                 }
                 else if (sub.Subscribed)
                 {
-
                     await BotApi.SendMessage(update.Message.Chat.Id, "You already subscribed to breakout bot. Your current settings: " +
-                                                                     $"\nGate IO platform: {user.GateioSub}\nBinance platform: {user.BinanceSub}\nOkx platfrom: {user.OkxSub}\nKucoin platform: {user.KucoinSub}");
+                                                                     $"\nGate IO platform: {sub.GateioSub}\nBinance platform: {sub.BinanceSub}" +
+                                                                     $"\nOkx platfrom: {sub.OkxSub}\nKucoin platform: {sub.KucoinSub}");
                 }
                 else if (!sub.Subscribed)
                 {
                     sub.Subscribed = true;
                     db.SaveChangesAsync();
                     await BotApi.SendMessage(update.Message.Chat.Id, string.Format(Messages.subscribedSucs,
-                        $"\nGate IO platform: {user.GateioSub}\nBinance platform: {user.BinanceSub}\nOkx platfrom: {user.OkxSub}\nKucoin platform: {user.KucoinSub}"));
+                        $"\nGate IO platform: {sub.GateioSub}\nBinance platform: {sub.BinanceSub}" +
+                        $"\nOkx platfrom: {sub.OkxSub}\nKucoin platform: {sub.KucoinSub}"));
                 }
 
             }
