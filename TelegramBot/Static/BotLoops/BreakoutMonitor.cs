@@ -184,12 +184,8 @@ namespace TelegramBot.Static
         private static List<BreakoutPair> CompairedPairs(CryDbSet oldExchangeData, CryDbSet freshExchangeData, double procent, double time = 0, string exchange = "Binance")
         {
             List<BreakoutPair> changedData = new List<BreakoutPair>() { };
-            DataBaseContext dbContext = new DataBaseContext();
-            var oldPairs = dbContext.TradingPairs.OrderByDescending(x => x.Id)
-                .Where(z => z.CryDbSet == oldExchangeData).ToList();
-            var freshPairs = dbContext.TradingPairs.OrderByDescending(x => x.Id)
-                .Where(z => z.CryDbSet == freshExchangeData).ToList();
-            dbContext.Dispose();
+            var oldPairs = oldExchangeData.pairs;
+            var freshPairs = freshExchangeData.pairs;
             for (int pairIndex = 0; pairIndex < oldPairs.Count; pairIndex++)
             {
                 var oldPairData = oldPairs[pairIndex];
