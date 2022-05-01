@@ -9,6 +9,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoNotifierBot.Tests", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelegramBot", "TelegramBot\TelegramBot.csproj", "{406806FF-C7D8-4350-BAED-2938FDB03E2B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoWebPortal", "CryptoWebPortal\CryptoWebPortal.csproj", "{EA0B42FA-D083-4A82-86AF-15D367B069A5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{406806FF-C7D8-4350-BAED-2938FDB03E2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{406806FF-C7D8-4350-BAED-2938FDB03E2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{406806FF-C7D8-4350-BAED-2938FDB03E2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA0B42FA-D083-4A82-86AF-15D367B069A5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA0B42FA-D083-4A82-86AF-15D367B069A5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA0B42FA-D083-4A82-86AF-15D367B069A5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA0B42FA-D083-4A82-86AF-15D367B069A5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
