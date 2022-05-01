@@ -94,13 +94,12 @@ namespace CryptoApi.Static.DataHandler
         {
             using (DataBaseContext dbContext = new DataBaseContext())
             {
-
                 var latestData = minutesOffset == 0 ? dbContext.DataSet.OrderByDescending(x => x.Id).FirstOrDefault() :
                     dbContext.DataSet.OrderByDescending(x => x.Id).FirstOrDefault(x => 
                         x.DateTime > DateTime.Now.AddMinutes(-minutesOffset) &&
                         DateTime.Now.AddMinutes(-minutesOffset+1) > x.DateTime);
                 if (latestData == null) return null;
-                var lastdataSets = dbContext.DataSet.OrderByDescending(x => x.Id)
+                var lastdataSets = dbContext.DataSet.Include(c=>c.pairs).OrderByDescending(x => x.Id)
                    .Where(x => x.IdGuid == latestData.IdGuid);
                 return lastdataSets?.ToList();
             }

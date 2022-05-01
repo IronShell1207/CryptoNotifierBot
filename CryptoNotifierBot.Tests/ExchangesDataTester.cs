@@ -8,6 +8,8 @@ using CryptoApi.API;
 using CryptoApi.Constants;
 using CryptoApi.Objects;
 using CryptoApi.Objects.ExchangesPairs;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace CryptoApi.Tests
 {
@@ -91,6 +93,20 @@ namespace CryptoApi.Tests
             }
 
 
+        }
+
+        [Test]
+        public async Task GetPairsInfo()
+        {
+            var timing = 850;
+            using (DataBaseContext dbContext = new DataBaseContext())
+            {
+                var dbSet = dbContext.DataSet.Include(x=>x.pairs).
+                    OrderByDescending(x => x.Id).First(x => x.Id == 1934);
+
+                if (dbSet.pairs.Count > 12) Assert.Pass(dbSet.pairs.Count.ToString());
+                Assert.Fail();
+            }
         }
         [Test]
         public async Task ZGetLatestDataSets()
