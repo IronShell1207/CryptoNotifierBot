@@ -72,7 +72,7 @@ namespace TelegramBot.Static
                                     if (compairedPairs.Any())
                                     {
                                         listDateTimes[indexTiming] = datetimeNow;
-                                        sb.Append("{data[i].Exchange}: {compairedPairs.Count} Time: {timeIn} ");
+                                        sb.Append($"{oldData[i].Exchange}: {compairedPairs.Count} Time: {timing} ");
                                         SpreadBreakoutNotify(compairedPairs, oldExchangeData.Exchange, timing);
                                     }
                                 }
