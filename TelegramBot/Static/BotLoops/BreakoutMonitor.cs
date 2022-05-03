@@ -119,7 +119,7 @@ namespace TelegramBot.Static
 
             }
         }
-
+                    
         public static async void SpreadBreakoutNotify(List<BreakoutPair> pairs, string platform, int timing)
         {
             ConsoleCommandsHandler.LogWrite($"Breakout bot sending notify");

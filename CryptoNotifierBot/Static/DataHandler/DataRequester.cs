@@ -43,13 +43,13 @@ namespace CryptoApi.Static.DataHandler
 
         public void RemoveOldData()
         {
-            var date = DateTime.Now - TimeSpan.FromDays(2);
+            var date = DateTime.Now - TimeSpan.FromHours(60);
             using (DataBaseContext dbContext = new DataBaseContext())
             {
                 if (dbContext.DataSet.Any(x => x.DateTime < date))
                 {
                     var rows = dbContext.Database.ExecuteSqlRaw(
-                         $"DELETE FROM DataSet Where Id in (SELECT Id FROM DataSet Where date <= \"{date.ToString()}\" ORDER BY Id LIMIT 500)");
+                         $"DELETE FROM DataSet Where Id in (SELECT Id FROM DataSet Where DateTime <= \"{date.ToString()}\" ORDER BY Id LIMIT 800)");
                     Diff.LogWrite($"Rows deleted {rows} for data older {date}");
                 }
 
@@ -64,7 +64,6 @@ namespace CryptoApi.Static.DataHandler
         }
         public async Task UpdateDataLoop()
         {
-            RemoveOldData();
             if (DataDownloadedCounter > 3000)
                 using (DataBaseContext dbContext = new DataBaseContext())
                 {
@@ -75,6 +74,7 @@ namespace CryptoApi.Static.DataHandler
             while (UpdaterLive)
             {
                 UpdateAllData();
+                RemoveOldData();
                 DataDownloadedCounter++;
                 Thread.Sleep(29900);
             }
