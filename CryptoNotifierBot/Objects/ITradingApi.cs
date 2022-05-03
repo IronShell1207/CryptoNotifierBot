@@ -14,7 +14,7 @@ namespace CryptoApi.Objects
         public Task GetExchangeData(Guid guid);
         public string ApiName { get; }
         public int PairsCount { get; }
-        public DateTime LastUpdate { get; }
+        public DateTime LastUpdate { get;}
         
         //  public  List<CryptoExchangePairInfo> ExchangePairsConverter(List<object> list);
     }

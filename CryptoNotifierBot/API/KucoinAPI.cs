@@ -22,12 +22,12 @@ namespace CryptoApi.API
         public string ApiName => Exchanges.Kucoin;
         public int PairsCount { get; private set; }
         public DateTime LastUpdate { get; private set; }
-        public List<PricedTradingPair> PairsListConverter(List<KucoinData.Ticker> list)
+        public List<PricedTradingPair> PairsListConverter(List<KuTicker> list)
         {
             var listReturner = new List<PricedTradingPair>();
             if (list != null)
             {
-                foreach (KucoinData.Ticker pair in list)
+                foreach (KuTicker pair in list)
                 {
                     var pairSymbol = SplitSymbolConverter(pair.symbol);
                     if (pairSymbol != null)
@@ -54,7 +54,7 @@ namespace CryptoApi.API
             return null;
         }
 
-        public async Task<List<KucoinData.Ticker>> GetTickerData()
+        public async Task<List<KuTicker>> GetTickerData()
         {
             using (var restRequester = new RestRequester())
             {
@@ -63,7 +63,7 @@ namespace CryptoApi.API
                 {
                     JsonSerializer serializer = new JsonSerializer();
                     var kudata =
-                        serializer.Deserialize<KucoinData.Rootobject>(
+                        serializer.Deserialize<KucoinData>(
                             new JsonTextReader(new StringReader(response.Content)));
                     PairsCount = kudata.data.ticker.ToList().Count;
                     LastUpdate = DateTime.Now;
@@ -79,9 +79,8 @@ namespace CryptoApi.API
                     return await GetTickerData();
                 }
             }
-            return new List<KucoinData.Ticker>()
-            {
-            };
+
+            return null;
         }
         public void SavePairsToDb(string exchange, List<PricedTradingPair> pairs, Guid guid)
         {

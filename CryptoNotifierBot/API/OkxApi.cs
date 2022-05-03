@@ -21,12 +21,12 @@ namespace CryptoApi.API
         public string ApiName => Exchanges.Okx;
         public int PairsCount { get; private set; }
         public DateTime LastUpdate { get; private set; }
-        public List<PricedTradingPair> PairsListConverter(List<OkxPairsInfo> list)
+        public List<PricedTradingPair> PairsListConverter(List<OkxTicker> list)
         {
             var listReturner = new List<PricedTradingPair>();
             if (list != null)
             {
-                foreach (OkxPairsInfo pair in list)
+                foreach (OkxTicker pair in list)
                 {
                     var pairSymbol = SplitSymbolConverter(pair.instId);
                     if (pairSymbol != null)
@@ -54,7 +54,7 @@ namespace CryptoApi.API
             return null;
         }
 
-        public async Task<List<OkxPairsInfo>> GetTickerData()
+        public async Task<List<OkxTicker>> GetTickerData()
         {
             using (var restRequester = new RestRequester())
             {
@@ -78,7 +78,7 @@ namespace CryptoApi.API
                 }
             }
 
-            return new List<OkxPairsInfo>();
+            return new List<OkxTicker>();
         }
         public void SavePairsToDb(string exchange, List<PricedTradingPair> pairs, Guid guid)
         {
@@ -87,7 +87,7 @@ namespace CryptoApi.API
                 if (pairs.Any())
                 {
                     var dbSet = new CryDbSet(DateTime.Now, exchange, guid);
-                    dbSet.pairs = pairs;
+                    dbSet.pairs = pairs;    
                     dbContext.DataSet.Add(dbSet);
                     dbContext.SaveChanges();
                 }
