@@ -132,8 +132,9 @@ namespace CryptoApi.API
         }
         public async Task GetExchangeData<T>(Guid guid = default(Guid))
         {
-            var pairs = PairsListConverter(await GetTickerData<T>());
-            SavePairsToDb(ApiName, pairs, guid);
+            var apiData = await GetTickerData<T>();
+            var pairs = PairsListConverter(apiData);
+            if (pairs != null) SavePairsToDb(ApiName, pairs, guid);
         }
 
         public ExchangeApi(string apiName)
