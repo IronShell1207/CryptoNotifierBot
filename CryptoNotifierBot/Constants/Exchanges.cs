@@ -45,7 +45,7 @@ namespace CryptoApi.Constants
             switch (name)
             {
                 case GateIO:
-                    return typeof(GateIOData);
+                    return typeof(GateIOTicker);
                 case Okx:
                     return typeof(OkxData);
                 case Binance:

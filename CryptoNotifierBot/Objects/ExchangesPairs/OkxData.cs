@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CryptoApi.Objects.ExchangesPairs
 {
-    public class OkxData
+    public class OkxData : ITradingApiData
     {
         public string code { get; set; }
         public string msg { get; set; }

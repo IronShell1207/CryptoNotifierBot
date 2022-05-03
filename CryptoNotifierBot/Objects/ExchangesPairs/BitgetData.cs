@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CryptoApi.Objects.ExchangesPairs
 {
-    public class BitgetData
+    public class BitgetData : ITradingApiData
     {
         public string code { get; set; }
         public BitgetTicker[] data { get; set; }

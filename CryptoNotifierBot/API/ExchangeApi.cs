@@ -47,8 +47,8 @@ namespace CryptoApi.API
                     return Convert((crdata as KucoinData).data.ticker.ToList());
                 else if (crdata is OkxData)
                     return Convert((crdata as OkxData).data.ToList());
-                else if (crdata is List<GateIOData>)
-                    return Convert((crdata as List<GateIOData>));
+                else if (crdata is List<GateIOTicker>)
+                    return Convert((crdata as List<GateIOTicker>));
                 else if (crdata is List<BinancePair>)
                     return Convert((crdata as List<BinancePair>));
                 else if (crdata is BitgetData)

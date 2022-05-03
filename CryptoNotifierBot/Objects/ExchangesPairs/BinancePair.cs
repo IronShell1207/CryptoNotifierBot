@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace CryptoApi.Objects.ExchangesPairs
 {
+    public class BinanceData : ITradingApiData
+    {
+        public List<BinancePair> data { get; set; }
+    }
     public class BinancePair : TheTradingPair
     {
         public string symbol { get; set; }

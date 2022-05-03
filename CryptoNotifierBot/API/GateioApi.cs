@@ -23,12 +23,12 @@ namespace CryptoApi.API
         public string ApiName { get; } = Exchanges.GateIO;
         public int PairsCount { get; private set; }
         public DateTime LastUpdate { get; private set; }
-        public List<PricedTradingPair> ExchangePairsConverter(List<GateIOData> list)
+        public List<PricedTradingPair> ExchangePairsConverter(List<GateIOTicker> list)
         {
             var listReturner = new List<PricedTradingPair>();
             if (list != null)
             {
-                foreach (GateIOData pair in list)
+                foreach (GateIOTicker pair in list)
                 {
                     var pairSymbol = SplitSymbolConverter(pair.currency_pair);
                     if (pairSymbol != null)
@@ -56,7 +56,7 @@ namespace CryptoApi.API
             return null;
         }
 
-        public async Task<List<GateIOData>> GetTickerData()
+        public async Task<List<GateIOTicker>> GetTickerData()
         {
             using (var restRequester = new RestRequester())
             {
@@ -64,7 +64,7 @@ namespace CryptoApi.API
                 if (response?.StatusCode == HttpStatusCode.OK)
                 {
                     JsonSerializer serializer = new JsonSerializer();
-                    var data = serializer.Deserialize<List<GateIOData>>(
+                    var data = serializer.Deserialize<List<GateIOTicker>>(
                         new JsonTextReader(new StringReader(response.Content)));
                     PairsCount = data.Count;
                     LastUpdate = DateTime.Now;
@@ -81,7 +81,7 @@ namespace CryptoApi.API
                 }
             }
 
-            return new List<GateIOData>()
+            return new List<GateIOTicker>()
             {
 
             };

@@ -19,25 +19,27 @@ namespace CryptoApi.Static.DataHandler
     {
         public bool UpdaterLive { get; set; } = true;
         public int DataDownloadedCounter { get; private set; } = 0;
-        public List<ITradingApi> apis = new()
-        {
-            new BitgetApi(),
-            new BinanceApi(),
-            new GateioApi(),
-            new KucoinAPI(),
-            new OkxApi()
-        };
 
-        public void UpdateAllData()
+        public async void UpdateAllData()
         {
             var datenow = DateTime.Now;
-            StringBuilder sb = new StringBuilder($"Market data updated: ");
+            StringBuilder sb = new StringBuilder($"Market data updated");
             var guid = Guid.NewGuid();
-            foreach (var api in apis)
-            {
-                api.GetExchangeData(guid);
-                sb.Append($"{api.ApiName}: {api.PairsCount} ");
-            }
+            using (var api = new ExchangeApi(Exchanges.Binance))
+                await api.GetExchangeData<BinanceData>(guid);
+
+            using (var api = new ExchangeApi(Exchanges.Bitget))
+                await api.GetExchangeData<BitgetData>(guid);
+
+            using (var api = new ExchangeApi(Exchanges.Okx))
+                await api.GetExchangeData<OkxData>(guid);
+
+            using (var api = new ExchangeApi(Exchanges.GateIO))
+                await api.GetExchangeData<GateIoData>(guid);
+
+            using (var api = new ExchangeApi(Exchanges.Kucoin))
+                await api.GetExchangeData<KucoinData>(guid);
+
             Diff.LogWrite(sb.ToString());
         }
 
@@ -95,11 +97,11 @@ namespace CryptoApi.Static.DataHandler
             using (DataBaseContext dbContext = new DataBaseContext())
             {
                 var latestData = minutesOffset == 0 ? dbContext.DataSet.OrderByDescending(x => x.Id).FirstOrDefault() :
-                    dbContext.DataSet.OrderByDescending(x => x.Id).FirstOrDefault(x => 
+                    dbContext.DataSet.OrderByDescending(x => x.Id).FirstOrDefault(x =>
                         x.DateTime > DateTime.Now.AddMinutes(-minutesOffset) &&
-                        DateTime.Now.AddMinutes(-minutesOffset+1) > x.DateTime);
+                        DateTime.Now.AddMinutes(-minutesOffset + 1) > x.DateTime);
                 if (latestData == null) return null;
-                var lastdataSets = dbContext.DataSet.Include(c=>c.pairs).OrderByDescending(x => x.Id)
+                var lastdataSets = dbContext.DataSet.Include(c => c.pairs).OrderByDescending(x => x.Id)
                    .Where(x => x.IdGuid == latestData.IdGuid);
                 return lastdataSets?.ToList();
             }

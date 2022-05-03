@@ -31,6 +31,7 @@ namespace TelegramBot.Objects
         public bool S480MinUpdates { get; set; } = true;
         public bool S960MinUpdates { get; set; } = false;
         public bool S1920MinUpdates { get; set; } = true;
+        public List<BlackListedPairs>? BlackListedPairsList { get; set; } = new();
 
     }
 }

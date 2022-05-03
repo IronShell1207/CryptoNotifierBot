@@ -148,7 +148,7 @@ namespace CryptoApi.Tests
         {
             using (CryptoApi.API.ExchangeApi api = new ExchangeApi(Exchanges.GateIO))
             {
-                await api.GetExchangeData<List<GateIOData>>(NewGuid);
+                await api.GetExchangeData<List<GateIOTicker>>(NewGuid);
                 Assert.Pass(await GetBtcPrice(Exchanges.GateIO));
             }
         }
