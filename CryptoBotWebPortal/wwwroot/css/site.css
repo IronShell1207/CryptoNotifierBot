@@ -8,6 +8,18 @@ h1:focus {
     outline: none;
 }
 
+td {
+
+    text-align: left;
+    width: 0.2em;
+}
+tr {
+    text-align: left; width: 0.4em;
+}
+th {
+    text-align: left;
+    width: 0.4em;
+}
 a, .btn-link {
     color: #0071c1;
 }

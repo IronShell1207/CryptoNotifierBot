@@ -1,0 +1,64 @@
+﻿@page "/fetchtasks"
+
+<PageTitle>User tasks</PageTitle>
+
+@using CryptoBotWebPortal.Data
+@using CryptoApi.Objects
+@using TelegramBot.Objects
+@inject WeatherForecastService ForecastService
+
+<h1>User tasks</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (USERTasks == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        
+        <tr>
+            <th>Enabled</th>
+            <th>Id</th>
+            <th>User Id</th>
+            <th>Pair symbol</th>
+            <th>Exchange</th>
+            <th>User telegram id</th>
+        </tr>
+        </thead>
+        <tbody>
+            @foreach (var pair in USERTasks)
+            {
+                <tr>
+                    <td>
+                        <input type="checkbox" checked="@pair.Enabled"/>
+                    </td>
+                    <td>@pair.Id</td>
+                    <td>@pair.OwnerId</td>
+                    <td><p>@StringToHtml(pair.TaskStatusWithLink())</p></td>
+                    <td>@pair.ExchangePlatform</td>
+                    <td>@pair.User.TelegramId</td>
+                    
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<CryptoPair>? USERTasks;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        USERTasks = await ForecastService.UsersTasks();
+    }
+
+    private MarkupString StringToHtml(string line)
+    {
+        return (MarkupString) line;
+    }
+}

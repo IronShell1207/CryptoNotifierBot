@@ -16,11 +16,11 @@ namespace CryptoApi.Constants
         /// <summary>
         /// Binance spot page, pair pattern BASE_QUOTE
         /// </summary>
-        public const string BinanceSpot = "https://www.binance.com/ru/trade/{0}";
+        public const string BinanceSpot = "https://www.binance.com/ru/trade/{0}?layout=pro";
         /// <summary>
         /// GateIO spot page, pair pattern BASE_QUOTE
         /// </summary>
-        public const string GateIoSpot = "https://www.gate.io/tradepro/{0}";
+        public const string GateIoSpot = "https://www.gate.io/trade/{0}";
         /// <summary>
         /// GateIO spot page, pair pattern BASE-QUOTE
         /// </summary>
@@ -51,7 +51,7 @@ namespace CryptoApi.Constants
                 throw new ArgumentNullException(nameof(exchange));
             if    (exchange == Exchanges.Binance)  return $"{Base}_{Quote}";
             else if (exchange == Exchanges.Okx)    return $"{Base}-{Quote}";
-            else if (exchange == Exchanges.GateIO) return $"{Base}-{Quote}";
+            else if (exchange == Exchanges.GateIO) return $"{Base}_{Quote}";
             else if (exchange == Exchanges.Kucoin) return $"{Base}_{Quote}";
             else if (exchange == Exchanges.Bitget) return $"{Base}{Quote}";
             return null;

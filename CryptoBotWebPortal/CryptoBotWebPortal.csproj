@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CryptoNotifierBot\CryptoApi.csproj" />
+    <ProjectReference Include="..\TelegramBot\TelegramBot.csproj" />
   </ItemGroup>
 
 </Project>

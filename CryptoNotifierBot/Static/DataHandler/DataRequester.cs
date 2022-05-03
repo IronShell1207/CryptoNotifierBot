@@ -88,7 +88,8 @@ namespace CryptoApi.Static.DataHandler
         {
             using (DataBaseContext dbContext = new DataBaseContext())
             {
-                var dSet = dbContext.DataSet.OrderBy(x => x.Id).LastOrDefault(x => x.Exchange == exchange);
+                var dSet = dbContext.DataSet.Include(x=>x.pairs).OrderBy(x => x.Id).LastOrDefault(x => x.Exchange == exchange);
+                return dSet.pairs.Take(limit).ToList();
                 var pairs = dbContext.TradingPairs.Where(x => x.CryDbSetId == dSet.Id && x.Exchange == dSet.Exchange).Take(limit).ToList();
                 return pairs;
             }

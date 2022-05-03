@@ -1,0 +1,37 @@
+﻿@page "/userconfig/{userid}"
+
+<PageTitle>Users</PageTitle>
+
+
+@using CryptoBotWebPortal.Data
+@using CryptoApi.Objects
+
+@using Microsoft.AspNetCore.Mvc.RazorPages
+@using TelegramBot.Objects
+@inject WeatherForecastService ForecastService
+
+<h1>User's config</h1>
+<div id="userconfig">
+    <h5>User id</h5>
+    <p>@user.Id</p>
+    <h5>User telegram id</h5>
+    <p>@user.TelegramId</p>
+    <h5>User pairs</h5>
+    <p>@user.pairs.Count</p><input type="button" href="/fetchtasks/@userid" value="Show tasks list">
+    <h5>Language</h5>
+    <input type="text" value="@user.Language"/>
+    <h5>Notification timeout</h5>
+    <input type="number" value="@user.NoticationsInterval"/>
+    <a class="list-group-numbered"></a>
+    <input type="button" value="Save changes"/>
+</div>
+
+@code {
+    private UserConfig? user;
+    [Parameter]
+    public string userid { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        user = await ForecastService.userconfigGET(int.Parse(userid));
+    }
+}

@@ -49,6 +49,7 @@ namespace TelegramBot.Objects
         /// </summary>
         public int? MorningReport { get; set; } = null;
 
+        public List<CryptoPair>? pairs { get; set; } = new();
 
     }
 }
