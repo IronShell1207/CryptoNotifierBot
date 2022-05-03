@@ -32,7 +32,7 @@ namespace CryptoApi.API
                 {
                     var pairSymbol = SplitSymbolConverter(pair.currency_pair);
                     if (pairSymbol != null)
-                        listReturner.Add(new PricedTradingPair(pairSymbol, double.Parse(pair.last, new CultureInfo("en"))));
+                        listReturner.Add(new PricedTradingPair(pairSymbol, double.Parse(pair.last, new CultureInfo("en"))));    
                     //listReturner.Add(new CryptoExchangePairInfo(SplitSymbolConverter(pair.currency_pair), double.Parse(pair.last)));
                 }
             }

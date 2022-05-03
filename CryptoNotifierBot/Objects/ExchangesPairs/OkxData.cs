@@ -10,10 +10,10 @@ namespace CryptoApi.Objects.ExchangesPairs
     {
         public string code { get; set; }
         public string msg { get; set; }
-        public OkxPairsInfo[] data { get; set; }
+        public OkxTicker[] data { get; set; }
     }
 
-    public class OkxPairsInfo
+    public class OkxTicker : TheTradingPair
     {
         public string instType { get; set; }
         public string instId { get; set; }
@@ -31,6 +31,9 @@ namespace CryptoApi.Objects.ExchangesPairs
         public string ts { get; set; }
         public string sodUtc0 { get; set; }
         public string sodUtc8 { get; set; }
+
+        public override string Symbol => instId;
+        public override string Price => last;
     }
 
 }

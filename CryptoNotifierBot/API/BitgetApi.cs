@@ -76,14 +76,15 @@ namespace CryptoApi.API
         {
             using (var restRequester = new RestRequester())
             {
-                RestResponse response = await restRequester.GetRequest(new Uri(ExchangesApiLinks.BitgetSpotTicker), ApiName);
+                RestResponse response = await restRequester.GetRequest(
+                    new Uri(ExchangesApiLinks.BitgetSpotTicker), ApiName);
                 if (response?.StatusCode == HttpStatusCode.OK)
                 {
                     JsonSerializer serializer = new JsonSerializer();
                     var data = serializer.Deserialize<BitgetData>(
                         new JsonTextReader(new StringReader(response.Content)));
                     if (data.msg == "success")
-                    {
+                    {   
                         PairsCount = data.data.ToList().Count;
                         LastUpdate = DateTime.Now;
                         return data.data.ToList();

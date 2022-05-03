@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CryptoApi.Objects.ExchangesPairs
 {
-    public class GateIOData
+    public class GateIOData : TheTradingPair
     {
         public string currency_pair { get; set; }
         public string last { get; set; }
@@ -21,6 +21,8 @@ namespace CryptoApi.Objects.ExchangesPairs
         public string etf_pre_net_value { get; set; }
         public int etf_pre_timestamp { get; set; }
         public string etf_leverage { get; set; }
+        public override string Symbol => currency_pair;
+        public override string Price => last;
     }
 
 

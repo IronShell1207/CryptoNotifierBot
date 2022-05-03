@@ -33,7 +33,7 @@ namespace CryptoApi.API
                 {
                     var pairSymbol = SplitSymbolConverter(pair.symbol);
                     if (pairSymbol != null)
-                        listReturner.Add(new PricedTradingPair(pairSymbol, pair.price));
+                        listReturner.Add(new PricedTradingPair(pairSymbol, pair.price));    
                 }
             }
 
