@@ -1,0 +1,49 @@
+﻿@page "/fetchdata"
+
+<PageTitle>Weather forecast</PageTitle>
+
+@using CryptoBotWebPortal.Data
+@using CryptoApi.Objects
+@inject WeatherForecastService ForecastService
+
+<h1>Weather forecast</h1>
+
+<p>This component demonstrates fetching data from a service.</p>
+
+@if (pairs == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Pair symbol</th>
+                <th>Exchange</th>
+                <th>Current price</th>
+                <th>Db set</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var pair in pairs)
+            {
+                <tr>
+                    <td>@pair.Name/@pair.Quote</td>
+                    <td>@pair.Exchange</td>
+                    <td>@pair.Price</td>
+                    <td>@pair.CryDbSetId</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<PricedTradingPair>? pairs;
+
+    protected override async Task OnInitializedAsync()
+    {
+        pairs = await ForecastService.GetLatest100Pairs();
+    }
+}

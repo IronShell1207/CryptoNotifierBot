@@ -82,12 +82,12 @@ namespace CryptoApi.Static.DataHandler
             }
         }
 
-        public async Task<List<PricedTradingPair>> GetLatestDataByExchangeName(string exchange)
+        public async Task<List<PricedTradingPair>> GetLatestDataByExchangeName(string exchange, int limit = 9999)
         {
             using (DataBaseContext dbContext = new DataBaseContext())
             {
                 var dSet = dbContext.DataSet.OrderBy(x => x.Id).LastOrDefault(x => x.Exchange == exchange);
-                var pairs = dbContext.TradingPairs.Where(x => x.CryDbSetId == dSet.Id && x.Exchange == dSet.Exchange).ToList();
+                var pairs = dbContext.TradingPairs.Where(x => x.CryDbSetId == dSet.Id && x.Exchange == dSet.Exchange).Take(limit).ToList();
                 return pairs;
             }
         }
