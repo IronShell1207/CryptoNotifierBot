@@ -19,14 +19,15 @@ namespace CryptoApi.Static.DataHandler
     {
         public bool UpdaterLive { get; set; } = true;
         public int DataDownloadedCounter { get; private set; } = 0;
-
+        public bool DataAvailable { get; private set; } = false;
         public async void UpdateAllData()
         {
             var datenow = DateTime.Now;
             StringBuilder sb = new StringBuilder($"Market data updated");
             var guid = Guid.NewGuid();
+
             using (var api = new ExchangeApi(Exchanges.Binance))
-                await api.GetExchangeData<BinanceData>(guid);
+                await api.GetExchangeData<List<BinancePair>>(guid);
 
             using (var api = new ExchangeApi(Exchanges.Bitget))
                 await api.GetExchangeData<BitgetData>(guid);
@@ -35,11 +36,12 @@ namespace CryptoApi.Static.DataHandler
                 await api.GetExchangeData<OkxData>(guid);
 
             using (var api = new ExchangeApi(Exchanges.GateIO))
-                await api.GetExchangeData<GateIoData>(guid);
+                await api.GetExchangeData<List<GateIOTicker>>(guid);
 
             using (var api = new ExchangeApi(Exchanges.Kucoin))
                 await api.GetExchangeData<KucoinData>(guid);
 
+            DataAvailable = true;
             Diff.LogWrite(sb.ToString());
         }
 
