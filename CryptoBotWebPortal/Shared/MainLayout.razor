@@ -1,19 +1,33 @@
 ﻿@inherits LayoutComponentBase
-
+@inject IJSRuntime JsRuntime
 <PageTitle>CryptoBotWebPortal</PageTitle>
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
-    <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
-            @Body
-        </article>
+<main>
+    <div id="wrapper">
+           <NavMenu/>
+           <div id="content-wrapper" class="d-flex flex-column">
+               <div id="content">
+                   <TopBar/>
+                   <div class="container-fluid">
+                       <article class="content px-4">
+                           @Body
+                       </article>
+                   </div>
+               </div>
+               <Footer/>
+           </div>
+       </div>
+    <a class="scroll-to-top rounded" @onclick="ScrollToTop">
+        <i class="fas fa-angle-up"></i>
+    </a>
+    <LogoutModal/>
     </main>
 </div>
+@code
+{
+    private async void ScrollToTop()
+    {
+        await JsRuntime.InvokeVoidAsync("OnScrollEvent");
+    }
+}

@@ -1,0 +1,47 @@
+﻿@page "/cryptodata"
+@model CryptoBotWebPortal.Pages.CryptoDataModel
+@{
+
+}
+@if (Model.pairs == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+
+{
+
+    <!-- DataTales Example -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">DataTables Example</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                    <thead>
+                    <tr>
+                        <th>Pair symbol</th>
+                        <th>Exchange</th>
+                        <th>Current price</th>
+                        <th>Db set</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach (var pair in Model.pairs)
+                    {
+                        <tr>
+                            <td>@pair.Name/@pair.Quote</td>
+                            <td>@pair.Exchange</td>
+                            <td>@pair.Price</td>
+                            <td>@pair.CryDbSetId</td>
+                        </tr>
+                    }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+   
+}

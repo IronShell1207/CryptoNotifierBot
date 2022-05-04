@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoNotifierBot.Tests", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelegramBot", "TelegramBot\TelegramBot.csproj", "{406806FF-C7D8-4350-BAED-2938FDB03E2B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoBotWebPortal", "CryptoBotWebPortal\CryptoBotWebPortal.csproj", "{BBF40C7D-7013-4ED7-B42C-A9902E76926D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoBotWebPortal", "CryptoBotWebPortal\CryptoBotWebPortal.csproj", "{BBF40C7D-7013-4ED7-B42C-A9902E76926D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

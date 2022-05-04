@@ -1,41 +1,54 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">CryptoBotWebPortal</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>
+﻿<!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchtasks">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch tasks
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchusers">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch users
-            </NavLink>
-        </div>
-    </nav>
-</div>
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="">
+                <div class="sidebar-brand-icon ">
+                    <i class="fas fa-fw fa-chart-line"></i>
+                </div>
+                <div class="sidebar-brand-text mx-2">CryptoBot Web Portal</div>
+            </a>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Users db
+            </div>
+
+            <li class="nav-item">
+                <a class="nav-link" href="fetchusers">
+                    <i class="fas fa-fw fa-table"></i>
+                    <span>Users list</span></a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="fetchtasks">
+                    <i class="fas fa-fw fa-table"></i>
+                    <span>Monitoring tasks</span></a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Crypto data
+            </div>
+
+            <li class="nav-item">
+                <a class="nav-link" href="fetchdata">
+                    <i class="fas fa-fw fa-chart-area"></i>
+                    <span>Fetch latest data</span></a>
+            </li>
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
+
+            <!-- Sidebar Toggler (Sidebar) -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle" @onclick="ToggleNavMenu"></button>
+            </div>
+
+        </ul>
+        <!-- End of Sidebar -->
 
 @code {
     private bool collapseNavMenu = true;
