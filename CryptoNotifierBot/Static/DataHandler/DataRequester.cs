@@ -27,19 +27,30 @@ namespace CryptoApi.Static.DataHandler
             var guid = Guid.NewGuid();
 
             using (var api = new ExchangeApi(Exchanges.Binance))
+            {
                 await api.GetExchangeData<List<BinancePair>>(guid);
+                sb.Append($"{api.ApiName}: {api.PairsCount} ");
+            }
 
-            using (var api = new ExchangeApi(Exchanges.Bitget))
+            using (var api = new ExchangeApi(Exchanges.Bitget)){
                 await api.GetExchangeData<BitgetData>(guid);
+                sb.Append($"{api.ApiName}: {api.PairsCount} ");
+            }
 
-            using (var api = new ExchangeApi(Exchanges.Okx))
+            using (var api = new ExchangeApi(Exchanges.Okx)){
                 await api.GetExchangeData<OkxData>(guid);
+                sb.Append($"{api.ApiName}: {api.PairsCount} ");
+            }
 
-            using (var api = new ExchangeApi(Exchanges.GateIO))
+            using (var api = new ExchangeApi(Exchanges.GateIO)){
                 await api.GetExchangeData<List<GateIOTicker>>(guid);
+                sb.Append($"{api.ApiName}: {api.PairsCount} ");
+            }
 
-            using (var api = new ExchangeApi(Exchanges.Kucoin))
+            using (var api = new ExchangeApi(Exchanges.Kucoin)){
                 await api.GetExchangeData<KucoinData>(guid);
+                sb.Append($"{api.ApiName}: {api.PairsCount}");
+            }
 
             DataAvailable = true;
             Diff.LogWrite(sb.ToString());

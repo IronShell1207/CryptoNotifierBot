@@ -62,7 +62,7 @@ namespace TelegramBot.Static
 
             if (update.Type == UpdateType.Message && update.Message != null)
             {
-                var user = await GetUserSettings(update.Message?.Chat?.Id);
+                var user = await GetUserSettings(update);
                 if (RegexCombins.CommandPattern.IsMatch(update.Message?.Text))
                     CommandsHandler(bot, update, canceltoken);
 
@@ -138,7 +138,7 @@ namespace TelegramBot.Static
         public static async void RepliedMsgHandlerAsync(ITelegramBotClient bot, Update update,
             CancellationToken canceltoken)
         {
-            var user = GetUserSettings(update.Message.Chat.Id).Result;
+            var user = GetUserSettings(update).Result;
             var editPriceMsgRegex =
                 CommandsRegex.ConvertMessageToRegex(CultureTextRequest.GetMessageString("CPEditPair", user.Language),
                     new List<string>()
@@ -331,9 +331,6 @@ namespace TelegramBot.Static
 
          #region UsersStuff
 
-        public static async Task<UserConfig> GetUserSettings(Update update) =>
-            GetUserSettings(GetTelegramIdFromUpdate(update)).Result;
-
         public static async Task<UserConfig> GetUserSettings(int userId)
         {
             using (AppDbContext db = new AppDbContext())
@@ -359,8 +356,9 @@ namespace TelegramBot.Static
                 return true;
             }
         }
-        public static async Task<UserConfig> GetUserSettings(ChatId chatId)
+        public static async Task<UserConfig> GetUserSettings(Update update)
         {
+            var chatId = GetTelegramIdFromUpdate(update);
             using (AppDbContext db = new AppDbContext())
             {
                 var user = db.Users.FirstOrDefault(x => x.TelegramId == chatId.Identifier);
@@ -368,7 +366,9 @@ namespace TelegramBot.Static
                 {
                     user = new UserConfig()
                     {
-                        TelegramId = (long) chatId.Identifier
+                        TelegramId = (long) chatId.Identifier,
+                        UserName = update.Message?.From?.Username ?? "",
+                        FirstName = update.Message?.From?.FirstName + " " + update.Message?.From?.LastName
                     };
                     db.Users.Add(user);
                     await SendMessage(chatId, Messages.welcomeMsg);

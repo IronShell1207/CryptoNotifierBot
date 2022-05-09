@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TelegramBot.Static;
 
@@ -10,9 +11,10 @@ using TelegramBot.Static;
 namespace TelegramBot.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220504160628_Added-user-info-to-userconfig")]
+    partial class Addeduserinfotouserconfig
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "6.0.4");
@@ -30,13 +32,7 @@ namespace TelegramBot.Migrations
                     b.Property<long>("TelegramId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
 
                     b.ToTable("BannedUsers");
                 });
@@ -306,17 +302,6 @@ namespace TelegramBot.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("TelegramBot.Objects.BannedUser", b =>
-                {
-                    b.HasOne("TelegramBot.Objects.UserConfig", "User")
-                        .WithOne("BanStatus")
-                        .HasForeignKey("TelegramBot.Objects.BannedUser", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("TelegramBot.Objects.BlackListedPairs", b =>
                 {
                     b.HasOne("TelegramBot.Objects.BreakoutSub", "Sub")
@@ -346,8 +331,6 @@ namespace TelegramBot.Migrations
 
             modelBuilder.Entity("TelegramBot.Objects.UserConfig", b =>
                 {
-                    b.Navigation("BanStatus");
-
                     b.Navigation("pairs");
                 });
 #pragma warning restore 612, 618

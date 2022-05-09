@@ -33,6 +33,7 @@ else
         <thead>
         
         <tr>
+            <th>Edit task</th>
             <th>Enabled</th>
             <th>Id</th>
             <th>User Id</th>
@@ -46,14 +47,18 @@ else
         {
             <tr>
                 <td>
+                    <a style="padding: 10px 20px" class="btn-primary"  href="/taskedit/@pair.Id">Edit</a>
+                </td>
+                <td>
                     <input type="checkbox" checked="@pair.Enabled"/>
                 </td>
                 <td>@pair.Id</td>
                 <td>@pair.OwnerId</td>
-                <td><p>@StringToHtml(pair.TaskStatusWithLink())</p></td>
+                <td>
+                    <p>@StringToHtml(pair.TaskStatusWithLink())</p></td>
                 <td>@pair.ExchangePlatform</td>
                 <td>@pair.User.TelegramId</td>
-                    
+
             </tr>
         }
         </tbody>

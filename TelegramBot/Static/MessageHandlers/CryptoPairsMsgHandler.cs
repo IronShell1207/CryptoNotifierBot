@@ -21,8 +21,7 @@ namespace TelegramBot.Static.MessageHandlers
     {
         private async Task<CryptoPair> GetTempUserTask(Update update)
         {
-            var userId = update.Message?.Chat?.Id ?? update.CallbackQuery?.From?.Id;
-            var user = await BotApi.GetUserSettings(userId);
+            var user = await BotApi.GetUserSettings(update);
             CryptoPair pair = PairsManager.TempObjects?.FirstOrDefault(x => x.OwnerId == user.Id);
             if (pair == null)
             {
@@ -35,7 +34,7 @@ namespace TelegramBot.Static.MessageHandlers
         public async void EditUserTask(Update update)
         {
             var match = CommandsRegex.MonitoringTaskCommands.EditPair.Match(update.Message.Text);
-            var user = BotApi.GetUserSettings(BotApi.GetTelegramIdFromUpdate(update)).Result;
+            var user = BotApi.GetUserSettings(update).Result;
             if (match.Success)
             {
                 var id = match.Groups["id"].Value;
@@ -125,7 +124,7 @@ namespace TelegramBot.Static.MessageHandlers
         public void EditUserTaskCallbackHandler(Update update)
         {
             var match = CallbackDataPatterns.EditPairRegex.Match(update.CallbackQuery.Data);
-            var user = BotApi.GetUserSettings(BotApi.GetTelegramIdFromUpdate(update)).Result;
+            var user = BotApi.GetUserSettings(update).Result;
             if (match.Success)
             {
                 var Id = int.Parse(match.Groups["id"].Value);
@@ -149,7 +148,7 @@ namespace TelegramBot.Static.MessageHandlers
         public void RemoveUserTaskCallbackHandler(Update update)
         {
             var match = CallbackDataPatterns.DeletePairRegex.Match(update.CallbackQuery.Data);
-            var user = BotApi.GetUserSettings(BotApi.GetTelegramIdFromUpdate(update)).Result;
+            var user = BotApi.GetUserSettings(update).Result;
             if (match.Success)
             {
                 var Id = int.Parse(match.Groups["id"].Value);
@@ -178,7 +177,7 @@ namespace TelegramBot.Static.MessageHandlers
             var match = CommandsRegex.MonitoringTaskCommands.DeletePair.Match(update.Message.Text);
             if (match.Success)
             {
-                var user = BotApi.GetUserSettings(update.Message.Chat.Id).Result;
+                var user = BotApi.GetUserSettings(update).Result;
                 var strId = match.Groups["id"].Value;
                 if (!string.IsNullOrWhiteSpace(strId))
                 {
@@ -229,7 +228,7 @@ namespace TelegramBot.Static.MessageHandlers
             var match = CommandsRegex.MonitoringTaskCommands.ShowPair.Match(update.Message.Text);
             if (match.Success)
             {
-                var user = BotApi.GetUserSettings(update.Message.Chat.Id).Result;
+                var user = BotApi.GetUserSettings(update).Result;
                 var strId = match.Groups["id"].Value;
                 if (!string.IsNullOrWhiteSpace(strId))
                 {
@@ -392,6 +391,10 @@ namespace TelegramBot.Static.MessageHandlers
 
             }
             catch (ArgumentException ex)
+            {
+                BotApi.SendMessage(update.Message.Chat.Id, Messages.newPairWrongPrice, true);
+            }
+            catch (FormatException ex)
             {
                 BotApi.SendMessage(update.Message.Chat.Id, Messages.newPairWrongPrice, true);
             }
