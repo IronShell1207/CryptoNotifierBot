@@ -37,6 +37,7 @@ namespace CryptoApi.API
                 }
             }
 
+            PairsCount = listReturner.Count;
             return listReturner;
         }
         public List<PricedTradingPair> PairsListConverter<T>(T crdata)

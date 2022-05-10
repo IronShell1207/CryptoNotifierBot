@@ -11,6 +11,8 @@ namespace TelegramBot.Objects
     {
         public int Id { get; set; }
         public long TelegramId { get; set; }
+        public string FirstName { get; set; }
+        public string UserName { get; set; }
         /// <summary>
         /// Notifications delay in seconds
         /// </summary>
@@ -50,6 +52,6 @@ namespace TelegramBot.Objects
         public int? MorningReport { get; set; } = null;
 
         public List<CryptoPair>? pairs { get; set; } = new();
-
+        public BannedUser? BanStatus { get; set; }
     }
 }

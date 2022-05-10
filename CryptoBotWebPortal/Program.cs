@@ -1,3 +1,4 @@
+using System.Globalization;
 using CryptoBotWebPortal.Data;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
@@ -28,5 +29,6 @@ app.UseRouting();
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
 
-
+CultureInfo ci = new CultureInfo("en");
+Thread.CurrentThread.CurrentCulture = ci;
 app.Run();
