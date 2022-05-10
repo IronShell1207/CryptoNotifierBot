@@ -23,7 +23,7 @@ namespace TelegramBot.Static
             {
                 AppSettingsStatic.Settings.TelegramBotToken = token.Value;
                 LogWrite("Bot token saved!");
-                JsonHelper.SaveJson(AppSettingsStatic.Settings, "config.json");
+                JsonHelper.SaveJson(AppSettingsStatic.Settings, AppSettingsStatic.SettsPath);
                 LogWrite("You need to restart program to apply changes!");
             }
             else
@@ -52,7 +52,7 @@ namespace TelegramBot.Static
                 await Task.Run(() => BotApi.SendMessage(id, "Bot has been configured! Admin rights granted"));
                 AppSettingsStatic.Settings.AdminTelegramId = id;
                 LogWrite("Admin set success");
-                JsonHelper.SaveJson(AppSettingsStatic.Settings, "config.json");
+                JsonHelper.SaveJson(AppSettingsStatic.Settings, AppSettingsStatic.SettsPath);
             }
             catch (Exception ex)
             {
