@@ -22,6 +22,7 @@ namespace TelegramBot.Objects
         public bool GainOrFall { get; set; }
         public double Price { get; set; }
         public bool TriggerOnce { get; set; } = false;
+        public bool Triggered { get; set; } = false;
         public string? Screenshot { get; set; }
         public string? Note { get; set; }
         [ForeignKey(nameof(OwnerId))]
