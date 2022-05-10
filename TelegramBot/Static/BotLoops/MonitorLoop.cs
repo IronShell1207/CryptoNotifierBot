@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CryptoApi.Objects;
+using Microsoft.EntityFrameworkCore;
 using Telegram.Bot.Types;
 using TelegramBot.Objects;
 
@@ -20,13 +21,15 @@ namespace TelegramBot.Static.BotLoops
             {
                 using (AppDbContext dbContext = new AppDbContext())
                 {
-                    foreach (UserConfig user in dbContext.Users)
+                    var users = dbContext.Users.Include(x => x.pairs).OrderBy(x => x.Id).ToList();
+                    foreach (UserConfig user in users)
                     {
                         StringBuilder sb = new StringBuilder();
-                        List<(CryptoPair, double)> pairs = await UserTasksToNotify(user, dbContext, true);
-                        if (pairs.Any())
+                        List<(CryptoPair, double)> pairsDefault = await UserTasksToNotify(user, dbContext, true);
+                        List<(CryptoPair, double)> pairsSingleNotify;
+                        if (pairsDefault.Any())
                         {
-                            foreach (var pair in pairs)
+                            foreach (var pair in pairsDefault)
                                 sb.AppendLine(FormatNotifyEntryStock(pair.Item1, pair.Item2));
 
                             lastUpdateUsers.Add(new IntervaledUsersHistory(user.Id, DateTime.Now));
@@ -49,12 +52,31 @@ namespace TelegramBot.Static.BotLoops
                 var pairs = dbContext.CryptoPairs.Where(x => x.OwnerId == user.Id && x.Enabled).ToList();
                 foreach (var pair in pairs)
                 {
-                    var price = await Program.cryptoData.GetCurrentPricePairByName(new TradingPair(pair.PairBase, pair.PairQuote, pair.ExchangePlatform));
+                    var price = await Program.cryptoData.GetCurrentPricePairByName(pair.ToTradingPair());
                     if (price.Price > 0 &&( price.Price > pair.Price && pair.GainOrFall || price.Price < pair.Price && !pair.GainOrFall))
                         tasks.Add(new(pair, price.Price));
                 }
             }
             return tasks;
+        }
+
+        public static async Task<List<(CryptoPair, double)>> UserTasksSingleNotify(UserConfig user,
+            AppDbContext dbContext)
+        {
+            List<(CryptoPair, double)> tasksReturing = new List<(CryptoPair, double)>();
+            var pairsSingle = user?.pairs?.Where(x => x.TriggerOnce && !x.Triggered)?.ToList();
+            var pairsTriggered = user?.pairs?.Where(x => x.TriggerOnce && x.Triggered)?.ToList();
+            if (pairsSingle?.Count > 0)
+            {
+                foreach (var pair in pairsSingle)
+                {
+                    var price = await Program.cryptoData.GetCurrentPricePairByName(pair.ToTradingPair());
+                    if (price.Price > 0 && (price.Price > pair.Price && pair.GainOrFall || price.Price < pair.Price && !pair.GainOrFall))
+                        tasksReturing.Add(new(pair, price.Price));
+                }
+            }
+
+            return tasksReturing;
         }
 
         private static string FormatNotifyEntryStock(CryptoPair pair, double newprice)
