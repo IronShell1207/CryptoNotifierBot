@@ -31,5 +31,12 @@ namespace CryptoApi.Objects
             Name = name;
             Quote = quote;
         }
+
+        public TradingPair(PricedTradingPair pair)
+        {
+            Name = pair.Name;
+            Quote = pair.Quote;
+            Exchange = pair.Exchange;
+        }
     }
 }

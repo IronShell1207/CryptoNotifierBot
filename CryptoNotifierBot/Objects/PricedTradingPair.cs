@@ -29,5 +29,14 @@ namespace CryptoApi.Objects
             this.Price = Price;
             this.Exchange = Exchange;
         }
+
+        public TradingPair ToTP()
+        {
+            TradingPair pair = new TradingPair();
+            pair.Exchange = Exchange;
+            pair.Name = Name;
+            pair.Quote = Quote;
+            return pair;
+        }
     }
 }

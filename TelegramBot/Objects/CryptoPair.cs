@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using CryptoApi.Constants;
+using CryptoApi.Objects;
 using TelegramBot.Static;
 
 namespace TelegramBot.Objects
@@ -78,6 +79,11 @@ namespace TelegramBot.Objects
             if (!string.IsNullOrEmpty(Note)) sb.AppendLine($"Notes: {Note}");
             return sb.ToString();
 
+        }
+
+        public TradingPair ToTradingPair()
+        {
+            return new TradingPair(PairBase, PairQuote, ExchangePlatform);
         }
 
     }
