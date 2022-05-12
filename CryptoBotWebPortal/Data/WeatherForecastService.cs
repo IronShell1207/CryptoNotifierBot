@@ -65,6 +65,7 @@ namespace CryptoBotWebPortal.Data
                 pair.ExchangePlatform = pairExt.ExchangePlatform;
                 pair.Enabled = pairExt.Enabled;
                 pair.GainOrFall = pairExt.GainOrFall;
+                pair.TriggerOnce = pairExt.TriggerOnce;
                 dbContext.SaveChangesAsync();
             }
              

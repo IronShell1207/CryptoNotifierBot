@@ -13,36 +13,30 @@
 
 <h1>Task @StringToHtml(@pair.ToStringWithLink()) edit:</h1>
 <div id="taskedit">
-    <h5>User id</h5>
-    <p>@user.Id</p>
-    <h5>User telegram id</h5>
-    <p>@user.TelegramId</p>
+    <h5>User id: @user.Id</h5>
+    <h5>User telegram id: @user.TelegramId</h5>
     <h5>Pair info</h5>
+    <p>Pair base: <input type="text" name="symbol" @bind="pair.PairBase"/></p>
+    <p>Pair quote: <input type="text" name="symbol" @bind="pair.PairQuote"/></p>
 
-    <p>Symbol: </p>
-    <p>Pair base:</p> <input type="text" name="symbol" @bind="pair.PairBase"/>
-    <p>Pair quote:</p> <input type="text" name="symbol" @bind="pair.PairQuote"/>
+    <h5>Price trigger: <input type="text" @bind="pair.Price"/></h5>
+    
 
-    <h5>Price trigger: </h5>
-    <input type="text" @bind="pair.Price"/>
+    <h5>Task active <input type="checkbox" @bind="pair.Enabled"/></h5>
+    <h5>Rise or fall of trigger price <input type="checkbox" @bind="pair.GainOrFall"/></h5>
+    <h5>Trigger once (when price hits trigger you get notified once without flood) <input type="checkbox" @bind="pair.TriggerOnce"/></h5>
 
-    <h5>Task active</h5>
-    <input type="checkbox" @bind="pair.Enabled"/>
-
-    <h5>Rise or fall of trigger price</h5>
-    <input type="checkbox" @bind="pair.GainOrFall"/>
-
-    <h5>Exchange platform</h5>
-    <select @bind="pair.ExchangePlatform">
+    <h5>Exchange platform <select @bind="pair.ExchangePlatform">
         <option value="Binance">Binance</option>
         <option value="Bitget">Bitget</option>
         <option value="Okx">Okx</option>
         <option value="Kucoin">Kucoin</option>
         <option value="GateIO">GateIO</option>
-    </select>
+    </select></h5>
     
-    <h5>Note</h5>
-    <input type="text" @value="pair.Note"/>
+    
+    <h5>Note <input type="text" @value="pair.Note"/></h5>
+    
     <p></p>
     <input type="button" @onclick="SaveSettings" value="Save changes"/>
 
