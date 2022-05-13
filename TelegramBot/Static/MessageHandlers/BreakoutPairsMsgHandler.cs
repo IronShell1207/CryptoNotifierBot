@@ -32,11 +32,11 @@ namespace TelegramBot.Static.MessageHandlers
         }
         public async void SubNewUserBreakouts(Update update)
         {
-            
+
             using (AppDbContext db = new AppDbContext())
             {
                 var user = await BotApi.GetUserSettings(update);
-                var sub = db.BreakoutSubs?.OrderBy(x => x.Id).FirstOrDefault(x =>x.TelegramId == user.TelegramId);
+                var sub = db.BreakoutSubs?.OrderBy(x => x.Id).FirstOrDefault(x => x.TelegramId == user.TelegramId);
                 if (sub == null)
                 {
                     sub = new BreakoutSub()
@@ -46,9 +46,10 @@ namespace TelegramBot.Static.MessageHandlers
                         BinanceSub = true,
                         BitgetSub = true,
                         BlackListEnable = false,
-                        GateioSub =false,
+                        GateioSub = false,
                         KucoinSub = true,
-                        OkxSub = true
+                        OkxSub = true,
+                        UserId = user.Id
                     };
                     db.BreakoutSubs.Add(sub);
                     db.SaveChangesAsync();
@@ -155,7 +156,7 @@ namespace TelegramBot.Static.MessageHandlers
                 var Pairbase = match.Groups["base"].Value.ToUpper();
                 var Pairquote = match.Groups["quote"].Value.ToUpper();
                 if (!string.IsNullOrWhiteSpace(Pairbase) && !string.IsNullOrWhiteSpace(Pairquote))
-                    AddPairToBlackList(update, Pairbase, Pairquote);
+                    AddPairToBlackList(update, new TradingPair(Pairbase, Pairquote));
                 else
                 {
                     BotApi.SendMessage(update.Message.Chat.Id,
@@ -169,41 +170,50 @@ namespace TelegramBot.Static.MessageHandlers
                 var Pairbase = match.Groups["base"].Value;
                 var Pairquote = match.Groups["quote"].Value;
                 if (!string.IsNullOrWhiteSpace(Pairbase) && !string.IsNullOrWhiteSpace(Pairquote))
-                    AddPairToBlackList(update, Pairbase, Pairquote);
+                    AddPairToBlackList(update, new TradingPair(Pairbase, Pairquote));
             }
-            
+
         }
 
-        public async void AddPairToBlackList(Update update, string Pairbase, string Pairquote)
+        public async void AddPairToBlackList(Update update, TradingPair pair)
         {
-           //bool isValid = ExchangesCheckerForUpdates.GetCurrentPrice(new TradingPair(Pairbase, Pairquote)).;
-            //if (isValid)
-            //{
-            //    var user = BotApi.GetUserSettings(update.Message.Chat.Id).Result;
-            //    using (AppDbContext dbContext = new AppDbContext())
-            //    {
-            //        var blackPairEx = dbContext.BlackListedPairs.FirstOrDefault(x =>
-            //            x.Base == Pairbase && x.Quote == Pairquote && x.OwnerId == user.Id);
-            //        if (blackPairEx == null)
-            //        {
-            //            BlackListedPairs badPair = new BlackListedPairs()
-            //            {
-            //                Base = Pairbase,
-            //                Quote = Pairquote,
-            //                OwnerId = user.Id
-            //            };
-            //            dbContext.BlackListedPairs.Add(badPair);
-            //            dbContext.SaveChangesAsync();
-            //            BotApi.SendMessage(user.TelegramId, string.Format(
-            //                CultureTextRequest.GetMessageString("blacklistPairAdded", user.Language), badPair.ToString()));
-            //        }
-            //        else
-            //        {
-            //            BotApi.SendMessage(user.TelegramId,string.Format(
-            //                CultureTextRequest.GetMessageString("blacklistPairExists", user.Language), blackPairEx.ToString()));
-            //        }
-            //    }
-            //}
+            var user = await BotApi.GetUserSettings(update);
+            var isValid = Program.cryptoData.GetCurrentPricePairByName(pair);
+            if (isValid != null)
+            {
+                
+
+                using (AppDbContext dbContext = new AppDbContext())
+                {
+                    var breakoutSetts = dbContext.BreakoutSubs.Include(x => x.BlackListedPairsList).OrderBy(x => x.Id)
+                        .FirstOrDefault(x => x.UserId == user.Id);
+                    if (breakoutSetts == null)
+                    {
+                        await BotApi.SendMessage(user.TelegramId, "You're not subscribed to breakouts notifications. To subscribe send /subscribe");
+                        return;
+                    }
+                    var existsPairCheck =
+                        breakoutSetts.BlackListedPairsList.FirstOrDefault(x => x.ToString() == pair.ToString());
+                    if (existsPairCheck != null)
+                    {
+                        await BotApi.SendMessage(user.TelegramId, string.Format(
+                                            CultureTextRequest.GetMessageString("blacklistPairExists", user.Language), pair.ToString()));
+                        return;
+                    }
+                    else
+                    {
+                        breakoutSetts.BlackListedPairsList.Add(new BlackListedPairs(pair));
+                        dbContext.SaveChanges();
+                        await BotApi.SendMessage(user.TelegramId, string.Format(
+                                      CultureTextRequest.GetMessageString("blacklistPairAdded", user.Language), pair.ToString()));
+                    }
+                }
+            }
+            else
+            {
+                BotApi.SendMessage(user.TelegramId, "Pair doesnt exists!");
+            }
+ 
 
         }
 

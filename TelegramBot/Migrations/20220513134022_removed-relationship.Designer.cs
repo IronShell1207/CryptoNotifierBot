@@ -11,8 +11,8 @@ using TelegramBot.Static;
 namespace TelegramBot.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220504160628_Added-user-info-to-userconfig")]
-    partial class Addeduserinfotouserconfig
+    [Migration("20220513134022_removed-relationship")]
+    partial class removedrelationship
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -32,7 +32,12 @@ namespace TelegramBot.Migrations
                     b.Property<long>("TelegramId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("BannedUsers");
                 });
@@ -124,6 +129,12 @@ namespace TelegramBot.Migrations
                     b.Property<long>("TelegramId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("WhitelistInsteadBlack")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
                     b.ToTable("BreakoutSubs");
@@ -166,6 +177,9 @@ namespace TelegramBot.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("TriggerOnce")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Triggered")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -300,6 +314,17 @@ namespace TelegramBot.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("TelegramBot.Objects.BannedUser", b =>
+                {
+                    b.HasOne("TelegramBot.Objects.UserConfig", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TelegramBot.Objects.BlackListedPairs", b =>

@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelegramBot", "TelegramBot\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoBotWebPortal", "CryptoBotWebPortal\CryptoBotWebPortal.csproj", "{BBF40C7D-7013-4ED7-B42C-A9902E76926D}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApiPortal", "WebApiPortal\WebApiPortal.csproj", "{C1C20880-2C52-4FA8-8E90-20DC02C3A7D4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -42,6 +44,12 @@ Global
 		{BBF40C7D-7013-4ED7-B42C-A9902E76926D}.Release|Any CPU.Build.0 = Release|Any CPU
 		{BBF40C7D-7013-4ED7-B42C-A9902E76926D}.ttt|Any CPU.ActiveCfg = Debug|Any CPU
 		{BBF40C7D-7013-4ED7-B42C-A9902E76926D}.ttt|Any CPU.Build.0 = Debug|Any CPU
+		{C1C20880-2C52-4FA8-8E90-20DC02C3A7D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1C20880-2C52-4FA8-8E90-20DC02C3A7D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1C20880-2C52-4FA8-8E90-20DC02C3A7D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1C20880-2C52-4FA8-8E90-20DC02C3A7D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C1C20880-2C52-4FA8-8E90-20DC02C3A7D4}.ttt|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1C20880-2C52-4FA8-8E90-20DC02C3A7D4}.ttt|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

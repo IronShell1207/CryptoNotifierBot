@@ -92,6 +92,7 @@ namespace TelegramBot.Static.MessageHandlers
                 }
             }
         }
+
         public async void EditUserTaskReplyHandler(Update update, UserConfig user)
         {
             var editPriceMsgRegex =
@@ -121,6 +122,7 @@ namespace TelegramBot.Static.MessageHandlers
             }
 
         }
+
         public void EditUserTaskCallbackHandler(Update update)
         {
             var match = CallbackDataPatterns.EditPairRegex.Match(update.CallbackQuery.Data);
@@ -145,6 +147,7 @@ namespace TelegramBot.Static.MessageHandlers
                 }
             }
         }
+
         public void RemoveUserTaskCallbackHandler(Update update)
         {
             var match = CallbackDataPatterns.DeletePairRegex.Match(update.CallbackQuery.Data);
@@ -172,6 +175,7 @@ namespace TelegramBot.Static.MessageHandlers
                 }
             }
         }
+
         public void RemoveUserTask(Update update)
         {
             var match = CommandsRegex.MonitoringTaskCommands.DeletePair.Match(update.Message.Text);
@@ -418,6 +422,7 @@ namespace TelegramBot.Static.MessageHandlers
 
                 var msg = CultureTextRequest.GetSettingsMsgString("CPEditTaskCreated", user.Language);
                 var formatedmsg = $"{msg} {pair.FullTaskInfo(user.Language)}";
+                
                 BotApi.SendMessage(BotApi.GetTelegramIdFromUpdate(update).Identifier, formatedmsg, ParseMode.Html);
             }
         }
@@ -557,5 +562,6 @@ namespace TelegramBot.Static.MessageHandlers
                 }
             }
         }
+
     }
 }

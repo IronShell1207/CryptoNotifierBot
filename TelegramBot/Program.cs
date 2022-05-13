@@ -40,13 +40,17 @@ namespace TelegramBot
             ConsoleCommandsHandler.LogWrite("Crypto exchanges data updater loop has been started");
             while (true)
             {
-                var reader = Console.ReadLine();
-                if (reader.ToString() == "/changebotkey" || reader.ToString() == "/setbotkey")
+                try
                 {
-                    ConsoleCommandsHandler.ChangeTokenAsync();
+                    var reader = Console.ReadLine();
+                    if (reader.ToString() == "/changebotkey" || reader.ToString() == "/setbotkey")
+                    {
+                        ConsoleCommandsHandler.ChangeTokenAsync();
+                    }
+                    else if (reader.ToString() == "/exit")
+                        Environment.Exit(0);
                 }
-                else if ( reader.ToString() == "/exit")
-                    Environment.Exit(0);
+                catch (Exception ex) {}
             }
         }
 

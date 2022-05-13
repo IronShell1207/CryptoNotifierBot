@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CryptoApi.Objects;
 
 namespace TelegramBot.Objects
 {
@@ -15,9 +16,14 @@ namespace TelegramBot.Objects
         public BreakoutSub? Sub { get; set; }
         public string Base { get; set; }
         public string Quote { get; set; }
-        public override string ToString()
+        public override string ToString() => $"{Base}/{Quote}";
+        
+        public BlackListedPairs(){}
+
+        public BlackListedPairs(TradingPair pair)
         {
-            return $"{Base}/{Quote}";
+            Base = pair.Name;
+            Quote = pair.Quote;
         }
     }
 }

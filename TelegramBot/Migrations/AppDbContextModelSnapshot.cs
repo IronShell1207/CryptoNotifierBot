@@ -35,8 +35,7 @@ namespace TelegramBot.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("UserId");
 
                     b.ToTable("BannedUsers");
                 });
@@ -126,6 +125,12 @@ namespace TelegramBot.Migrations
                         .HasColumnType("INTEGER");
 
                     b.Property<long>("TelegramId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("WhitelistInsteadBlack")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -312,8 +317,8 @@ namespace TelegramBot.Migrations
             modelBuilder.Entity("TelegramBot.Objects.BannedUser", b =>
                 {
                     b.HasOne("TelegramBot.Objects.UserConfig", "User")
-                        .WithOne("BanStatus")
-                        .HasForeignKey("TelegramBot.Objects.BannedUser", "UserId")
+                        .WithMany()
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -349,8 +354,6 @@ namespace TelegramBot.Migrations
 
             modelBuilder.Entity("TelegramBot.Objects.UserConfig", b =>
                 {
-                    b.Navigation("BanStatus");
-
                     b.Navigation("pairs");
                 });
 #pragma warning restore 612, 618

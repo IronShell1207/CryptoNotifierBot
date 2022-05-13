@@ -4,41 +4,40 @@
 
 namespace TelegramBot.Migrations
 {
-    public partial class Fix : Migration
+    public partial class removedrelationship : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_BreakoutSubs_Users_UserId",
+                name: "FK_BreakoutSubs_Users_UserConfigId",
                 table: "BreakoutSubs");
 
             migrationBuilder.DropIndex(
-                name: "IX_BreakoutSubs_UserId",
+                name: "IX_BreakoutSubs_UserConfigId",
                 table: "BreakoutSubs");
 
-            migrationBuilder.DropColumn(
-                name: "UserId",
-                table: "BreakoutSubs");
+            migrationBuilder.RenameColumn(
+                name: "UserConfigId",
+                table: "BreakoutSubs",
+                newName: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
+            migrationBuilder.RenameColumn(
                 name: "UserId",
                 table: "BreakoutSubs",
-                type: "INTEGER",
-                nullable: false,
-                defaultValue: 0);
+                newName: "UserConfigId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_BreakoutSubs_UserId",
+                name: "IX_BreakoutSubs_UserConfigId",
                 table: "BreakoutSubs",
-                column: "UserId");
+                column: "UserConfigId");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_BreakoutSubs_Users_UserId",
+                name: "FK_BreakoutSubs_Users_UserConfigId",
                 table: "BreakoutSubs",
-                column: "UserId",
+                column: "UserConfigId",
                 principalTable: "Users",
                 principalColumn: "Id",
                 onDelete: ReferentialAction.Cascade);

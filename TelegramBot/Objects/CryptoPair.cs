@@ -28,16 +28,12 @@ namespace TelegramBot.Objects
         public string? Note { get; set; }
         [ForeignKey(nameof(OwnerId))]
         public UserConfig? User { get; set; }
-
         public CryptoPair(){}
         public CryptoPair(int owner)
         {
             OwnerId = owner;
         }
-        public override string ToString()
-        {
-            return $"{PairBase}/{PairQuote}";
-        }
+        public override string ToString() => $"{PairBase}/{PairQuote}";
 
         public string ToStringWithLink()
         {
@@ -47,6 +43,7 @@ namespace TelegramBot.Objects
             return link;
         }
 
+        private string EnabledDisabled(bool isEn) => isEn ? "enabled" : "disabled";
         public string TaskStatus()
         {
             var enabled = Enabled ? "✅" : "⛔️";
@@ -76,6 +73,7 @@ namespace TelegramBot.Objects
             sb.AppendLine($"{CultureTextRequest.GetSettingsMsgString("taskInfoActiveStatus", lang)}{enable}");
             sb.AppendLine($"{CultureTextRequest.GetSettingsMsgString("taskInfoTriggerPrice", lang)}{lessOrGreater}{this.Price} {lessOrGreaterSymbol}");
             sb.AppendLine($"{CultureTextRequest.GetSettingsMsgString("taskInfoExchangePlatform", lang)}{this.ExchangePlatform}");
+            if (TriggerOnce) sb.AppendLine($"Single trigger: {this.EnabledDisabled(this.TriggerOnce)}");
             if (!string.IsNullOrEmpty(Note)) sb.AppendLine($"Notes: {Note}");
             return sb.ToString();
 

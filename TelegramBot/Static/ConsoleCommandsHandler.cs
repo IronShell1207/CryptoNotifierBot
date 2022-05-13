@@ -15,7 +15,7 @@ namespace TelegramBot.Static
     {
         public static async Task ChangeTokenAsync()
         {
-            setbottoken:
+        setbottoken:
             LogWrite("Set telegram bot token: ");
             var reader = Console.ReadLine();
             var token = RegexCombins.TelegramBotToken.Match(reader);
@@ -44,7 +44,7 @@ namespace TelegramBot.Static
 
         public static async Task SetAdminId()
         {
-            setid:
+        setid:
             ConsoleCommandsHandler.LogWrite("Set admin telegram id: ");
             var id = Console.ReadLine();
             try
@@ -72,13 +72,23 @@ namespace TelegramBot.Static
             }
         }
 
-        public static void LogWrite(string line)
+        public async static void LogWrite(string line)
         {
+
             DateTime dt = DateTime.Now;
             var logFile = DataDir + "log.txt";
             var lineS = $"[{dt.ToString()}] {line}";
-            File.AppendAllText(logFile, lineS+"\n");
+            try
+            {
+                File.AppendAllText(logFile, lineS + "\n");
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine(ex.Message + " " + ex.HResult.ToString());
+            }
             Console.WriteLine(lineS);
+
+
         }
     }
 }

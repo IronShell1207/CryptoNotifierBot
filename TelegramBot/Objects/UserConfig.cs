@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
@@ -21,12 +22,10 @@ namespace TelegramBot.Objects
         /// Automaticaly amplify notification interval if notifications keep coming
         /// </summary>
         public bool AntifloodIntervalAmplification { get; set; } = true;
-
         /// <summary>
         /// Compact notifications without any notes for true value, and full info notifications for false
         /// </summary>
         public bool NotesEnable { get; set; } = false;
-
         /// <summary>
         /// Compact pairs notifications for true value, and full info for false
         /// </summary>
@@ -52,6 +51,5 @@ namespace TelegramBot.Objects
         public int? MorningReport { get; set; } = null;
 
         public List<CryptoPair>? pairs { get; set; } = new();
-        public BannedUser? BanStatus { get; set; }
     }
 }

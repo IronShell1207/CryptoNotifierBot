@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,6 +15,9 @@ namespace TelegramBot.Objects
         public double? newPrice { get; set; }
         public double Time { get; set; }
         public string Exchange { get; set; }
+        public BreakoutSub SubOwner { get; set; }
+        [ForeignKey(nameof(SubOwner))]
+        public int SubId { get; set; }
 
     }
 }

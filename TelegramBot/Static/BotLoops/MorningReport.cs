@@ -16,8 +16,8 @@ namespace TelegramBot.Static
         public static bool MorningPool { get; set; } = true;
         private static List<TradingPair> MorningPairs = new List<TradingPair>()
         {
-            new("BTC","USDT"), new("ETC", "USDT"),
-            new("ETH", "USDT"), new("XMR", "USDT")
+            new("BTC","USDT"), 
+            new("ETH", "USDT")
         };
         public static void MorningSpread()
         {

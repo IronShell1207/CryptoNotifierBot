@@ -11,8 +11,8 @@ using TelegramBot.Static;
 namespace TelegramBot.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20220501123124_Fix")]
-    partial class Fix
+    [Migration("20220513131445_fix-users")]
+    partial class fixusers
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -32,7 +32,12 @@ namespace TelegramBot.Migrations
                     b.Property<long>("TelegramId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("UserId")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId");
 
                     b.ToTable("BannedUsers");
                 });
@@ -124,6 +129,9 @@ namespace TelegramBot.Migrations
                     b.Property<long>("TelegramId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("WhitelistInsteadBlack")
+                        .HasColumnType("INTEGER");
+
                     b.HasKey("Id");
 
                     b.ToTable("BreakoutSubs");
@@ -166,6 +174,9 @@ namespace TelegramBot.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("TriggerOnce")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Triggered")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
@@ -255,11 +266,21 @@ namespace TelegramBot.Migrations
                     b.Property<bool>("AntifloodIntervalAmplification")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int>("BanId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("BreakoutSubId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("CryptoNotifyStyle")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("DisplayTaskEditButtonsInNotifications")
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Language")
                         .IsRequired()
@@ -289,15 +310,34 @@ namespace TelegramBot.Migrations
                     b.Property<long>("TelegramId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<string>("UserName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
 
+                    b.HasIndex("BanId");
+
+                    b.HasIndex("BreakoutSubId");
+
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("TelegramBot.Objects.BannedUser", b =>
+                {
+                    b.HasOne("TelegramBot.Objects.UserConfig", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TelegramBot.Objects.BlackListedPairs", b =>
                 {
                     b.HasOne("TelegramBot.Objects.BreakoutSub", "Sub")
-                        .WithMany()
+                        .WithMany("BlackListedPairsList")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -308,12 +348,41 @@ namespace TelegramBot.Migrations
             modelBuilder.Entity("TelegramBot.Objects.CryptoPair", b =>
                 {
                     b.HasOne("TelegramBot.Objects.UserConfig", "User")
-                        .WithMany()
+                        .WithMany("pairs")
                         .HasForeignKey("OwnerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TelegramBot.Objects.UserConfig", b =>
+                {
+                    b.HasOne("TelegramBot.Objects.BannedUser", "BanStatus")
+                        .WithMany()
+                        .HasForeignKey("BanId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TelegramBot.Objects.BreakoutSub", "BreakoutSetts")
+                        .WithMany()
+                        .HasForeignKey("BreakoutSubId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("BanStatus");
+
+                    b.Navigation("BreakoutSetts");
+                });
+
+            modelBuilder.Entity("TelegramBot.Objects.BreakoutSub", b =>
+                {
+                    b.Navigation("BlackListedPairsList");
+                });
+
+            modelBuilder.Entity("TelegramBot.Objects.UserConfig", b =>
+                {
+                    b.Navigation("pairs");
                 });
 #pragma warning restore 612, 618
         }

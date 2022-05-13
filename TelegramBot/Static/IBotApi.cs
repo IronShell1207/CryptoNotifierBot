@@ -73,7 +73,7 @@ namespace TelegramBot.Static
                 else if (CommandsRegex.MonitoringTaskCommands.ShowPair.IsMatch(update.Message.Text))
                     using (CryptoPairsMsgHandler msgHanlder = new CryptoPairsMsgHandler())
                         msgHanlder.ShowTaskInfo(update);
-                
+
                 else if (CommandsRegex.MonitoringTaskCommands.AddComment.IsMatch(update.Message.Text))
                     using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
                         msgHandler.AddCommentForTask(update);
@@ -113,7 +113,7 @@ namespace TelegramBot.Static
             if (update.Message?.Text == Commands.Subscribe)
                 using (BreakoutPairsMsgHandler msghandler = new BreakoutPairsMsgHandler())
                     msghandler.SubNewUserBreakouts(update);
-            
+
             else if (update.Message.Text.Contains(Commands.FlipTasks))
                 using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
                     msgHandler.FlipTriggeredTasks(update);
@@ -207,21 +207,7 @@ namespace TelegramBot.Static
             }
             catch (Telegram.Bot.Exceptions.ApiRequestException apiException)
             {
-                if (apiException.Message == "Bad Request: chat not found") // || apiException.ErrorCode == 400)
-                {
-                    using (AppDbContext dbContext = new AppDbContext())
-                    {
-                        var baduser = dbContext.Users.ToList().Where(x => x.TelegramId == chatId.Identifier)
-                            .FirstOrDefault();
-                        if (baduser != null)
-                        {
-                            dbContext.Users.Remove(baduser);
-                            dbContext.SaveChangesAsync();
-                            ConsoleCommandsHandler.LogWrite($"Bad user {chatId.Identifier}. Removed from the database");
-                        }
-                    }
-                }
-                else throw;
+                await BadRequestHandler(chatId, apiException);
             }
         }
 
@@ -238,21 +224,7 @@ namespace TelegramBot.Static
             }
             catch (Telegram.Bot.Exceptions.ApiRequestException apiException)
             {
-                if (apiException.Message == "Bad Request: chat not found") // || apiException.ErrorCode == 400)
-                {
-                    using (AppDbContext dbContext = new AppDbContext())
-                    {
-                        var baduser = dbContext.Users.ToList().Where(x => x.TelegramId == chatId.Identifier)
-                            .FirstOrDefault();
-                        if (baduser != null)
-                        {
-                            dbContext.Users.Remove(baduser);
-                            dbContext.SaveChangesAsync();
-                            ConsoleCommandsHandler.LogWrite($"Bad user {chatId.Identifier}. Removed from the database");
-                        }
-                    }
-                }
-                else throw;
+                await BadRequestHandler(chatId, apiException);
             }
         }
 
@@ -265,6 +237,20 @@ namespace TelegramBot.Static
             else return null;
         }
 
+        public static async Task BadRequestHandler(ChatId chatId, Telegram.Bot.Exceptions.ApiRequestException ex)
+        {
+            if (ex.Message == "Bad Request: chat not found" || ex.ErrorCode == 400)
+            {
+                using (AppDbContext dbContext = new AppDbContext())
+                {
+                    var baduser = dbContext.Users.FirstOrDefault(x => x.TelegramId == chatId.Identifier);
+                    if (baduser != null) dbContext.Users.Remove(baduser);
+                    ConsoleCommandsHandler.LogWrite($"Bad user {chatId.Identifier}. Removed from the database");
+                }
+            }
+            else throw ex;
+        }
+
         public static async Task SendMessage(ChatId chatId, string message, bool replythis)
         {
             try
@@ -273,16 +259,9 @@ namespace TelegramBot.Static
             }
             catch (Telegram.Bot.Exceptions.ApiRequestException apiException)
             {
-                if (apiException.Message == "Bad Request: chat not found" || apiException.ErrorCode == 400)
-                {
-                    using (AppDbContext dbContext = new AppDbContext())
-                    {
-                        var baduser = dbContext.Users.FirstOrDefault(x => x.TelegramId == chatId.Identifier);
-                        if (baduser != null) dbContext.Users.Remove(baduser);
-                        ConsoleCommandsHandler.LogWrite($"Bad user {chatId.Identifier}. Removed from the database");
-                    }
-                }
+                await BadRequestHandler(chatId, apiException);
             }
+
         }
 
         public static async Task SendMessage(ChatId chatId, string message, IReplyMarkup replyMarkup)
@@ -293,26 +272,32 @@ namespace TelegramBot.Static
             }
             catch (Telegram.Bot.Exceptions.ApiRequestException apiException)
             {
-                if (apiException.Message == "Bad Request: chat not found" || apiException.ErrorCode == 400)
-                {
-                    using (AppDbContext dbContext = new AppDbContext())
-                    {
-                        var baduser = dbContext.Users.FirstOrDefault(x => x.TelegramId == chatId.Identifier);
-                        if (baduser != null) dbContext.Users.Remove(baduser);
-                        ConsoleCommandsHandler.LogWrite($"Bad user {chatId.Identifier}. Removed from the database");
-                    }
-                }
+                await BadRequestHandler(chatId, apiException);
             }
         }
 
         public static async Task EditMessage(ChatId chatId, int messageID, string newMessage)
         {
-            await BotClient.EditMessageTextAsync(chatId, messageID, newMessage);
+            try
+            {
+                await BotClient.EditMessageTextAsync(chatId, messageID, newMessage);
+            }
+            catch (ApiRequestException apiEx)
+            {
+                await BadRequestHandler(chatId, apiEx);
+            }
         }
 
         public static async Task EditMessage(ChatId chatId, int messageId, string message, ParseMode parseMode)
         {
-            await BotClient.EditMessageTextAsync(chatId, messageId, message, parseMode: parseMode, disableWebPagePreview:true);
+            try
+            {
+                await BotClient.EditMessageTextAsync(chatId, messageId, message, parseMode: parseMode, disableWebPagePreview: true);
+            }
+            catch (ApiRequestException apiEx)
+            {
+                await BadRequestHandler(chatId, apiEx);
+            }
         }
 
         /// <summary>
@@ -324,12 +309,19 @@ namespace TelegramBot.Static
         /// <returns></returns>
         public static async Task EditMessage(ChatId chatId, int messageID, bool revokeKB)
         {
-            await BotClient.EditMessageReplyMarkupAsync(chatId, messageID, null);
+            try
+            {
+                await BotClient.EditMessageReplyMarkupAsync(chatId, messageID, null);
+            }
+            catch (ApiRequestException apiEx)
+            {
+                await BadRequestHandler(chatId, apiEx);
+            }
         }
 
         #endregion
 
-         #region UsersStuff
+        #region UsersStuff
 
         public static async Task<UserConfig> GetUserSettings(int userId)
         {
@@ -366,13 +358,13 @@ namespace TelegramBot.Static
                 {
                     user = new UserConfig()
                     {
-                        TelegramId = (long) chatId.Identifier,
+                        TelegramId = (long)chatId.Identifier,
                         UserName = update.Message?.From?.Username ?? "",
                         FirstName = update.Message?.From?.FirstName + " " + update.Message?.From?.LastName
                     };
                     db.Users.Add(user);
                     await SendMessage(chatId, Messages.welcomeMsg);
-                    await db.SaveChangesAsync();
+                    db.SaveChangesAsync();
                 }
 
                 return user;
@@ -386,6 +378,6 @@ namespace TelegramBot.Static
             else return 0;
         }
 
-    #endregion
+        #endregion
     }
 }

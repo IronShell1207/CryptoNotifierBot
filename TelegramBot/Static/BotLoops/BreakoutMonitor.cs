@@ -82,51 +82,14 @@ namespace TelegramBot.Static
                 if (sb.Length > 0)
                     ConsoleCommandsHandler.LogWrite("Breakouts: " + sb.ToString());
                 Thread.Sleep(10000);
-                //var datetimeNow = DateTime.Now;
-                //var latestData = Program.cryptoData.GetLatestDataSets();
-                //for (var index = Program.cryptoData.DataDownloadedCounter; index >= 0; index--)
-                //{
-                //    if (index > Program.cryptoData.DataDownloadedCounter) break;
-                //    for (var iTi = 0; iTi < ListTimings.Count; iTi++)
-                //    {
-                //        int timeIn = ListTimings[iTi];
-                //        if (data[0].CreationTime + TimeSpan.FromMinutes(timeIn) < datetimeNow &&
-                //            datetimeNow < data[0].CreationTime + TimeSpan.FromMinutes(timeIn + 1) &&
-                //            listDateTimes[iTi] + TimeSpan.FromMinutes(timeIn) < datetimeNow)
-                //        {
-                //            listDateTimes[iTi] = datetimeNow;
-                //            index -= timeIn - 1;
-                //            for (int i = 0; i < data.Count; i++)
-                //            {
-                //                SymbolTimedExInfo dataExchange = data[i];
-                //                var compairedPairs = CompairedPairs(dataExchange.Pairs, latestData[i].Pairs,
-                //                    procentsDifference[iTi], ListTimings[iTi], dataExchange.Exchange);
-                //                Console.WriteLine(
-                //                    $"[{datetimeNow.ToString()}] {data[i].Exchange}: {compairedPairs.Count} Time: {timeIn}");
-                //                if (compairedPairs.Count > 0)
-                //                {
-                //                    SpreadBreakoutNotify(compairedPairs, data[i].Exchange, timeIn);
-                //                    Thread.Sleep(25);
-                //                }
-                //            }
-                //        }
-                //        //}
-                //    }
-                //loopend:
-                //    count = countNow;
-                //    Thread.Sleep(30000);
-                //}
-
             }
         }
-                    
+
         public static async void SpreadBreakoutNotify(List<BreakoutPair> pairs, string platform, int timing)
         {
-            ConsoleCommandsHandler.LogWrite($"Breakout bot sending notify");
-            using (AppDbContext db = new AppDbContext())
-            {
+            //ConsoleCommandsHandler.LogWrite($"Breakout bot sending notify");
+            await using (AppDbContext db = new AppDbContext())
                 foreach (BreakoutSub sub in db.BreakoutSubs.ToList())
-                {
                     if (sub.Subscribed)
                         if ((timing == 2 && sub.S2MinUpdates)
                             || (timing == 5 && sub.S5MinUpdates)
@@ -139,7 +102,6 @@ namespace TelegramBot.Static
                             || (timing == 480 && sub.S480MinUpdates)
                             || (timing == 960 && sub.S960MinUpdates)
                             || (timing == 1920 && sub.S1920MinUpdates))
-                        {
                             //StringBuilder sendingMessage = new StringBuilder();
                             if ((platform == Exchanges.Binance && sub.BinanceSub)
                                 || (platform == Exchanges.Kucoin && sub.KucoinSub)
@@ -147,25 +109,32 @@ namespace TelegramBot.Static
                                 || (platform == Exchanges.GateIO && sub.GateioSub)
                                 || (platform == Exchanges.Bitget && sub.BitgetSub))
                             {
-                                ConsoleCommandsHandler.LogWrite($"{sub.TelegramId}");
+                                //ConsoleCommandsHandler.LogWrite($"{sub.TelegramId}");
                                 StringBuilder sb = new StringBuilder($"Updated data from {platform}:\n");
                                 var blackList = db.BlackListedPairs.Where(x => x.OwnerId == sub.Id).ToList();
-                                if (blackList.Any())
+                                if (!sub.WhitelistInsteadBlack && blackList.Any() && sub.BlackListEnable)
                                 {
                                     var newList = pairs;
                                     foreach (var pair in blackList)
                                     {
                                         newList.RemoveAll(x => x.Symbol.ToString() == pair.ToString());
                                     }
-                                    if (blackList.Any())
+                                    if (newList.Any())
+                                        FormatAndSendAsync(newList, platform, timing, sb, sub);
+                                }
+                                else if (sub.WhitelistInsteadBlack && blackList.Any() && sub.BlackListEnable)
+                                {
+                                    var newList = new List<BreakoutPair>();
+                                    foreach (var pair in blackList)
+                                    {
+                                        var bpr = pairs.FirstOrDefault(x => x.Symbol.ToString() == pair.ToString());
+                                        if (bpr != null) newList.Add(bpr);
+                                    }
+                                    if (newList.Any())
                                         FormatAndSendAsync(newList, platform, timing, sb, sub);
                                 }
                                 else FormatAndSendAsync(pairs, platform, timing, sb, sub);
-
                             }
-                        }
-                }
-            }
         }
 
         private static async void FormatAndSendAsync(List<BreakoutPair> pairs, string platform, int timing, StringBuilder sb, BreakoutSub sub)
