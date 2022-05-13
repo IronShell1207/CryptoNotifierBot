@@ -193,112 +193,98 @@ namespace TelegramBot.Static
 
         #region Send or edit
 
-        public static async Task SendMessage(ChatId chatId, string message, ParseMode parse = ParseMode.MarkdownV2)
+        public static async Task<Message> SendMessage(ChatId chatId, string message, ParseMode parse = ParseMode.MarkdownV2)
         {
             try
             {
                 var messagelenght = message.Length;
                 if (messagelenght > 4125)
                     for (int i = 0; i < messagelenght / 3500; i++)
-                        await BotClient.SendTextMessageAsync(chatId, message.Substring(i * 3500, i + 3500), parse,
+                        return await BotClient.SendTextMessageAsync(chatId, message.Substring(i * 3500, i + 3500), parse,
                             disableWebPagePreview: true);
                 else
-                    await BotClient.SendTextMessageAsync(chatId, message, parse, disableWebPagePreview: true);
+                    return await BotClient.SendTextMessageAsync(chatId, message, parse, disableWebPagePreview: true);
             }
             catch (Telegram.Bot.Exceptions.ApiRequestException apiException)
             {
                 await BadRequestHandler(chatId, apiException);
             }
+
+            return null;
         }
 
-        public static async Task SendMessage(ChatId chatId, string message)
+        public static async Task<Message> SendMessage(ChatId chatId, string message)
         {
             try
             {
                 var messagelenght = message.Length;
                 if (messagelenght > 4125)
                     for (int i = 0; i < messagelenght / 3500; i++)
-                        await BotClient.SendTextMessageAsync(chatId, message.Substring(i * 3500, i + 3500));
+                       return await BotClient.SendTextMessageAsync(chatId, message.Substring(i * 3500, i + 3500));
                 else
-                    await BotClient.SendTextMessageAsync(chatId, message);
+                   return await BotClient.SendTextMessageAsync(chatId, message);
             }
             catch (Telegram.Bot.Exceptions.ApiRequestException apiException)
             {
                 await BadRequestHandler(chatId, apiException);
             }
+            return null;
         }
 
-        public static ChatId GetTelegramIdFromUpdate(Update update)
-        {
-            if (update.Message?.Chat.Id != null)
-                return update.Message.Chat.Id;
-            else if (update.CallbackQuery?.From?.Id != null)
-                return update.CallbackQuery.From.Id;
-            else return null;
-        }
-
-        public static async Task BadRequestHandler(ChatId chatId, Telegram.Bot.Exceptions.ApiRequestException ex)
-        {
-            if (ex.Message == "Bad Request: chat not found" || ex.ErrorCode == 400)
-            {
-                using (AppDbContext dbContext = new AppDbContext())
-                {
-                    var baduser = dbContext.Users.FirstOrDefault(x => x.TelegramId == chatId.Identifier);
-                    if (baduser != null) dbContext.Users.Remove(baduser);
-                    ConsoleCommandsHandler.LogWrite($"Bad user {chatId.Identifier}. Removed from the database");
-                }
-            }
-            else throw ex;
-        }
-
-        public static async Task SendMessage(ChatId chatId, string message, bool replythis)
+      
+        public static async Task<Message> SendMessage(ChatId chatId, string message, bool replythis)
         {
             try
             {
-                var msg = await BotClient.SendTextMessageAsync(chatId, message, replyMarkup: new ForceReplyMarkup());
+                return await BotClient.SendTextMessageAsync(chatId, message, replyMarkup: new ForceReplyMarkup());
             }
             catch (Telegram.Bot.Exceptions.ApiRequestException apiException)
             {
                 await BadRequestHandler(chatId, apiException);
             }
+            return null;
 
         }
 
-        public static async Task SendMessage(ChatId chatId, string message, IReplyMarkup replyMarkup)
+        public static async Task<Message> SendMessage(ChatId chatId, string message, IReplyMarkup replyMarkup)
         {
             try
             {
-                await BotClient.SendTextMessageAsync(chatId, message, replyMarkup: replyMarkup);
+                return await BotClient.SendTextMessageAsync(chatId, message, replyMarkup: replyMarkup);
             }
             catch (Telegram.Bot.Exceptions.ApiRequestException apiException)
             {
                 await BadRequestHandler(chatId, apiException);
             }
+            return null;
         }
 
-        public static async Task EditMessage(ChatId chatId, int messageID, string newMessage)
+        public static async Task<Message> EditMessage(ChatId chatId, int messageID, string newMessage)
         {
             try
             {
-                await BotClient.EditMessageTextAsync(chatId, messageID, newMessage);
+                return await BotClient.EditMessageTextAsync(chatId, messageID, newMessage);
             }
             catch (ApiRequestException apiEx)
             {
                 await BadRequestHandler(chatId, apiEx);
             }
+            return null;
         }
 
-        public static async Task EditMessage(ChatId chatId, int messageId, string message, ParseMode parseMode)
+        public static async Task<Message> EditMessage(ChatId chatId, int messageId, string message, ParseMode parseMode)
         {
             try
             {
-                await BotClient.EditMessageTextAsync(chatId, messageId, message, parseMode: parseMode, disableWebPagePreview: true);
+                 return await BotClient.EditMessageTextAsync(chatId, messageId, message, parseMode: parseMode, disableWebPagePreview: true);
             }
             catch (ApiRequestException apiEx)
             {
                 await BadRequestHandler(chatId, apiEx);
             }
+            return null;
         }
+
 
         /// <summary>
         /// Editing self message for revoking inline keyboard
@@ -317,6 +303,41 @@ namespace TelegramBot.Static
             {
                 await BadRequestHandler(chatId, apiEx);
             }
+        }
+
+        public static async Task RemoveMessage(ChatId chatId, int msgId)
+        {
+            try
+            {
+                await BotClient.DeleteMessageAsync(chatId, msgId);
+            }
+            catch (ApiRequestException apiEx)
+            {
+                await BadRequestHandler(chatId, apiEx);
+            }
+        }
+        public static ChatId GetTelegramIdFromUpdate(Update update)
+        {
+            if (update.Message?.Chat.Id != null)
+                return update.Message.Chat.Id;
+            else if (update.CallbackQuery?.From?.Id != null)
+                return update.CallbackQuery.From.Id;
+            else return null;
+        }
+
+
+        public static async Task BadRequestHandler(ChatId chatId, Telegram.Bot.Exceptions.ApiRequestException ex)
+        {
+            if (ex.Message == "Bad Request: chat not found" || ex.ErrorCode == 400)
+            {
+                using (AppDbContext dbContext = new AppDbContext())
+                {
+                    var baduser = dbContext.Users.FirstOrDefault(x => x.TelegramId == chatId.Identifier);
+                    if (baduser != null) dbContext.Users.Remove(baduser);
+                    ConsoleCommandsHandler.LogWrite($"Bad user {chatId.Identifier}. Removed from the database");
+                }
+            }
+            else throw ex;
         }
 
         #endregion

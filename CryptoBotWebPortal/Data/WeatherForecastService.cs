@@ -88,6 +88,7 @@ namespace CryptoBotWebPortal.Data
                 user.NightModeStartTime = userConfig.NightModeStartTime;
                 user.NoticationsInterval = userConfig.NoticationsInterval;
                 user.DisplayTaskEditButtonsInNotifications = userConfig.DisplayTaskEditButtonsInNotifications;
+                user.RemoveLatestNotifyBeforeNew = userConfig.RemoveLatestNotifyBeforeNew;
                 user.NoticationsInterval = userConfig.NoticationsInterval;
                 if (sub != null)
                 {

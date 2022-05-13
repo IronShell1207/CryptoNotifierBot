@@ -32,6 +32,7 @@ namespace TelegramBot.Objects
         public string? CryptoNotifyStyle { get; set; }
         public string Language { get; set; } = "en";
         public bool DisplayTaskEditButtonsInNotifications { get; set; } = true;
+        public bool RemoveLatestNotifyBeforeNew { get; set; } = false;
         public bool NightModeEnable { get; set; } = false;
         /// <summary>
         /// Time in minutes (23*60 by default)

@@ -15,6 +15,7 @@ namespace TelegramBot.Static.BotLoops
     {
         private static List<IntervaledUsersHistory> lastUpdateUsers = new List<IntervaledUsersHistory>() { };
         public static bool MonitorLoopCancellationToken { get; set; } = true;
+
         public static async void Loop()
         {
             while (MonitorLoopCancellationToken)
@@ -25,6 +26,7 @@ namespace TelegramBot.Static.BotLoops
                     foreach (UserConfig user in users)
                     {
                         StringBuilder sb = new StringBuilder();
+                        var lastMsg = lastUpdateUsers.LastOrDefault(x => x.UserId == user.Id)?.LastMsgId;
                         var pairsDefault = await UserTasksToNotify(user, dbContext, true);
                         var pairsSingleNotify = await UserTasksSingleNotify(user, dbContext);
                         var pairsTriggeredButRaised = await UserTriggeredTasksRaised(user, dbContext);
@@ -32,8 +34,11 @@ namespace TelegramBot.Static.BotLoops
                         {
                             foreach (var pair in pairsDefault)
                                 sb.AppendLine(FormatNotifyEntryStock(pair.Item1, pair.Item2));
-                            lastUpdateUsers.Add(new IntervaledUsersHistory(user.Id, DateTime.Now));
-                            await BotApi.SendMessage(user.TelegramId, sb.ToString());
+                            if (user.RemoveLatestNotifyBeforeNew && lastMsg != null)
+                                 await BotApi.RemoveMessage(user.TelegramId,(int)lastMsg);
+                            var msg = await BotApi.SendMessage(user.TelegramId, sb.ToString());
+                            var tpl = new IntervaledUsersHistory(user.Id, DateTime.Now, msg?.MessageId);
+                            lastUpdateUsers.Add(tpl);
                         }
 
                         if (pairsSingleNotify.Any())
@@ -109,8 +114,8 @@ namespace TelegramBot.Static.BotLoops
                 foreach (var pair in pairsTriggered)
                 {
                     var price = await Program.cryptoData.GetCurrentPricePairByName(pair.ToTradingPair());
-                    if (price.Price > 0 && ((price.Price * 1.01) < pair.Price && pair.GainOrFall ||
-                                            (price.Price * 0.99) > pair.Price && !pair.GainOrFall))
+                    if (price.Price > 0 && ((price.Price * 1.01) > pair.Price && pair.GainOrFall ||
+                                            (price.Price * 0.99) < pair.Price && !pair.GainOrFall))
                     {
                         tasksReturing.Add(new(pair, price.Price));
                         pair.Triggered = false;
@@ -158,10 +163,19 @@ namespace TelegramBot.Static.BotLoops
     {
         public int UserId { get; set; }
         public DateTime LastUpdateDateTime { get; set; }
+        public int? LastMsgId { get; set; }
         public IntervaledUsersHistory(int userid, DateTime datetime)
         {
             UserId = userid;
             LastUpdateDateTime = datetime;
+        }
+
+        public IntervaledUsersHistory(int userid, DateTime datetime, int? msg)
+        {
+
+            UserId = userid;
+            LastUpdateDateTime = datetime;
+            LastMsgId = msg;
         }
     }
 }
