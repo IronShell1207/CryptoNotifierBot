@@ -20,40 +20,40 @@ namespace CryptoApi.Static.DataHandler
         public bool UpdaterLive { get; set; } = true;
         public int DataDownloadedCounter { get; private set; } = 0;
         public bool DataAvailable { get; private set; } = false;
+        
         public async void UpdateAllData()
         {
             var datenow = DateTime.Now;
-            StringBuilder sb = new StringBuilder($"Market data updated");
+            StringBuilder sb = new StringBuilder($"Market data updated: ");
             var guid = Guid.NewGuid();
 
             using (var api = new ExchangeApi(Exchanges.Binance))
+                api.GetExchangeData<List<BinancePair>>(guid);
+
+            using (var api = new ExchangeApi(Exchanges.Bitget))
+                api.GetExchangeData<BitgetData>(guid);
+
+            using (var api = new ExchangeApi(Exchanges.Okx))
+                api.GetExchangeData<OkxData>(guid);
+
+            using (var api = new ExchangeApi(Exchanges.GateIO))
+                 api.GetExchangeData<List<GateIOTicker>>(guid);
+            
+            using (var api = new ExchangeApi(Exchanges.Kucoin))
+                api.GetExchangeData<KucoinData>(guid);
+            
+
+            Task.Run(() => Thread.Sleep(1200));
+            var dataSetsReady = await GetLatestDataSets();
+            while (dataSetsReady.Count < 5)
             {
-                await api.GetExchangeData<List<BinancePair>>(guid);
-                sb.Append($"{api.ApiName}: {api.PairsCount} ");
+                Task.Run(() => Thread.Sleep(500));
+                dataSetsReady = await GetLatestDataSets();
             }
-
-            using (var api = new ExchangeApi(Exchanges.Bitget)){
-                await api.GetExchangeData<BitgetData>(guid);
-                sb.Append($"{api.ApiName}: {api.PairsCount} ");
-            }
-
-            using (var api = new ExchangeApi(Exchanges.Okx)){
-                await api.GetExchangeData<OkxData>(guid);
-                sb.Append($"{api.ApiName}: {api.PairsCount} ");
-            }
-
-            using (var api = new ExchangeApi(Exchanges.GateIO)){
-                await api.GetExchangeData<List<GateIOTicker>>(guid);
-                sb.Append($"{api.ApiName}: {api.PairsCount} ");
-            }
-
-            using (var api = new ExchangeApi(Exchanges.Kucoin)){
-                await api.GetExchangeData<KucoinData>(guid);
-                sb.Append($"{api.ApiName}: {api.PairsCount}");
-            }
-
-            DataAvailable = true;
+            foreach (var dataSet in dataSetsReady)
+                sb.Append($"{dataSet.Exchange}: {dataSet.pairs.Count} ");
             Diff.LogWrite(sb.ToString());
+            DataAvailable = true;
         }
 
         public void RemoveOldData()
