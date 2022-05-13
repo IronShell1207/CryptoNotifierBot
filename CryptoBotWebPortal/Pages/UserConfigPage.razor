@@ -31,15 +31,18 @@
             <input type="text" @bind="user.Item1.MorningReport" style="max-width: 120px"/>
         </div>
     </td>
-    <td style="border: 0px; ">
+   
+    <td style="border: 0px;">
+    @if (user.Item2 != null)
+    {
         <div id="breakoutConfig" style="margin-left: 30px; align-self: center">
             <h1>Breakouts settings:</h1>
             <h5>Subscribed status @user.Item2.Subscribed</h5>
             <h5>Platforms subscription:</h5>
-            <label class="cl-switch"> <input type="checkbox" @bind="user.Item2.BinanceSub"> <span class="switcher"></span> <span class="label">Binance</span></label> 
-            <label class="cl-switch"> <input type="checkbox" @bind="user.Item2.BitgetSub"> <span class="switcher"></span> <span class="label">Bitget</span></label> 
-            <label class="cl-switch"> <input type="checkbox" @bind="user.Item2.OkxSub"> <span class="switcher"></span> <span class="label">Okx</span></label> 
-            <label class="cl-switch"> <input type="checkbox" @bind="user.Item2.KucoinSub"> <span class="switcher"></span> <span class="label">Kucoin</span></label> 
+            <label class="cl-switch"> <input type="checkbox" @bind="user.Item2.BinanceSub"> <span class="switcher"></span> <span class="label">Binance</span></label>
+            <label class="cl-switch"> <input type="checkbox" @bind="user.Item2.BitgetSub"> <span class="switcher"></span> <span class="label">Bitget</span></label>
+            <label class="cl-switch"> <input type="checkbox" @bind="user.Item2.OkxSub"> <span class="switcher"></span> <span class="label">Okx</span></label>
+            <label class="cl-switch"> <input type="checkbox" @bind="user.Item2.KucoinSub"> <span class="switcher"></span> <span class="label">Kucoin</span></label>
             <label class="cl-switch"> <input type="checkbox" @bind="user.Item2.GateioSub"> <span class="switcher"></span> <span class="label">GateIO</span></label>
             <h5>Timings subscription:</h5>
             <p><label class="cl-switch"> <input type="checkbox" @bind="user.Item2.S2MinUpdates"> <span class="switcher"></span> <span class="label">2 mins updates</span></label> </p>
@@ -54,7 +57,13 @@
             <p><label class="cl-switch"> <input type="checkbox" @bind="user.Item2.S960MinUpdates"> <span class="switcher"></span> <span class="label">16 hours updates</span></label> </p>
             <p><label class="cl-switch"> <input type="checkbox" @bind="user.Item2.S1920MinUpdates"> <span class="switcher"></span> <span class="label">32 hours updates</span></label></p>
         </div>
+    }
+    else
+    {
+        <h1>You are not subscribed to breakouts notifications. To subscribe send /subscribe in chat</h1>
+    }
     </td>
+    
 </tr>
 <p/>
 <input type="button" value="Save changes" @onclick="SaveChanges"/>
