@@ -114,7 +114,7 @@ namespace CryptoBotWebPortal.Data
                         breaksub.BlackListEnable = sub.BlackListEnable;
                         breaksub.WhitelistInsteadBlack = sub.WhitelistInsteadBlack;
                     }
-                }9
+                }
 
                 dbContext.SaveChangesAsync();
             }
