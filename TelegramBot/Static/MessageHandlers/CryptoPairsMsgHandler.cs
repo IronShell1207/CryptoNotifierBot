@@ -120,6 +120,7 @@ namespace TelegramBot.Static.MessageHandlers
                     }
                 }
             }
+            else BotApi.SendMessage(user.TelegramId, "Pair doesnt exists");
 
         }
 
@@ -139,13 +140,15 @@ namespace TelegramBot.Static.MessageHandlers
                         var pair = dbHandler.GetPairFromId(Id, userId);
                         if (pair != null)
                         {
-                            var msg = string.Format(CultureTextRequest.GetMessageString("CPEditPair", user.Language), pair.ToString(), pair.Id);
+                            var msg = string.Format(CultureTextRequest.GetMessageString("CPEditPair", user.Language),
+                                pair.ToString(), pair.Id);
                             BotApi.SendMessage(user.TelegramId, msg, true);
                         }
 
                     }
                 }
             }
+            else BotApi.SendMessage(user.TelegramId, "Pair doesnt exists");
         }
 
         public void RemoveUserTaskCallbackHandler(Update update)
@@ -240,9 +243,9 @@ namespace TelegramBot.Static.MessageHandlers
                     using (CryptoPairDbHandler dbh = new CryptoPairDbHandler())
                     {
                         var pair = dbh.GetPairFromId(id, user.Id);
-                        var pairCurrentPrice = await Program.cryptoData.GetCurrentPricePairByName(pair.PairBase, pair.PairQuote, pair.ExchangePlatform);
+                        var pairCurrentPrice = await Program.cryptoData.GetCurrentPricePairByName(pair.ToTradingPair());
 
-                        BotApi.SendMessage(user.TelegramId,pair.FullTaskInfo() + $"\nCurrent price: {pairCurrentPrice} {pair.PairQuote}", ParseMode.Html);
+                        BotApi.SendMessage(user.TelegramId,pair.FullTaskInfo() + $"\nCurrent price: {pairCurrentPrice.Price} {pair.PairQuote}", ParseMode.Html);
                     }
                 }
                 else
@@ -264,7 +267,7 @@ namespace TelegramBot.Static.MessageHandlers
                             }
                         }
                         var pairCurrentPrice = await Program.cryptoData.GetCurrentPricePairByName(pairbase, pairquote);
-                        BotApi.SendMessage(user.TelegramId, sb.ToString() + $"\nCurrent price: {pairCurrentPrice} {pairquote}", ParseMode.Html);
+                        BotApi.SendMessage(user.TelegramId, sb.ToString() + $"\nCurrent price: {pairCurrentPrice.Price} {pairquote}", ParseMode.Html);
                     }
                     else if (!string.IsNullOrWhiteSpace(pairbase))
                     {
@@ -280,7 +283,7 @@ namespace TelegramBot.Static.MessageHandlers
                             }
                         }
                         var pairCurrentPrice = await Program.cryptoData.GetCurrentPricePairByName(pairbase, "USDT");
-                        BotApi.SendMessage(user.TelegramId, sb.ToString() + $"\nCurrent price: {pairCurrentPrice} USDT", ParseMode.Html);
+                        BotApi.SendMessage(user.TelegramId, sb.ToString() + $"\nCurrent price: {pairCurrentPrice.Price} USDT", ParseMode.Html);
                     }
                     else
                     {
@@ -477,6 +480,7 @@ namespace TelegramBot.Static.MessageHandlers
 
                         strTasks.AppendLine("");
                         strTasks.AppendLine("To edit any task send: /edit 'id' 'new_price' or /edit BASE/QUOTE");
+                        strTasks.AppendLine("*💎 - single trigger tasks, 🌗 - that trigger fired");
                         BotApi.SendMessage(update.Message.Chat.Id, strTasks.ToString(), ParseMode.Html);
                     }
                     else BotApi.SendMessage(update.Message.Chat.Id, CultureTextRequest.GetMessageString("noCryptoTasks", user.Language));

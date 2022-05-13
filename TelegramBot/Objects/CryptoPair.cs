@@ -48,13 +48,17 @@ namespace TelegramBot.Objects
         {
             var enabled = Enabled ? "✅" : "⛔️";
             var rofl = GainOrFall ? ">" : "<";
-            return $"{enabled} #{Id} {this.ToString()} {rofl}{Price}";
+            var triggered = TriggerOnce ? "💎" : "";
+            triggered = Triggered && TriggerOnce ? "🌗" : triggered;
+            return $"{enabled} #{Id} {this.ToString()} {rofl}{Price} {triggered}";
         }
         public string TaskStatusWithLink()
         {
             var enabled = Enabled ? "✅" : "⛔️";
             var rofl = GainOrFall ? "&#62;" : "&#60;";
-            return $"{enabled} #{Id} {this.ToStringWithLink()} {rofl}{Price}";
+            var triggered = TriggerOnce ? "💎" : "";
+            triggered = Triggered && TriggerOnce ? "🌗" : triggered;
+            return $"{enabled} #{Id} {this.ToStringWithLink()} {rofl}{Price} {triggered}";
         }
 
         public string FullTaskInfo(string lang = "en")
@@ -73,7 +77,7 @@ namespace TelegramBot.Objects
             sb.AppendLine($"{CultureTextRequest.GetSettingsMsgString("taskInfoActiveStatus", lang)}{enable}");
             sb.AppendLine($"{CultureTextRequest.GetSettingsMsgString("taskInfoTriggerPrice", lang)}{lessOrGreater}{this.Price} {lessOrGreaterSymbol}");
             sb.AppendLine($"{CultureTextRequest.GetSettingsMsgString("taskInfoExchangePlatform", lang)}{this.ExchangePlatform}");
-            if (TriggerOnce) sb.AppendLine($"Single trigger: {this.EnabledDisabled(this.TriggerOnce)}");
+            if (TriggerOnce) sb.AppendLine($"Single trigger: {this.EnabledDisabled(this.TriggerOnce)} *💎 - if enabled, 🌗 - when triggered");
             if (!string.IsNullOrEmpty(Note)) sb.AppendLine($"Notes: {Note}");
             return sb.ToString();
 
