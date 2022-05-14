@@ -20,11 +20,10 @@
     <p>Pair quote: <input type="text" name="symbol" @bind="pair.PairQuote"/></p>
 
     <h5>Price trigger: <input type="text" @bind="pair.Price"/></h5>
-    
 
-    <h5>Task active <input type="checkbox" @bind="pair.Enabled"/></h5>
-    <h5>Rise or fall of trigger price <input type="checkbox" @bind="pair.GainOrFall"/></h5>
-    <h5>Trigger once (when price hits trigger you get notified once without flood) <input type="checkbox" @bind="pair.TriggerOnce"/></h5>
+    <h5><label class="cl-switch"><input type="checkbox" @bind="pair.Enabled" ><span class="switcher"></span><span class="label">Task active</span></label></h5>
+    <h5><label class="cl-switch"><input type="checkbox" @bind="pair.GainOrFall" ><span class="switcher"></span><span class="label">Rise or fall of trigger price</span></label></h5>
+    <h5><label class="cl-switch"><input type="checkbox" @bind="pair.TriggerOnce" ><span class="switcher"></span><span class="label">Trigger once (when price hits trigger you get notified once without flood)</span></label></h5>
 
     <h5>Exchange platform <select @bind="pair.ExchangePlatform">
         <option value="Binance">Binance</option>

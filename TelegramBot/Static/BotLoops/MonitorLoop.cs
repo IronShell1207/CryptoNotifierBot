@@ -114,8 +114,8 @@ namespace TelegramBot.Static.BotLoops
                 foreach (var pair in pairsTriggered)
                 {
                     var price = await Program.cryptoData.GetCurrentPricePairByName(pair.ToTradingPair());
-                    if (price.Price > 0 && ((price.Price * 1.01) > pair.Price && pair.GainOrFall ||
-                                            (price.Price * 0.99) < pair.Price && !pair.GainOrFall))
+                    if (price.Price > 0 && ((price.Price * 1.01) < pair.Price && pair.GainOrFall ||
+                                            (price.Price * 0.99) > pair.Price && !pair.GainOrFall))
                     {
                         tasksReturing.Add(new(pair, price.Price));
                         pair.Triggered = false;
@@ -128,10 +128,11 @@ namespace TelegramBot.Static.BotLoops
 
         private static string FormatNotifyEntryStock(CryptoPair pair, double newprice)
         {
-            var enabledSymbol = pair.GainOrFall ? "▲" : "▼";
-            var gainOrFallSymbol = pair.GainOrFall ? "raise 📈" : "fall 📉";
-            var priceDiff = pair.GainOrFall ? ((newprice / pair.Price) * 100) - 100 : ((newprice / pair.Price) * 100) - 100;
-            var plusic = pair.GainOrFall ? "+" : "";
+            var gorfall = pair.Price < newprice ;
+            var enabledSymbol = gorfall ? "▲" : "▼";
+            var gainOrFallSymbol = gorfall ? "raise 📈" : "fall 📉";
+            var priceDiff = gorfall ? ((newprice / pair.Price) * 100) - 100 : ((newprice / pair.Price) * 100) - 100;
+            var plusic = gorfall ? "+" : "";
             return $"{enabledSymbol} {pair.Id} {pair.PairBase}/{pair.PairQuote} {plusic}{string.Format("{0:##0.00#}", priceDiff)}% {gainOrFallSymbol} {pair.Price}->{newprice}";
         }
         private static string FormatNotifyEntryByUserFormat(string formater, CryptoPair pair, double newPrice)
