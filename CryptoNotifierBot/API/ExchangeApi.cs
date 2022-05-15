@@ -136,6 +136,7 @@ namespace CryptoApi.API
             var apiData = await GetTickerData<T>();
             var pairs = PairsListConverter(apiData);
             if (pairs != null) SavePairsToDb(ApiName, pairs, guid);
+            return true;
         }
 
         public ExchangeApi(string apiName)
