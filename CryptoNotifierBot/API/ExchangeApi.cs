@@ -131,7 +131,7 @@ namespace CryptoApi.API
                 }
             }
         }
-        public async Task GetExchangeData<T>(Guid guid = default(Guid))
+        public async Task<bool> GetExchangeData<T>(Guid guid = default(Guid))
         {
             var apiData = await GetTickerData<T>();
             var pairs = PairsListConverter(apiData);
