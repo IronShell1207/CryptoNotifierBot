@@ -10,6 +10,12 @@
 @using TelegramBot.Objects
 @inject WeatherForecastService ForecastService
 
+@if (AlertVisible)
+{
+    <div class="alert alert-success fade show">
+        <strong>Success!</strong> @AlertMessage
+    </div>
+}
 
 <tr style="border: 0px; ">
     <td  style="border: 0px; "> 
@@ -67,13 +73,16 @@
     
 </tr>
 <p/>
-<input type="button" value="Save changes" @onclick="SaveChanges"/>
+<button type="button" class="btn btn-primary"  @onclick="SaveChanges">Save changes</button>
 
 @code {
     private (UserConfig, BreakoutSub) user;
 
     [Parameter]
     public string userid { get; set; }
+
+    public bool AlertVisible { get; set; }
+    public string AlertMessage { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
@@ -83,6 +92,13 @@
     private async Task SaveChanges()
     {
         await ForecastService.SaveUserSettings(user.Item1, user.Item2);
+        AlertMessage = "Settings saved";
+        AlertVisible = true;
+        await Task.Run((() => Thread.Sleep(2500)));
+        AlertVisible = false;
         NavigationManager.NavigateTo("/fetchusers");
+        
+
     }
+
 }

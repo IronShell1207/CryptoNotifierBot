@@ -22,16 +22,16 @@ namespace CryptoApi.Static
             {
                 var request = new RestRequest(Link);
                 request.Method = Method.Get;
-                request.Timeout = 6000;
+                request.Timeout = 10000;
+                request.AddHeader("UserAgent",WebHeaders.UserAgent);
                 var client = new RestClient();
                 var result = await client.ExecuteAsync(request);
                 if (result.StatusCode == 0)
                 {
                     Diff.LogWrite($"No connection while requesting {exchange} ticker data. Status code: {result.StatusCode}. {result.Content}");
-                    return null;
-                }
-                if (!result.IsSuccessful)
                     client = new RestClient(ProxyClient(Link));
+                }
+                
                 result = await client.ExecuteAsync(request);
                 return result;
             }
@@ -45,7 +45,7 @@ namespace CryptoApi.Static
         {
             List<Uri> ProxyList = new List<Uri>()
             {
-                new Uri("http://121.156.109.108:8080")
+                new Uri("http://148.251.66.8:3128")
             };
             foreach (var uri in ProxyList)
             {

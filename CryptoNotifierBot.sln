@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TelegramBot", "TelegramBot\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoBotWebPortal", "CryptoBotWebPortal\CryptoBotWebPortal.csproj", "{BBF40C7D-7013-4ED7-B42C-A9902E76926D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApiPortal", "WebApiPortal\WebApiPortal.csproj", "{C1C20880-2C52-4FA8-8E90-20DC02C3A7D4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApiPortal", "WebApiPortal\WebApiPortal.csproj", "{C1C20880-2C52-4FA8-8E90-20DC02C3A7D4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
