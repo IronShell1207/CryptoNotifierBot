@@ -163,7 +163,9 @@ You can view all tasks by clicking on the 'List of tasks 📝' button.
 As soon as the price of this pair reaches the target mark, you will immediately receive a notification from the bot for each of the added pairs. 
 You can also edit, turn off or turn off the task at any time. 
 
-For create new task 🖍 send: /createtask.
+For create new task 🖍 send: /create or /create BTC USDT
+To subcribe to crypto breakouts (fast prices changes) send: /subscribed
+To stop subscription send: /substop
 For get info 📋 send: /info
 For get all available commands 🔎 send: /help</value>
   </data>
