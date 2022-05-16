@@ -26,7 +26,7 @@ namespace TelegramBot.Static.BotLoops
                     foreach (UserConfig user in users)
                     {
                         StringBuilder sb = new StringBuilder();
-                        var lastMsg = lastUpdateUsers.LastOrDefault(x => x.UserId == user.Id)?.LastMsgId;
+                        var lastMsg = lastUpdateUsers?.LastOrDefault(x => x.UserId == user.Id)?.LastMsgId;
                         var pairsDefault = await UserTasksToNotify(user, dbContext, true);
                         var pairsSingleNotify = await UserTasksSingleNotify(user, dbContext);
                         var pairsTriggeredButRaised = await UserTriggeredTasksRaised(user, dbContext);

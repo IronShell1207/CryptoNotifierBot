@@ -21,6 +21,7 @@ namespace TelegramBot.Static
         public DbSet<PositionPair> Positions { get; set; }
         public DbSet<Takes> PositionTakes { get; set; }
         public DbSet<BannedUser> BannedUsers { get; set; }
+        public DbSet<MessageAccepted> AcceptedMessages { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

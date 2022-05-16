@@ -26,26 +26,25 @@ namespace CryptoApi.Static.DataHandler
             var datenow = DateTime.Now;
             StringBuilder sb = new StringBuilder($"Market data updated: ");
             var guid = Guid.NewGuid();
-            var results = new List<bool>();
             using (var api = new ExchangeApi(Exchanges.Binance))
-                results.Add( api.GetExchangeData<List<BinancePair>>(guid).Result);
+                 api.GetExchangeData<List<BinancePair>>(guid);
 
             using (var api = new ExchangeApi(Exchanges.Bitget))
-                results.Add(api.GetExchangeData<BitgetData>(guid).Result);
+                api.GetExchangeData<BitgetData>(guid);
 
             using (var api = new ExchangeApi(Exchanges.Okx))
-                results.Add(api.GetExchangeData<OkxData>(guid).Result);
+                api.GetExchangeData<OkxData>(guid);
 
             using (var api = new ExchangeApi(Exchanges.GateIO))
-                results.Add(api.GetExchangeData<List<GateIOTicker>>(guid).Result);
+                api.GetExchangeData<List<GateIOTicker>>(guid);
             
             using (var api = new ExchangeApi(Exchanges.Kucoin))
-                results.Add(api.GetExchangeData<KucoinData>(guid).Result);
+                api.GetExchangeData<KucoinData>(guid);
             
 
             Task.Run(() => Thread.Sleep(1200));
             var dataSetsReady = await GetLatestDataSets();
-            while (results.Count < 5)
+            while (dataSetsReady.Count < 5)
             {
                 Task.Run(() => Thread.Sleep(500));
                 dataSetsReady = await GetLatestDataSets();

@@ -50,9 +50,22 @@ namespace TelegramBot.Static
             return true;
         }
 
+        private static void SaveUserMsg(Update update)
+        {
+            using (AppDbContext dbContext = new AppDbContext())
+            {
+                var user = dbContext.Users.Include(x=>x.Messages).OrderBy(x => x.Id).First(x => x.TelegramId == update.Message.From.Id);
+                var msg = new MessageAccepted(user, update.Message.Text, update.Message.MessageId);
+                msg.Date = update.Message.Date;
+                user.Messages.Add(msg);
+                dbContext.SaveChangesAsync();
+            }
+        }
         #region Updates
         public static async Task UpdateHandler(ITelegramBotClient bot, Update update, CancellationToken canceltoken)
         {
+            var user = await GetUserSettings(update);
+            SaveUserMsg(update);
             if (IsUserBanned(update))
                 return;
             if (!string.IsNullOrWhiteSpace(update.Message?.ReplyToMessage?.Text))
@@ -62,7 +75,7 @@ namespace TelegramBot.Static
 
             if (update.Type == UpdateType.Message && update.Message != null)
             {
-                var user = await GetUserSettings(update);
+               
                 if (RegexCombins.CommandPattern.IsMatch(update.Message?.Text))
                     CommandsHandler(bot, update, canceltoken);
 
