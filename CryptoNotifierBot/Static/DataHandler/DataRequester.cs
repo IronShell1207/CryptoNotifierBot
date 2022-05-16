@@ -20,7 +20,8 @@ namespace CryptoApi.Static.DataHandler
         public bool UpdaterLive { get; set; } = true;
         public int DataDownloadedCounter { get; private set; } = 0;
         public bool DataAvailable { get; private set; } = false;
-        
+
+        private int Try = 30;
         public async void UpdateAllData()
         {
             var datenow = DateTime.Now;
@@ -42,12 +43,13 @@ namespace CryptoApi.Static.DataHandler
                 api.GetExchangeData<KucoinData>(guid);
             
 
-            Task.Run(() => Thread.Sleep(1200));
+            await Task.Run(() => Thread.Sleep(1200));
             var dataSetsReady = await GetLatestDataSets();
-            while (dataSetsReady.Count < 5)
+            while (dataSetsReady == null || dataSetsReady?.Count < 5 && Try>0)
             {
-                Task.Run(() => Thread.Sleep(500));
+                await Task.Run(() => Thread.Sleep(500));
                 dataSetsReady = await GetLatestDataSets();
+                Try--;
             }
             foreach (var dataSet in dataSetsReady)
                 sb.Append($"{dataSet.Exchange}: {dataSet.pairs.Count} ");
