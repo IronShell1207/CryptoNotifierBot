@@ -68,7 +68,7 @@ namespace TelegramBot.Static.BotLoops
                     user.NightModeStartTime, user.NightModeEndsTime,
                     dateTimenow.Hour * 60 + dateTimenow.Minute)))
             {
-                var pairs = dbContext.CryptoPairs.Where(x => x.OwnerId == user.Id && x.Enabled).ToList();
+                var pairs = dbContext.CryptoPairs.Where(x => x.OwnerId == user.Id && x.Enabled && !x.TriggerOnce).ToList();
                 foreach (var pair in pairs)
                 {
                     var price = await Program.cryptoData.GetCurrentPricePairByName(pair.ToTradingPair());
