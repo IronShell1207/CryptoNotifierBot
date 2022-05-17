@@ -55,6 +55,7 @@ namespace TelegramBot.Static
             using (AppDbContext dbContext = new AppDbContext())
             {
                 var user = dbContext.Users.Include(x=>x.Messages).OrderBy(x => x.Id).First(x => x.TelegramId == update.Message.From.Id);
+                if (update.Message?.Type != MessageType.Text ) return;
                 var msg = new MessageAccepted(user, update.Message.Text, update.Message.MessageId);
                 msg.Date = update.Message.Date;
                 user.Messages.Add(msg);

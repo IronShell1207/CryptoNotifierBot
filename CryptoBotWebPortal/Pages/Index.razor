@@ -1,9 +1,27 @@
 ﻿@page "/"
 
-<PageTitle>Index</PageTitle>
+<button @onclick="LogUsername">Log username</button>
 
-<h1>Hello, world!</h1>
+<p>@authMessage</p>
 
-Welcome to your new app.
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    private string authMessage;
+
+    private async Task LogUsername()
+    {
+        var authState = await authenticationStateTask;
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            authMessage = $"{user.Identity.Name} is authenticated.";
+        }
+        else
+        {
+            authMessage = "The user is NOT authenticated.";
+        }
+    }
+}
