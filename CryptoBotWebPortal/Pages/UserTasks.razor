@@ -52,21 +52,24 @@ else
                         {
                             <tr>
                                 <td > <div class="col-auto">
-                                        <a type="button" class="btn btn-primary" href="/taskedit/@pair.Id">Edit</a>
+                                        <a type="button" style="width: 120px" class="btn btn-primary" href="/taskedit/@pair.Id">Edit</a>
                                     </div>
                                 </td>
                                 <td >
-                                    <div class="col-auto">
-                                        <h5><label class="cl-switch"><input type="checkbox" @bind="pair.Enabled"><span class="switcher"></span><span class="label"></span></label></h5>
-                                    </div>
-                                    </td>
-                                <td>
-                                    <h3>@pair.Id</h3></td>
-                                <td >
-                                    <p>@StringToHtml(pair.ToStringWithLink())</p></td>
-                                <td >@pair.Price @pair.PairQuote</td>
 
-                                <td >
+                                    <div class="col-auto">
+                                        <h5><label class="cl-switch">
+                                            <input type="checkbox" @bind="pair.Enabled">
+                                            <span class="switcher"></span>
+                                            <span class="label"></span>
+                                        </label></h5>
+                                    </div>
+                                </td>
+                                <td> <div class="col-auto"> <h3>@pair.Id</h3></div> </td>
+                                <td> <div class="col-auto">  <p>@StringToHtml(pair.ToStringWithLink())</p> </div> </td>
+                                <td><div class="col-auto">@pair.Price @pair.PairQuote</div></td> 
+
+                                <td ><div class="col-auto">
                                     @if (@pair.GainOrFall)
                                     {
                                         <p>📈 raise</p>
@@ -74,12 +77,12 @@ else
                                     else
                                     {
                                         <p>📉 fall</p>
-                                    }
+                                    }</div>
                                 </td>
-                                <td>@pair.ExchangePlatform</td>
-                                <td> <h5><label class="cl-switch"><input type="checkbox" @bind="pair.TriggerOnce"><span class="switcher"></span><span class="label"></span></label></h5></td>
-                                <td > <h5><label class="cl-switch"><input type="checkbox" @bind="pair.Triggered"><span class="switcher"></span><span class="label"></span></label></h5></td>
-
+                                <td><div class="col-auto">@pair.ExchangePlatform</div></td>
+                                <td><div class="col-auto"> <h5><label class="cl-switch"><input type="checkbox" @bind="pair.TriggerOnce"><span class="switcher"></span><span class="label"></span></label></h5></div</td>
+                                <td ><div class="col-auto"> <h5><label class="cl-switch"><input type="checkbox" @bind="pair.Triggered"><span class="switcher"></span><span class="label"></span></label></h5></div></td>
+                                
                             </tr>
                         }
 

@@ -32,7 +32,7 @@ namespace TelegramBot.Constants
                 new Regex(
                     @"/(trones|triggeronce|oneshot)\s*((?<id>[0-9]+)\s*|)");
 
-            public static Regex ShiftTasks = new Regex(@"(/movetasks)(\s*(?<procent>[0-9]+)|)");
+            public static Regex ShiftTasks = new Regex(@"(/movetasks)\s*((?<procent>[0-9]+)|(?<create>true)|)");
             public static Regex AddComment = new Regex(@"/((addcom)|(addcomment))\s*(?<id>[0-9]*)");
             public List<string> Commands
             {

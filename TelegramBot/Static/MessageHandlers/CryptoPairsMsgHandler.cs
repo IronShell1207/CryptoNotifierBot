@@ -588,7 +588,7 @@ namespace TelegramBot.Static.MessageHandlers
 
 
         #endregion
-#region MultiTasksOperations
+        #region MultiTasksOperations
         public async void DropEverythingByProcent(Update update)
         {
             var match = CommandsRegex.MonitoringTaskCommands.ShiftTasks.Match(update.Message.Text);
@@ -596,10 +596,19 @@ namespace TelegramBot.Static.MessageHandlers
             {
                 var user = await BotApi.GetUserSettings(update);
                 var procent = !string.IsNullOrWhiteSpace(match.Groups["procent"].Value) ? int.Parse(match.Groups["procent"].Value) : 2;
+                var isCreateAltTasks = !string.IsNullOrWhiteSpace(match.Groups["create"].Value);
+
                 var appDbContext = new AppDbContext();
                 var pairs = await MonitorLoop.UserTasksToNotify(user, appDbContext, false);
                 foreach (var pair in pairs)
                 {
+                    if (isCreateAltTasks)
+                    {
+                        CryptoPair cp = pair.Item1.Clone() as CryptoPair;
+                        cp.Id = 0;
+                        cp.GainOrFall = cp.GainOrFall;
+                        appDbContext.CryptoPairs.Add(cp);
+                    }
                     if (pair.Item1.GainOrFall && pair.Item1.Price < pair.Item2)
                         pair.Item1.Price = pair.Item2 * (procent + 100) / 100;
                     else if (!pair.Item1.GainOrFall && pair.Item1.Price > pair.Item2)

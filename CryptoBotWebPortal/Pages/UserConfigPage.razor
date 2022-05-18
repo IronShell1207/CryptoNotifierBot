@@ -25,6 +25,7 @@
             <h5>Username: @user.Item1.UserName</h5>
             <h5>Nickname: @user.Item1.FirstName</h5>
             <h5>User pairs @user.Item1.pairs.Count </h5>
+            <h5><Tumbler  @bind-IsEnabled="@user.Item1.TriggerOneTasksByDefault" Text="Trigger once for new tasks by default"></Tumbler></h5>
                 @if (user.Item1.pairs?.Count > 0)
                 {
                     <a style="margin: 10px 5px" type="button" class="btn btn-primary" href="/usertasks/@user.Item1.Id">Show tasks list</a>

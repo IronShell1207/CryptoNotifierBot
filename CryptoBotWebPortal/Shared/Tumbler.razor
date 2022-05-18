@@ -1,0 +1,24 @@
+﻿
+<div class="align-items-lg-center" style="width: max-content; height: max-content;">
+    <label class="cl-switch">
+        <input type="checkbox" value="@IsEnabled" >
+        <span class="switcher"></span>
+        <span class="label">@Text</span>
+    </label>
+</div>
+
+
+@code {
+    [Parameter]
+    public bool IsEnabled { get; set; }
+
+    [Parameter]
+    public string Text { get; set; }
+    [Parameter]
+    public EventCallback<bool> IsEnabledChanged { get; set; }
+    async Task UpdateCurrentCounterValue()
+    {
+        IsEnabled = !IsEnabled;
+        await IsEnabledChanged.InvokeAsync(IsEnabled);
+    }
+}

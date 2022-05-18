@@ -1,12 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CryptoApi.API;
+using CryptoApi.Constants;
+using CryptoApi.Objects;
 using CryptoApi.Static.DataHandler;
 using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using Microsoft.EntityFrameworkCore.Sqlite;
+using Newtonsoft.Json;
+using RestSharp;
 
 namespace CryptoNotifierBot.Tests
 {
@@ -22,6 +28,20 @@ namespace CryptoNotifierBot.Tests
                 
 
             }
+        }
+
+        [Test]
+        public async Task CMCTest()
+        {
+
+            using (CoinMarketCapTop cmctop = new CoinMarketCapTop())
+            {
+                await cmctop.Get(200);
+            }
+
+           
+
+
         }
     }
 }

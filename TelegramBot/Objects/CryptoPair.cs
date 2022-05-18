@@ -12,7 +12,7 @@ using TelegramBot.Static;
 
 namespace TelegramBot.Objects
 {
-    public class CryptoPair
+    public class CryptoPair : ICloneable
     {
         public int Id { get; set; }
         public int OwnerId { get; set; }
@@ -37,6 +37,12 @@ namespace TelegramBot.Objects
         public override string ToString() => !string.IsNullOrWhiteSpace(PairBase) && !string.IsNullOrWhiteSpace(PairQuote)
             ? $"{PairBase}/{PairQuote}"
             : "";
+
+        public object Clone()
+        {
+            
+            return this.MemberwiseClone();
+        }
 
         public string ToStringWithLink()
         {
