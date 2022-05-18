@@ -31,6 +31,7 @@ namespace TelegramBot.Static.MessageHandlers
             return pair;
         }
 
+        #region TasksEditChange
         public async void EditUserTask(Update update)
         {
             var match = CommandsRegex.MonitoringTaskCommands.EditPair.Match(update.Message.Text);
@@ -92,7 +93,6 @@ namespace TelegramBot.Static.MessageHandlers
                 }
             }
         }
-
         public async void EditUserTaskReplyHandler(Update update, UserConfig user)
         {
             var editPriceMsgRegex =
@@ -123,7 +123,6 @@ namespace TelegramBot.Static.MessageHandlers
             else BotApi.SendMessage(user.TelegramId, "Pair doesnt exists");
 
         }
-
         public void EditUserTaskCallbackHandler(Update update)
         {
             var match = CallbackDataPatterns.EditPairRegex.Match(update.CallbackQuery.Data);
@@ -150,7 +149,6 @@ namespace TelegramBot.Static.MessageHandlers
             }
             else BotApi.SendMessage(user.TelegramId, "Pair doesnt exists");
         }
-
         public void RemoveUserTaskCallbackHandler(Update update)
         {
             var match = CallbackDataPatterns.DeletePairRegex.Match(update.CallbackQuery.Data);
@@ -178,7 +176,6 @@ namespace TelegramBot.Static.MessageHandlers
                 }
             }
         }
-
         public void RemoveUserTask(Update update)
         {
             var match = CommandsRegex.MonitoringTaskCommands.DeletePair.Match(update.Message.Text);
@@ -230,6 +227,242 @@ namespace TelegramBot.Static.MessageHandlers
             }
         }
 
+        public async void SetSingleTriggerForUserTask(Update update)
+        {
+            var match = CommandsRegex.MonitoringTaskCommands.TriggerOncePair.Match(update.Message.Text);
+            if (match.Success)
+            {
+                var id = int.Parse(match.Groups["id"].Value);
+                var user = await BotApi.GetUserSettings(update);
+                using (CryptoPairDbHandler dbHandler = new CryptoPairDbHandler())
+                {
+                    var pair = dbHandler.GetPairFromId(id, user.Id);
+                    if (pair != null)
+                    {
+                        pair.TriggerOnce = !pair.TriggerOnce;
+                        var trigger = pair.TriggerOnce ? "☑️ enabled" : "❌ disabled";
+                        var msg = string.Format(
+                            CultureTextRequest.GetMessageString("CPTriggerOnceChange", user.Language),
+                            pair.TaskStatus(), trigger);
+                        var editresult = await dbHandler.CompletlyEditCryptoPair(pair);
+                        msg = editresult ? msg : "Can't save your changes because of unexpected error!";
+                        BotApi.SendMessage(user.TelegramId, msg, ParseMode.Html);
+                    }
+                    else
+                    {
+                        BotApi.SendMessage(user.TelegramId, "Task not exists, or not yours!");
+                    }
+                }
+            }
+        }
+        public async void AddCommentForTask(Update update)
+        {
+            var match = CommandsRegex.MonitoringTaskCommands.AddComment.Match(update.Message.Text);
+            if (match.Success)
+            {
+                var id = int.Parse(match.Groups["id"].Value);
+                var user = await BotApi.GetUserSettings(update);
+                var task = new CryptoPairDbHandler().GetPairFromId(id, user.Id);
+                if (task != null)
+                {
+                    var msg = string.Format(CultureTextRequest.GetMessageString("CPAddComment", user.Language), task.Id, task.ToString());
+                    BotApi.SendMessage(user.TelegramId, msg, true);
+                }
+                else
+                {
+                    BotApi.SendMessage(user.TelegramId, "Task not exists, or not yours!");
+                }
+            }
+        }
+        public async void AddCommentForTaskReplyHandler(Update update)
+        {
+            var user = await BotApi.GetUserSettings(update);
+            var msgRegex = CommandsRegex.ConvertMessageToRegex(CultureTextRequest.GetMessageString("CPAddComment", user.Language), new List<string>()
+            {
+                @"(?<id>[0-9]*)", @"(?<base>[a-zA-Z0-9]{2,9})(\s+|/)(?<quote>[a-zA-Z0-9]{2,6})"
+            });
+            var match = msgRegex.Match(update.Message.ReplyToMessage.Text);
+            if (match.Success)
+            {
+                var id = int.Parse(match.Groups["id"].Value);
+                var task = new CryptoPairDbHandler().GetPairFromId(id, user.Id);
+                if (task != null)
+                {
+                    task.Note = update.Message.Text;
+                }
+            }
+        }
+        #endregion
+
+        #region CreateTask stages
+        /// <summary>
+        /// Create task entry method. Uses for handle /create "base"/"quote" "price" command
+        /// Can handle command without params, with symbol only and with symbol and price
+        /// </summary>
+        /// <param name="update">Latest message from user</param>
+        /// <param name="user">UserConfig from db</param>
+        public async void CreateTaskFirstStage(Update update, UserConfig user)
+        {
+            var match = CommandsRegex.MonitoringTaskCommands.CreatePair.Match(update.Message.Text);
+            if (match.Success)
+            {
+                string baseValue = match.Groups["base"].Value.ToUpper();
+                string quoteValue = match.Groups["quote"].Value.ToUpper();
+                string priceStr = match.Groups["price"].Value;
+                var pair = GetTempUserTask(update).Result;
+                if (!String.IsNullOrWhiteSpace(baseValue) && !string.IsNullOrWhiteSpace(quoteValue))
+                {
+                    pair.PairBase = baseValue;
+                    pair.PairQuote = quoteValue;
+                    if (!string.IsNullOrWhiteSpace(priceStr))
+                    {
+                        pair.Price = double.Parse(priceStr, new CultureInfo("en"));
+                    }
+                    await SetExchangePStage(update, pair, user);
+                }
+                else
+                {
+                    await BotApi.SendMessage(update.Message.Chat.Id, Messages.newPairRequestingForPair, true, ParseMode.Html);
+                }
+            }
+        }
+        /// <summary>
+        /// Creates new pair from user's message like: "base"/"quote".
+        /// This method parses answer on replied message of creating new task without arguments
+        /// </summary>
+        /// <param name="update">Latest message from user, must contains only message with text "base"/"quote"</param>
+        public async void SetPairSymbolStage(Update update)
+        {
+            var match = RegexCombins.CryptoPairRegex.Match(update.Message?.Text);
+            if (match.Success)
+            {
+                var pair = GetTempUserTask(update).Result;
+                pair.PairBase = match.Groups["base"].Value.ToUpper();
+                pair.PairQuote = match.Groups["quote"].Value.ToUpper();
+            }
+            else
+            {
+                await BotApi.SendMessage(update.Message.Chat.Id, "Wrong pair name!");
+            }
+        }
+        private async Task<bool?> SetExchangePStage(Update update, CryptoPair pair, UserConfig user)
+        {
+            var exchangesForPair = await 
+                Program.cryptoData.GetExchangesForPair(
+                    new CryptoApi.Objects.TradingPair(pair.PairBase, pair.PairQuote));
+            if (exchangesForPair.Any())
+            {
+                if (user.SetExchangeAutomaticaly)
+                {
+                    pair.ExchangePlatform = exchangesForPair.First();
+                    if (pair.Price != 0)
+                        SetRaiseOrFallStage(update, pair);
+                    return true;
+                }
+                else
+                {
+                    var kbexchanges = Keyboards.ExchangeSelectingKeyboardMarkup(exchangesForPair);
+                    await BotApi.SendMessage(user.TelegramId, $"Select crypto exchange for {pair}: ", kbexchanges);
+                    return true;
+                }
+            }
+            else
+            {
+                await BotApi.SendMessage(user.TelegramId, "Wrong pair!");
+                return false;
+            }
+        }
+
+
+        public async Task SetExchangeCallbackHandlerStage(Update update)
+        {
+            var exchange = update.CallbackQuery?.Data;
+            var pair = GetTempUserTask(update).Result;
+            pair.ExchangePlatform = exchange;
+            if (pair.Price == 0)
+            {
+                await BotApi.SendMessage(update.CallbackQuery?.From.Id,
+                    "Exchange for new crypto pair setted. Set price in next message", true);
+            }
+            else if (pair.Price > 0)
+            {
+                SetRaiseOrFallStage(update, pair);
+            }
+        }
+
+        /// <summary>
+        /// Automatically sets direction of price trigger based on current price. Can set new price to task if not its set.
+        /// </summary>
+        private async void SetRaiseOrFallStage(Update update, CryptoPair pair, UserConfig user = default(UserConfig), double price = 0)
+        {
+            user = (user is null) ? await BotApi.GetUserSettings(update) : user;
+            if (price > 0)
+                pair.Price = price;
+            if (string.IsNullOrWhiteSpace(pair.ToString()))
+            {
+                var lastMsgId = await BotApi.GetMessageIdFromUpdateTask(update);
+                if (lastMsgId != 0)
+                    await BotApi.EditMessage(user.TelegramId, lastMsgId, "Task creating expired. Start again");
+                else await BotApi.SendMessage(user.TelegramId, "Task creating expired. Start again");
+            }
+            else
+            {
+                var curprice = await Program.cryptoData.GetCurrentPricePairByName(pair.ToTradingPair());
+                pair.GainOrFall = curprice.Price < pair.Price;
+                SaveNewTaskToDB(update, user);
+            }
+        }
+
+        /// <summary>
+        /// Accepts price value from user to set it to his task
+        /// </summary>
+        public async void SetPriceStage(Update update, UserConfig user)
+        {
+            var pair = GetTempUserTask(update).Result;
+            try
+            {
+                var price = double.Parse(update.Message?.Text, new CultureInfo("en"));
+                SetRaiseOrFallStage(update, pair, user, price);
+            }
+            catch (ArgumentException ex)
+            {
+                await BotApi.SendMessage(update.Message?.Chat?.Id, Messages.newPairWrongPrice, true);
+            }
+            catch (FormatException ex)
+            {
+                await BotApi.SendMessage(update.Message?.Chat?.Id, Messages.newPairWrongPrice, true);
+            }
+        }
+
+        /// <summary>
+        /// Last stage of creating tasks, saving to db and sends message to user, that is pair is created successfuly
+        /// </summary>
+        private async void SaveNewTaskToDB(Update update, UserConfig user)
+        {
+            var pair = GetTempUserTask(update).Result;
+            if (pair?.Price > 0 &&
+                !string.IsNullOrWhiteSpace(pair?.PairBase) &&
+                !string.IsNullOrWhiteSpace(pair?.PairQuote) &&
+                !string.IsNullOrWhiteSpace(pair?.ExchangePlatform))
+            {
+                using (AppDbContext db = new AppDbContext())
+                {
+                    pair.Enabled = true;
+                    db.CryptoPairs.Add(pair);
+                    PairsManager.TempObjects?.Remove(pair);
+                    db.SaveChangesAsync();
+                }
+
+                var msg = CultureTextRequest.GetSettingsMsgString("CPEditTaskCreated", user.Language);
+                var formatedmsg = $"{msg} {pair.FullTaskInfo(user.Language)}";
+                
+                BotApi.SendMessage(BotApi.GetTelegramIdFromUpdate(update).Identifier, formatedmsg, ParseMode.Html);
+            }
+        }
+        #endregion
+
+        #region DisplayTaskInfo
+
         public async void ShowTaskInfo(Update update)
         {
             var match = CommandsRegex.MonitoringTaskCommands.ShowPair.Match(update.Message.Text);
@@ -245,7 +478,7 @@ namespace TelegramBot.Static.MessageHandlers
                         var pair = dbh.GetPairFromId(id, user.Id);
                         var pairCurrentPrice = await Program.cryptoData.GetCurrentPricePairByName(pair.ToTradingPair());
 
-                        BotApi.SendMessage(user.TelegramId,pair.FullTaskInfo() + $"\nCurrent price: {pairCurrentPrice.Price} {pair.PairQuote}", ParseMode.Html);
+                        BotApi.SendMessage(user.TelegramId, pair.FullTaskInfo() + $"\nCurrent price: {pairCurrentPrice.Price} {pair.PairQuote}", ParseMode.Html);
                     }
                 }
                 else
@@ -287,146 +520,10 @@ namespace TelegramBot.Static.MessageHandlers
                     }
                     else
                     {
-                       // BotApi.SendMessage(user.TelegramId, CultureTextRequest.GetMessageString("CPRemoveEmpty", user.Language));
+                        // BotApi.SendMessage(user.TelegramId, CultureTextRequest.GetMessageString("CPRemoveEmpty", user.Language));
                     }
                 }
                 //PairsManager.TempObjects?.Remove(pair);
-            }
-        }
-
-        public async void NewCP(Update update)
-        {
-            var match = CommandsRegex.MonitoringTaskCommands.CreatePair.Match(update.Message.Text);
-            if (match.Success)
-            {
-                string baseValue = match.Groups["base"].Value.ToUpper();
-                string quoteValue = match.Groups["quote"].Value.ToUpper();
-                string priceStr = match.Groups["price"].Value;
-                var pair = GetTempUserTask(update).Result;
-                if (!String.IsNullOrWhiteSpace(baseValue) && !string.IsNullOrWhiteSpace(quoteValue))
-                {
-                    pair.PairBase = baseValue;
-                    pair.PairQuote = quoteValue;
-                    if (!string.IsNullOrWhiteSpace(priceStr))
-                    {
-                        pair.Price = double.Parse(priceStr, new CultureInfo("en"));
-                    }
-
-                    var exchangesForPair =
-                        Program.cryptoData.GetExchangesForPair(
-                            new CryptoApi.Objects.TradingPair(pair.PairBase, pair.PairQuote));
-                    if (exchangesForPair.Result.Any())
-                    {
-                        var kbexchanges = Keyboards.ExchangeSelectingKeyboardMarkup(exchangesForPair.Result);
-                        await BotApi.SendMessage(update.Message.Chat.Id, "Select crypto exchanges for your pair: ", kbexchanges);
-                    }
-                    else await BotApi.SendMessage(update.Message.Chat.Id, "Wrong pair!");
-                }
-                else
-                {
-                    await BotApi.SendMessage(update.Message.Chat.Id, Messages.newPairRequestingForPair, true);
-                }
-            }
-        }
-
-        public async void CreatingPairStageCP(Update update)
-        {
-            var match = RegexCombins.CryptoPairRegex.Match(update.Message.Text);
-            if (match.Success)
-            {
-                var pair = GetTempUserTask(update).Result;
-                pair.PairBase = match.Groups["base"].Value.ToUpper();
-                pair.PairQuote = match.Groups["quote"].Value.ToUpper();
-                var exchangesForPair =
-                    Program.cryptoData.GetExchangesForPair(
-                        new CryptoApi.Objects.TradingPair(pair.PairBase, pair.PairQuote));
-                if (exchangesForPair.Result.Any())
-                { 
-                    var kbexchanges = Keyboards.ExchangeSelectingKeyboardMarkup(exchangesForPair.Result);
-                    await BotApi.SendMessage(update.Message.Chat.Id, "Select crypto exchanges for your pair: ", kbexchanges);
-                }
-                else await BotApi.SendMessage(update.Message.Chat.Id, "Wrong pair!");
-            }
-            else
-            {
-                await BotApi.SendMessage(update.Message.Chat.Id, "Wrong pair!");
-            }
-        }
-
-        public async Task SetExchangeStageCP(Update update)
-        {
-            var exchange = update.CallbackQuery.Data;
-            var pair = GetTempUserTask(update).Result;
-            pair.ExchangePlatform = exchange;
-            if (pair.Price == 0)
-            {
-                await BotApi.SendMessage(update.CallbackQuery.From.Id,
-                    "Exchange for new crypto pair setted. Set price in next message", true);
-            }
-            else if (pair.Price > 0)
-            {
-                SetRaiseOrFallStatus(update, pair);
-            }
-        }
-
-        private async void SetRaiseOrFallStatus(Update update, CryptoPair pair, double price = 0)
-        {
-            var user = BotApi.GetUserSettings(update).Result;
-            if (price > 0)
-                pair.Price = price;
-            if (pair.ToString() == "/")
-            {
-                BotApi.EditMessage(update.Message.Chat.Id, BotApi.GetMessageIdFromUpdateTask(update).Result,
-                    "Task creating expired. Start again");
-                // BotApi.SendMessage(update.Message.Chat.Id, );
-            }
-            else
-            {
-                var curprice = await Program.cryptoData.GetCurrentPricePairByName(new TradingPair(pair.PairBase, pair.PairQuote, pair.ExchangePlatform));
-                pair.GainOrFall = curprice.Price < pair.Price;
-                SaveNewTaskToDB(update, user);
-            }
-        }
-
-        public async void SetTriggerPriceStageCP(Update update)
-        {
-            var pair = GetTempUserTask(update).Result;
-            try
-            {
-                var price = double.Parse(update.Message.Text, new CultureInfo("en"));
-                SetRaiseOrFallStatus(update, pair, price);
-
-            }
-            catch (ArgumentException ex)
-            {
-                BotApi.SendMessage(update.Message.Chat.Id, Messages.newPairWrongPrice, true);
-            }
-            catch (FormatException ex)
-            {
-                BotApi.SendMessage(update.Message.Chat.Id, Messages.newPairWrongPrice, true);
-            }
-        }
-
-        private async void SaveNewTaskToDB(Update update, UserConfig user)
-        {
-            var pair = GetTempUserTask(update).Result;
-            if (pair?.Price != null &&
-                !string.IsNullOrWhiteSpace(pair?.PairBase) &&
-                !string.IsNullOrWhiteSpace(pair?.PairQuote) &&
-                !string.IsNullOrWhiteSpace(pair?.ExchangePlatform))
-            {
-                using (AppDbContext db = new AppDbContext())
-                {
-                    pair.Enabled = true;
-                    db.CryptoPairs.Add(pair);
-                    PairsManager.TempObjects?.Remove(pair);
-                    db.SaveChangesAsync();
-                }
-
-                var msg = CultureTextRequest.GetSettingsMsgString("CPEditTaskCreated", user.Language);
-                var formatedmsg = $"{msg} {pair.FullTaskInfo(user.Language)}";
-                
-                BotApi.SendMessage(BotApi.GetTelegramIdFromUpdate(update).Identifier, formatedmsg, ParseMode.Html);
             }
         }
 
@@ -489,6 +586,9 @@ namespace TelegramBot.Static.MessageHandlers
             }
         }
 
+
+        #endregion
+#region MultiTasksOperations
         public async void DropEverythingByProcent(Update update)
         {
             var match = CommandsRegex.MonitoringTaskCommands.ShiftTasks.Match(update.Message.Text);
@@ -527,45 +627,8 @@ namespace TelegramBot.Static.MessageHandlers
                 BotApi.SendMessage(user.TelegramId, sb.ToString());
             }
         }
-
-        public async void AddCommentForTask(Update update)
-        {
-            var match = CommandsRegex.MonitoringTaskCommands.AddComment.Match(update.Message.Text);
-            if (match.Success)
-            {
-                var id = int.Parse(match.Groups["id"].Value);
-                var user = await BotApi.GetUserSettings(update);
-                var task = new CryptoPairDbHandler().GetPairFromId(id, user.Id);
-                if (task != null)
-                {
-                    var msg = string.Format(CultureTextRequest.GetMessageString("CPAddComment", user.Language), task.Id, task.ToString());
-                    BotApi.SendMessage(user.TelegramId, msg, true);
-                }
-                else
-                {
-                    BotApi.SendMessage(user.TelegramId, "Task not exists, or not yours!");
-                }
-            }
-        }
-
-        public async void AddCommentForTaskReplyHandler(Update update)
-        {
-            var user = await BotApi.GetUserSettings(update);
-            var msgRegex = CommandsRegex.ConvertMessageToRegex(CultureTextRequest.GetMessageString("CPAddComment", user.Language), new List<string>()
-            {
-                @"(?<id>[0-9]*)", @"(?<base>[a-zA-Z0-9]{2,9})(\s+|/)(?<quote>[a-zA-Z0-9]{2,6})"
-            });
-            var match = msgRegex.Match(update.Message.ReplyToMessage.Text);
-            if (match.Success)
-            {
-                var id = int.Parse(match.Groups["id"].Value);
-                var task = new CryptoPairDbHandler().GetPairFromId(id, user.Id);
-                if (task != null)
-                {
-                    task.Note = update.Message.Text;
-                }
-            }
-        }
+#endregion
+        
 
     }
 }

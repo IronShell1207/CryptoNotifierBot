@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection.Metadata;
@@ -26,7 +27,6 @@ namespace TelegramBot.Static
         public static bool IsBotStarted;
         public static TelegramBotClient BotClient { get; set; }
         public static CancellationTokenSource CancelToken { get; set; }
-
         public static async Task<bool> StartBotAsync()
         {
             try
@@ -49,12 +49,12 @@ namespace TelegramBot.Static
 
             return true;
         }
-
         private static void SaveUserMsg(Update update)
         {
             using (AppDbContext dbContext = new AppDbContext())
             {
-                var user = dbContext.Users.Include(x=>x.Messages).OrderBy(x => x.Id).First(x => x.TelegramId == update.Message.From.Id);
+                var userid = GetTelegramIdFromUpdate(update);
+                var user = dbContext.Users.Include(x=>x.Messages).OrderBy(x => x.Id).First(x => x.TelegramId == userid.Identifier);
                 if (update.Message?.Type != MessageType.Text ) return;
                 var msg = new MessageAccepted(user, update.Message.Text, update.Message.MessageId);
                 msg.Date = update.Message.Date;
@@ -73,12 +73,17 @@ namespace TelegramBot.Static
             {
                 RepliedMsgHandlerAsync(bot, update, canceltoken);
             }
-
-            if (update.Type == UpdateType.Message && update.Message != null)
+            if (update.Type == UpdateType.CallbackQuery)
+                CallbackHandlerAsync(bot, update, canceltoken);
+            else if (update.Type == UpdateType.Message && update.Message != null)
             {
                
                 if (RegexCombins.CommandPattern.IsMatch(update.Message?.Text))
-                    CommandsHandler(bot, update, canceltoken);
+                    CommandsHandler(bot, update, canceltoken, user);
+
+                else if (CommandsRegex.MonitoringTaskCommands.TriggerOncePair.IsMatch(update.Message.Text))
+                    using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
+                        msgHandler.SetSingleTriggerForUserTask(update);
 
                 else if (CommandsRegex.MonitoringTaskCommands.ShiftTasks.IsMatch(update.Message.Text))
                     using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
@@ -94,7 +99,7 @@ namespace TelegramBot.Static
 
                 else if (CommandsRegex.MonitoringTaskCommands.CreatePair.IsMatch(update.Message.Text))
                     using (CryptoPairsMsgHandler msghandler = new CryptoPairsMsgHandler())
-                        msghandler.NewCP(update);
+                        msghandler.CreateTaskFirstStage(update, user);
 
                 else if (CommandsRegex.SettingsCommands.ChangeDelay.IsMatch(update.Message.Text))
                     using (SettingsManager sm = new SettingsManager())
@@ -117,16 +122,19 @@ namespace TelegramBot.Static
                         msg.SetTimings(update);
 
             }
-            else if (update.Type == UpdateType.CallbackQuery)
-                CallbackHandlerAsync(bot, update, canceltoken);
+            
         }
 
         public static async void CommandsHandler(ITelegramBotClient bot, Update update,
-            CancellationToken cancellationToken)
+            CancellationToken cancellationToken, UserConfig user)
         {
             if (update.Message?.Text == Commands.Subscribe)
                 using (BreakoutPairsMsgHandler msghandler = new BreakoutPairsMsgHandler())
                     msghandler.SubNewUserBreakouts(update);
+
+            else if (update.Message.Text == "/create")
+                using (CryptoPairsMsgHandler msghandler = new CryptoPairsMsgHandler())
+                    msghandler.CreateTaskFirstStage(update, user);
 
             else if (update.Message.Text.Contains(Commands.FlipTasks))
                 using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
@@ -160,15 +168,15 @@ namespace TelegramBot.Static
 
             if (update.Message.ReplyToMessage.Text == Messages.newPairRequestingForPair)
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
-                    msgh.CreatingPairStageCP(update);
+                    msgh.SetPairSymbolStage(update);
 
             else if (update.Message.ReplyToMessage.Text == Messages.newPairWrongPrice)
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
-                    msgh.SetTriggerPriceStageCP(update);
+                    msgh.SetPriceStage(update, user);
 
             else if (update.Message.ReplyToMessage.Text == Messages.newPairAfterExchangeSetPrice)
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
-                    msgh.SetTriggerPriceStageCP(update);
+                    msgh.SetPriceStage(update, user);
 
             else if (update.Message.ReplyToMessage.Text ==
                      CultureTextRequest.GetMessageString("ToaddToTheBlackList", user.Language))
@@ -186,7 +194,7 @@ namespace TelegramBot.Static
             EditMessage(GetTelegramIdFromUpdate(update), update.CallbackQuery.Message.MessageId, true);
             if (Exchanges.Contains(update.CallbackQuery.Data))
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
-                    msgh.SetExchangeStageCP(update);
+                    msgh.SetExchangeCallbackHandlerStage(update);
 
             else if (CallbackDataPatterns.DeletePairRegex.IsMatch(update.CallbackQuery.Data))
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
@@ -200,13 +208,20 @@ namespace TelegramBot.Static
         public static Task ErrorHandler(ITelegramBotClient botClient, Exception ex, CancellationToken csToken)
         {
             ConsoleCommandsHandler.LogWrite(ex.Message);
+            throw ex;
             return Task.CompletedTask;
         }
 
         #endregion
 
         #region Send or edit
-
+        /// <summary>
+        /// Send message to user with parsing it with selected parse method
+        /// </summary>
+        /// <param name="chatId">User telegram id</param>
+        /// <param name="message">Any text to user</param>
+        /// <param name="parse">To select parse mode</param>
+        /// <returns>Sent message</returns>
         public static async Task<Message> SendMessage(ChatId chatId, string message, ParseMode parse = ParseMode.MarkdownV2)
         {
             try
@@ -226,7 +241,13 @@ namespace TelegramBot.Static
 
             return null;
         }
-
+        /// <summary>
+        /// Usually send long messages and automatically splits it in few messages.
+        /// Not using any formating
+        /// </summary>
+        /// <param name="chatId">User telegram id</param>
+        /// <param name="message">Any text to user</param>
+        /// <returns>Message, which is send</returns>
         public static async Task<Message> SendMessage(ChatId chatId, string message)
         {
             try
@@ -244,9 +265,14 @@ namespace TelegramBot.Static
             }
             return null;
         }
-
-      
-        public static async Task<Message> SendMessage(ChatId chatId, string message, bool replythis)
+        /// <summary>
+        /// Sending a message to the user and pinning the response to that message for the user to send back to the bot for further processing
+        /// </summary>
+        /// <param name="chatId">User telegram id</param>
+        /// <param name="message">Any text to user</param>
+        /// <param name="replyThis">Uses only to defining the path to this method</param>
+        /// <returns>Sent message</returns>
+        public static async Task<Message> SendMessage(ChatId chatId, string message, bool replyThis)
         {
             try
             {
@@ -257,9 +283,35 @@ namespace TelegramBot.Static
                 await BadRequestHandler(chatId, apiException);
             }
             return null;
-
+        }
+        /// <summary>
+        /// Sending a message to the user and pinning the response to that message for the user to send back to the bot for further processing
+        /// </summary>
+        /// <param name="chatId">User telegram id</param>
+        /// <param name="message">Any text to user</param>
+        /// <param name="replyThis">Uses only to defining the path to this method</param>
+        /// <param name="parse">To select parse mode</param>
+        /// <returns>Sent message</returns>
+        public static async Task<Message> SendMessage(ChatId chatId, string message, bool replyThis, ParseMode parse = ParseMode.MarkdownV2)
+        {
+            try
+            {
+                return await BotClient.SendTextMessageAsync(chatId, message, replyMarkup: new ForceReplyMarkup(), parseMode: parse);
+            }
+            catch (Telegram.Bot.Exceptions.ApiRequestException apiException)
+            {
+                await BadRequestHandler(chatId, apiException);
+            }
+            return null;
         }
 
+        /// <summary>
+        /// Sending message to user with defined keyboard
+        /// </summary>
+        /// <param name="chatId">User telegram id</param>
+        /// <param name="message">Any text to user</param>
+        /// <param name="replyMarkup">Keyboard to attach it to the message</param>
+        /// <returns></returns>
         public static async Task<Message> SendMessage(ChatId chatId, string message, IReplyMarkup replyMarkup)
         {
             try
@@ -272,7 +324,13 @@ namespace TelegramBot.Static
             }
             return null;
         }
-
+        /// <summary>
+        /// Edits message by message id
+        /// </summary>
+        /// <param name="chatId">User telegram id</param>
+        /// <param name="messageID">Any previous message id</param>
+        /// <param name="newMessage">Any text to user</param>
+        /// <returns>Sent message</returns>
         public static async Task<Message> EditMessage(ChatId chatId, int messageID, string newMessage)
         {
             try
@@ -285,7 +343,14 @@ namespace TelegramBot.Static
             }
             return null;
         }
-
+        /// <summary>
+        /// Edits message by message id
+        /// </summary>
+        /// <param name="chatId">User telegram id</param>
+        /// <param name="messageID">Any previous message id</param>
+        /// <param name="newMessage">Any text to user</param>
+        /// <param name="parseMode">To select parse mode</param>
+        /// <returns>Sent message</returns>
         public static async Task<Message> EditMessage(ChatId chatId, int messageId, string message, ParseMode parseMode)
         {
             try
@@ -298,8 +363,6 @@ namespace TelegramBot.Static
             }
             return null;
         }
-
-
         /// <summary>
         /// Editing self message for revoking inline keyboard
         /// </summary>
@@ -318,7 +381,12 @@ namespace TelegramBot.Static
                 await BadRequestHandler(chatId, apiEx);
             }
         }
-
+        /// <summary>
+        /// Simply removes message by message id
+        /// </summary>
+        /// <param name="chatId">Which chat</param>
+        /// <param name="msgId">Which message</param>
+        /// <returns></returns>
         public static async Task RemoveMessage(ChatId chatId, int msgId)
         {
             try
@@ -338,8 +406,6 @@ namespace TelegramBot.Static
                 return update.CallbackQuery.From.Id;
             else return null;
         }
-
-
         public static async Task BadRequestHandler(ChatId chatId, Telegram.Bot.Exceptions.ApiRequestException ex)
         {
             if (ex.Message == "Bad Request: chat not found" || ex.ErrorCode == 400)
@@ -353,7 +419,6 @@ namespace TelegramBot.Static
             }
             else throw ex;
         }
-
         #endregion
 
         #region UsersStuff

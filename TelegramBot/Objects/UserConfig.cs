@@ -31,8 +31,23 @@ namespace TelegramBot.Objects
         /// </summary>
         public string? CryptoNotifyStyle { get; set; }
         public string Language { get; set; } = "en";
+        /// <summary>
+        /// If enabled, when user creates new tasks its trigger once by default
+        /// </summary>
+        public bool TriggerOneTasksByDefault { get; set; } = false;
+
+        public bool SetExchangeAutomaticaly { get; set; } = false;
+        /// <summary>
+        /// Not uses and not created
+        /// </summary>
         public bool DisplayTaskEditButtonsInNotifications { get; set; } = true;
+        /// <summary>
+        /// Removes last notification before sending a new one. (if enabled)
+        /// </summary>
         public bool RemoveLatestNotifyBeforeNew { get; set; } = false;
+        /// <summary>
+        /// If night mode enabled and time setted correctly notifications will not be sended in that period of time.
+        /// </summary>
         public bool NightModeEnable { get; set; } = false;
         /// <summary>
         /// Time in minutes (23*60 by default)
@@ -52,5 +67,6 @@ namespace TelegramBot.Objects
         public int? MorningReport { get; set; } = null;
         public List<CryptoPair>? pairs { get; set; } = new();
         public List<MessageAccepted> Messages { get; set; } = new();
+        
     }
 }

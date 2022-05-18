@@ -26,8 +26,8 @@ namespace CryptoBotWebPortal.Data
             {
                 if (userid == 0)
                     return dbContext.CryptoPairs.Include(x=>x.User).ToList();
-                else return dbContext.CryptoPairs.Include(x => x.User).Where(
-                    x=>x.OwnerId == userid).ToList();
+                else return dbContext.Users.Include(x => x.pairs).OrderBy(x=>x.Id).
+                    FirstOrDefault(x=>x.Id == userid).pairs;
             }
         }
         public async Task<List<UserConfig>> Users()

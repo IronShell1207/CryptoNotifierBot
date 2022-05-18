@@ -24,7 +24,11 @@
             <h5>User telegram id: @user.Item1.TelegramId</h5>
             <h5>Username: @user.Item1.UserName</h5>
             <h5>Nickname: @user.Item1.FirstName</h5>
-            <h5>User pairs @user.Item1.pairs.Count <input type="button" href="/fetchtasks/@userid" value="Show tasks list"></h5>
+            <h5>User pairs @user.Item1.pairs.Count </h5>
+                @if (user.Item1.pairs?.Count > 0)
+                {
+                    <a style="margin: 10px 5px" type="button" class="btn btn-primary" href="/usertasks/@user.Item1.Id">Show tasks list</a>
+                } 
             <h5>Language <input type="text" @bind="user.Item1.Language" style="max-width: 70px"/></h5>
             <h5>Notification timeout <input type="number" @bind="user.Item1.NoticationsInterval" style="max-width: 70px"/></h5>
             <h5><label class="cl-switch"><input type="checkbox" @bind="user.Item1.NightModeEnable" ><span class="switcher"></span><span class="label">Night mode</span></label></h5>
@@ -73,7 +77,7 @@
     
 </tr>
 <p/>
-<button type="button" class="btn btn-primary"  @onclick="SaveChanges">Save changes</button>
+<button type="button" style="margin: 0 auto;" class="btn btn-primary"  @onclick="SaveChanges">Save changes</button>
 
 @code {
     private (UserConfig, BreakoutSub) user;

@@ -1529,6 +1529,9 @@ pre code {
 .table-borderless tbody + tbody {
   border: 0;
 }
+td.mytbl {
+    text-align:center;
+}
 
 .table-striped tbody tr:nth-of-type(odd) {
   background-color: rgba(0, 0, 0, 0.05);

@@ -33,7 +33,10 @@ namespace TelegramBot.Objects
         {
             OwnerId = owner;
         }
-        public override string ToString() => $"{PairBase}/{PairQuote}";
+
+        public override string ToString() => !string.IsNullOrWhiteSpace(PairBase) && !string.IsNullOrWhiteSpace(PairQuote)
+            ? $"{PairBase}/{PairQuote}"
+            : "";
 
         public string ToStringWithLink()
         {

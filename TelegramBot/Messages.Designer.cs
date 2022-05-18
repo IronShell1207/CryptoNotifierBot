@@ -164,6 +164,21 @@ namespace TelegramBot {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Single task triggering for task
+        ///{0}: 
+        ///			{1}
+        ///
+        ///*💎 - means	task have single trigger
+        ///🌗 - that trigger fired
+        ///.
+        /// </summary>
+        internal static string CPTriggerOnceChange {
+            get {
+                return ResourceManager.GetString("CPTriggerOnceChange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to ✅ New monitoring task has been created.\nDetails of your task:\n{0}.
         /// </summary>
         internal static string cryptoPairAdded {
@@ -225,8 +240,17 @@ namespace TelegramBot {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to .
+        /// </summary>
+        internal static string newPairAfterInitialTaskCreating {
+            get {
+                return ResourceManager.GetString("newPairAfterInitialTaskCreating", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to For creating new monitoring task, send me crypto pair with following next format of message with this message attached:
-        ///BASE/QUOTE or BASE QUOTE
+        ///&lt;code&gt;BASE/QUOTE&lt;/code&gt; or &lt;code&gt;BASE QUOTE&lt;/code&gt;
         ///Example: BTC/USDT or BTC USDT.
         /// </summary>
         internal static string newPairRequestingForPair {

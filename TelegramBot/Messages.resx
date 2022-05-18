@@ -133,9 +133,12 @@ If bot is usefull for you, you can buy my a ☕️ and thx 2u).
   <data name="newPairAfterExchangeSetPrice" xml:space="preserve">
     <value>Exchange for new crypto pair setted. Set price in next message</value>
   </data>
+  <data name="newPairAfterInitialTaskCreating" xml:space="preserve">
+    <value></value>
+  </data>
   <data name="newPairRequestingForPair" xml:space="preserve">
-    <value>For creating new monitoring task, send me crypto pair with following next format of message with this message attached:
-BASE/QUOTE or BASE QUOTE
+	  <value>For creating new monitoring task, send me crypto pair with following next format of message with this message attached:
+&lt;code&gt;BASE/QUOTE&lt;/code&gt; or &lt;code&gt;BASE QUOTE&lt;/code&gt;
 Example: BTC/USDT or BTC USDT</value>
   </data>
   <data name="newPairWrongPrice" xml:space="preserve">
@@ -180,6 +183,15 @@ For get all available commands 🔎 send: /help</value>
   </data>
   <data name="cryptoPairCantRemove" xml:space="preserve">
     <value>I can't remove your pair because of some problems!</value>
+  </data>
+  <data name="CPTriggerOnceChange" xml:space="preserve">
+    <value>Single task triggering for task
+{0}: 
+			{1}
+
+*💎 - means	task have single trigger
+🌗 - that trigger fired
+</value>
   </data>
   <data name="cryptoPairRemoveBySymbol" xml:space="preserve">
     <value>Select task you needed to remove from your tasks</value>

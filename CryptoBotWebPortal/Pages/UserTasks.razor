@@ -1,0 +1,125 @@
+﻿@page "/usertasks/{userid}"
+
+<PageTitle>User tasks</PageTitle>
+
+@using CryptoBotWebPortal.Data
+@using CryptoApi.Objects
+@inject NavigationManager NavigationManager
+@using TelegramBot.Objects
+@inject WeatherForecastService ForecastService
+
+
+
+
+@if (USERTasks == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{<!-- Page Heading -->
+    <!-- DataTales Example -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <div > <h1>User @userid tasks</h1></div>
+            <div style="flex: 3 0 auto"></div>
+            <div >
+                <button type="button" style="position: relative;" class="btn btn-primary" @onclick="SaveChanges">Save changes</button>
+            </div>
+        </div>
+            
+        <div class="card-body">
+            <div class="row justify-content-center">
+                
+                <div class="table-responsive">
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                        <thead>
+
+                        <tr>
+                            <th>Edit task</th>
+                            <th>Enabled</th>
+                            <th>Id</th>
+                            <th>Pair symbol</th>
+                            <th>Trigger price</th>
+                            <th>Trigger direct</th>
+                            <th>Exchange</th>
+                            <th>Single trigger</th>
+                            <th>Triggered</th>
+
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var pair in USERTasks)
+                        {
+                            <tr>
+                                <td > <div class="col-auto">
+                                        <button type="button" class="btn btn-primary" href="/taskedit/@pair.Id">Edit</buttoN>
+                                    </div>
+                                </td>
+                                <td >
+                                    <div class="col-auto">
+                                        <h5><label class="cl-switch"><input type="checkbox" @bind="pair.Enabled"><span class="switcher"></span><span class="label"></span></label></h5>
+                                    </div>
+                                    </td>
+                                <td>
+                                    <h3>@pair.Id</h3></td>
+                                <td >
+                                    <p>@StringToHtml(pair.ToStringWithLink())</p></td>
+                                <td >@pair.Price @pair.PairQuote</td>
+
+                                <td >
+                                    @if (@pair.GainOrFall)
+                                    {
+                                        <p>📈 raise</p>
+                                    }
+                                    else
+                                    {
+                                        <p>📉 fall</p>
+                                    }
+                                </td>
+                                <td>@pair.ExchangePlatform</td>
+                                <td> <h5><label class="cl-switch"><input type="checkbox" @bind="pair.TriggerOnce"><span class="switcher"></span><span class="label"></span></label></h5></td>
+                                <td > <h5><label class="cl-switch"><input type="checkbox" @bind="pair.Triggered"><span class="switcher"></span><span class="label"></span></label></h5></td>
+
+                            </tr>
+                        }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            
+            </div>
+            
+        </div>
+        
+    </div>
+}
+
+@code {
+    private List<CryptoPair>? USERTasks;
+    [Parameter]
+    public string userid { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(userid))
+            USERTasks = await ForecastService.UsersTasks(int.Parse(userid));
+    }
+
+    private MarkupString StringToHtml(string line)
+    {
+        return (MarkupString) line;
+    }
+    private async Task SaveChanges()
+    {
+        foreach (CryptoPair cp in USERTasks)
+        {
+            await ForecastService.SaveTaskSettings(cp);
+        }
+
+        NavigationManager.NavigateTo("/userconfig/"+userid);
+        
+
+    }
+}

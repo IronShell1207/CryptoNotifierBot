@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.ComTypes;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
@@ -26,6 +27,29 @@ namespace TelegramBot.Static.DbOperations
             }
         }
 
+        public async Task<bool> CompletlyEditCryptoPair(CryptoPair pair)
+        {
+            using (AppDbContext dbContext = new AppDbContext())
+            {
+                var pairEditable = dbContext.CryptoPairs.OrderBy(x => x.Id).FirstOrDefault(x => x.Id == pair.Id);
+                if (pairEditable != null)
+                {
+                    pairEditable.PairQuote = pair.PairQuote;
+                    pairEditable.Price = pair.Price;
+                    pairEditable.Triggered = pair.Triggered;
+                    pairEditable.TriggerOnce = pair.TriggerOnce;
+                    pairEditable.Enabled = pair.Enabled;
+                    pairEditable.ExchangePlatform = pair.ExchangePlatform;
+                    pairEditable.GainOrFall = pair.GainOrFall;
+                    pairEditable.PairBase = pair.PairBase;
+                    pairEditable.Note = pair.Note;
+                    _ = dbContext.SaveChanges();
+                    return true;
+                }
+                return false;
+            }
+        }
+
         public async Task<bool> SetNewPriceFromPair(CryptoPair pair, double price) =>
             SetNewPriceTriggerPair(pair.Id, pair.OwnerId, price).Result;
         public async Task<bool> SetNewPriceTriggerPair(int id, int ownerId, double price)
@@ -36,7 +60,7 @@ namespace TelegramBot.Static.DbOperations
                 if (pair != null)
                 {
                     pair.Price = price;
-                    await dbContext.SaveChangesAsync();
+                    _ = dbContext.SaveChanges();
                     return true;
                 }
 
