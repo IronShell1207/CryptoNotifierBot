@@ -40,18 +40,10 @@ namespace CryptoApi.API
             List<TradingPair> convertedPairs = new List<TradingPair>();
             pairsrequest:
             DataRequester dreq = new DataRequester();
-            var pairsAvailable = await dreq.GetLatestDataSets();
-            if (pairsAvailable == null)
-            {
-                dreq.UpdateAllData();
-                Task.Run(() => Thread.Sleep(2000));
-                goto pairsrequest;
-            }
             foreach (var pairCmc in data)
             {
-               
+                convertedPairs.Add(new TradingPair(pairCmc.symbol, "USDT"));
             }
-
             return convertedPairs;
         }
     }

@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Dynamic;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using CryptoApi.API;
 using CryptoApi.Objects;
 using Microsoft.EntityFrameworkCore;
 using Telegram.Bot.Types;
@@ -30,6 +33,7 @@ namespace TelegramBot.Static.MessageHandlers
                 }
             }
         }
+
         public async void SubNewUserBreakouts(Update update)
         {
 
@@ -135,6 +139,7 @@ namespace TelegramBot.Static.MessageHandlers
                 db.SaveChangesAsync();
             }
         }
+
         public async void SubSettings(Update update)
         {
             using (AppDbContext db = new AppDbContext())
@@ -215,6 +220,32 @@ namespace TelegramBot.Static.MessageHandlers
             }
  
 
+        }
+
+        public async void AddWhiteTopList(Update update)
+        {
+            var match = CommandsRegex.BreakoutCommands.AddTopSymbolsToWhiteList.Match(update.Message.Text);
+            if (match.Success)
+            {
+                var count = match.Groups["count"].Value != null ? int.Parse(match.Groups["count"].Value) : 0;
+                var topPairs = await new CoinMarketCapTop().GetCmcTopPairs(count);
+                using (AppDbContext dbContext = new AppDbContext())
+                {
+                    var userBreakoutCfg = dbContext.BreakoutSubs.OrderBy(x => x.TelegramId).
+                        FirstOrDefault(x=> x.TelegramId == update.Message.From.Id);
+                    userBreakoutCfg.WhitelistInsteadBlack = true;
+                    userBreakoutCfg.BlackListedPairsList.Clear();
+                    foreach (var pair in topPairs)
+                    {
+                        BlackListedPairs bpair = new BlackListedPairs(pair);
+                        userBreakoutCfg.BlackListedPairsList.Add(bpair);
+                    }
+
+                    dbContext.SaveChangesAsync();
+                    BotApi.SendMessage(update.Message.From.Id,
+                        $"White listed pairs saved to the db in count of {topPairs.Count}");
+                }
+            }
         }
 
     }

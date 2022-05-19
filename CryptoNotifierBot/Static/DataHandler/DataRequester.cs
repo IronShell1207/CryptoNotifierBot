@@ -19,7 +19,6 @@ namespace CryptoApi.Static.DataHandler
     {
         public bool UpdaterLive { get; set; } = true;
         public int DataDownloadedCounter { get; private set; } = 0;
-        public bool DataAvailable { get; private set; } = false;
 
         private int Try = 30;
         public async void UpdateAllData()
@@ -44,6 +43,7 @@ namespace CryptoApi.Static.DataHandler
             
 
             await Task.Run(() => Thread.Sleep(1200));
+
             var dataSetsReady = await GetLatestDataSets();
             while (dataSetsReady == null || dataSetsReady?.Count < 5 && Try>0)
             {
@@ -54,7 +54,6 @@ namespace CryptoApi.Static.DataHandler
             foreach (var dataSet in dataSetsReady)
                 sb.Append($"{dataSet.Exchange}: {dataSet.pairs.Count} ");
             Diff.LogWrite(sb.ToString());
-            DataAvailable = true;
         }
 
         public void RemoveOldData()
@@ -78,15 +77,16 @@ namespace CryptoApi.Static.DataHandler
 
             }
         }
+
         public async Task UpdateDataLoop()
         {
-            if (DataDownloadedCounter > 3000)
-                using (DataBaseContext dbContext = new DataBaseContext())
-                {
-                    var rows = dbContext.Database.ExecuteSqlRaw(
-                             "DELETE FROM DataSet WHERE Id in (SELECT Id FROM DataSet ORDER BY Id LIMIT 200)");
-                    Diff.LogWrite($"Rows deleted {rows} for data when storage overflow");
-                }
+            //if (DataDownloadedCounter > 3000)
+            //    using (DataBaseContext dbContext = new DataBaseContext())
+            //    {
+            //        var rows = dbContext.Database.ExecuteSqlRaw(
+            //                 "DELETE FROM DataSet WHERE Id in (SELECT Id FROM DataSet ORDER BY Id LIMIT 200)");
+            //        Diff.LogWrite($"Rows deleted {rows} for data when storage overflow");
+            //    }
             while (UpdaterLive)
             {
                 UpdateAllData();
@@ -149,6 +149,7 @@ namespace CryptoApi.Static.DataHandler
                 return pair ?? null;
             }
         }
+
         public async Task<List<String>> GetExchangesForPair(TradingPair pair)
         {
             List<string> exchanges = new List<string>();

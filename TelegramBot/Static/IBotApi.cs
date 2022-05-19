@@ -98,6 +98,10 @@ namespace TelegramBot.Static
                 using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
                     msgHandler.SetSingleTriggerForUserTask(update);
 
+            else if (CommandsRegex.BreakoutCommands.AddTopSymbolsToWhiteList.IsMatch(update.Message.Text))
+                using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler())
+                    msgHandler.AddWhiteTopList(update);
+
             else if (CommandsRegex.MonitoringTaskCommands.ShiftTasks.IsMatch(update.Message.Text))
                 using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
                     msgHandler.DropEverythingByProcent(update);
@@ -145,6 +149,10 @@ namespace TelegramBot.Static
             else if (update.Message.Text == "/create")
                 using (CryptoPairsMsgHandler msghandler = new CryptoPairsMsgHandler())
                     msghandler.CreateTaskFirstStage(update, user);
+
+            else if (CommandsRegex.BreakoutCommands.AddTopSymbolsToWhiteList.IsMatch(update.Message.Text))
+                using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler())
+                    msgHandler.AddWhiteTopList(update);
 
             else if (update.Message.Text.Contains(Commands.FlipTasks))
                 using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())

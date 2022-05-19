@@ -49,6 +49,8 @@ namespace TelegramBot.Constants
             public static Regex AddToBlackList = new Regex(
                 @"/addtoblack\s*((?<base>[a-zA-Z0-9]{2,9})((\s+|/)(?<quote>[a-zA-Z]{2,9}))|)");
 
+            public static Regex AddTopSymbolsToWhiteList = new Regex(@"/addtopwhite\s*(?<count>[0-9]{1,3})");
+
             public static Regex DeleteFav =
                 new Regex(
                     @"/(delfav)\s*(((?<id>[0-9]+)\s*)|((?<base>[a-zA-Z0-9]{2,9})((\s+|/)(?<quote>[a-zA-Z]{2,9})|)))");

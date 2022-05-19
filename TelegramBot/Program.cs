@@ -34,8 +34,6 @@ namespace TelegramBot
             ConsoleCommandsHandler.LogWrite($"Bot has been started!");
             cryptoData = new DataRequester();
             Task.Run(cryptoData.UpdateDataLoop);
-            while (!cryptoData.DataAvailable)
-                Thread.Sleep(1000);
             Task.Run(() => NotifyLoops.MainLoop());
             ConsoleCommandsHandler.LogWrite("Crypto exchanges data updater loop has been started");
             while (true)
