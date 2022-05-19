@@ -74,58 +74,65 @@ namespace TelegramBot.Static
                 return;
             if (!string.IsNullOrWhiteSpace(update.Message?.ReplyToMessage?.Text))
             {
-                RepliedMsgHandlerAsync(bot, update, canceltoken);
+                RepliedMsgHandlerAsync(bot, update, canceltoken, user);
             }
-            if (update.Type == UpdateType.CallbackQuery)
+            else if (update.Type == UpdateType.CallbackQuery)
                 CallbackHandlerAsync(bot, update, canceltoken);
-            else if (update.Type == UpdateType.Message && update.Message != null)
+            else if (update.Type == UpdateType.EditedMessage)
             {
-               
-                if (RegexCombins.CommandPattern.IsMatch(update.Message?.Text))
-                    CommandsHandler(bot, update, canceltoken, user);
-
-                else if (CommandsRegex.MonitoringTaskCommands.TriggerOncePair.IsMatch(update.Message.Text))
-                    using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
-                        msgHandler.SetSingleTriggerForUserTask(update);
-
-                else if (CommandsRegex.MonitoringTaskCommands.ShiftTasks.IsMatch(update.Message.Text))
-                    using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
-                        msgHandler.DropEverythingByProcent(update);
-
-                else if (CommandsRegex.MonitoringTaskCommands.ShowPair.IsMatch(update.Message.Text))
-                    using (CryptoPairsMsgHandler msgHanlder = new CryptoPairsMsgHandler())
-                        msgHanlder.ShowTaskInfo(update);
-
-                else if (CommandsRegex.MonitoringTaskCommands.AddComment.IsMatch(update.Message.Text))
-                    using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
-                        msgHandler.AddCommentForTask(update);
-
-                else if (CommandsRegex.MonitoringTaskCommands.CreatePair.IsMatch(update.Message.Text))
-                    using (CryptoPairsMsgHandler msghandler = new CryptoPairsMsgHandler())
-                        msghandler.CreateTaskFirstStage(update, user);
-
-                else if (CommandsRegex.SettingsCommands.ChangeDelay.IsMatch(update.Message.Text))
-                    using (SettingsManager sm = new SettingsManager())
-                        sm.SetNotifyDelay(update);
-
-                else if (CommandsRegex.MonitoringTaskCommands.EditPair.IsMatch(update.Message.Text))
-                    using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
-                        msgHandler.EditUserTask(update);
-
-                else if (CommandsRegex.MonitoringTaskCommands.DeletePair.IsMatch(update.Message.Text))
-                    using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
-                        msgHandler.RemoveUserTask(update);
-
-                else if (CommandsRegex.BreakoutCommands.AddToBlackList.IsMatch(update.Message.Text))
-                    using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler())
-                        msgHandler.AddPairToBlackListCommandHandler(update);
-
-                else if (CommandsRegex.SetTimings.IsMatch(update.Message.Text))
-                    using (BreakoutPairsMsgHandler msg = new BreakoutPairsMsgHandler())
-                        msg.SetTimings(update);
-
+                update.Message = new Message();
+                update.Message.Text = update.EditedMessage.Text;
+                await MessageTextHandler(bot, update, canceltoken, user);
             }
-            
+            else if (update.Type == UpdateType.Message && update.Message != null)
+                await MessageTextHandler(bot, update, canceltoken, user);
+        }
+
+        public static async Task MessageTextHandler(ITelegramBotClient bot, Update update, CancellationToken token,
+            UserConfig user)
+        {
+            if (RegexCombins.CommandPattern.IsMatch(update.Message?.Text))
+                CommandsHandler(bot, update, token, user);
+
+            else if (CommandsRegex.MonitoringTaskCommands.TriggerOncePair.IsMatch(update.Message.Text))
+                using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
+                    msgHandler.SetSingleTriggerForUserTask(update);
+
+            else if (CommandsRegex.MonitoringTaskCommands.ShiftTasks.IsMatch(update.Message.Text))
+                using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
+                    msgHandler.DropEverythingByProcent(update);
+
+            else if (CommandsRegex.MonitoringTaskCommands.ShowPair.IsMatch(update.Message.Text))
+                using (CryptoPairsMsgHandler msgHanlder = new CryptoPairsMsgHandler())
+                    msgHanlder.ShowTaskInfo(update);
+
+            else if (CommandsRegex.MonitoringTaskCommands.AddComment.IsMatch(update.Message.Text))
+                using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
+                    msgHandler.AddCommentForTask(update);
+
+            else if (CommandsRegex.MonitoringTaskCommands.CreatePair.IsMatch(update.Message.Text))
+                using (CryptoPairsMsgHandler msghandler = new CryptoPairsMsgHandler())
+                    msghandler.CreateTaskFirstStage(update, user);
+
+            else if (CommandsRegex.SettingsCommands.ChangeDelay.IsMatch(update.Message.Text))
+                using (SettingsManager sm = new SettingsManager())
+                    sm.SetNotifyDelay(update);
+
+            else if (CommandsRegex.MonitoringTaskCommands.EditPair.IsMatch(update.Message.Text))
+                using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
+                    msgHandler.EditUserTask(update);
+
+            else if (CommandsRegex.MonitoringTaskCommands.DeletePair.IsMatch(update.Message.Text))
+                using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
+                    msgHandler.RemoveUserTask(update);
+
+            else if (CommandsRegex.BreakoutCommands.AddToBlackList.IsMatch(update.Message.Text))
+                using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler())
+                    msgHandler.AddPairToBlackListCommandHandler(update);
+
+            else if (CommandsRegex.SetTimings.IsMatch(update.Message.Text))
+                using (BreakoutPairsMsgHandler msg = new BreakoutPairsMsgHandler())
+                    msg.SetTimings(update);
         }
 
         public static async void CommandsHandler(ITelegramBotClient bot, Update update,
@@ -163,7 +170,7 @@ namespace TelegramBot.Static
         public static async void RepliedMsgHandlerAsync(ITelegramBotClient bot, Update update,
             CancellationToken canceltoken, UserConfig user)
         {
-           
+
             var editPriceMsgRegex =
                 CommandsRegex.ConvertMessageToRegex(CultureTextRequest.GetMessageString("CPEditPair", user.Language),
                     new List<string>()
@@ -258,9 +265,9 @@ namespace TelegramBot.Static
                 var messagelenght = message.Length;
                 if (messagelenght > 4125)
                     for (int i = 0; i < messagelenght / 3500; i++)
-                       return await BotClient.SendTextMessageAsync(chatId, message.Substring(i * 3500, i + 3500));
+                        return await BotClient.SendTextMessageAsync(chatId, message.Substring(i * 3500, i + 3500));
                 else
-                   return await BotClient.SendTextMessageAsync(chatId, message);
+                    return await BotClient.SendTextMessageAsync(chatId, message);
             }
             catch (Telegram.Bot.Exceptions.ApiRequestException apiException)
             {
@@ -358,7 +365,7 @@ namespace TelegramBot.Static
         {
             try
             {
-                 return await BotClient.EditMessageTextAsync(chatId, messageId, message, parseMode: parseMode, disableWebPagePreview: true);
+                return await BotClient.EditMessageTextAsync(chatId, messageId, message, parseMode: parseMode, disableWebPagePreview: true);
             }
             catch (ApiRequestException apiEx)
             {
@@ -403,11 +410,11 @@ namespace TelegramBot.Static
         }
         public static ChatId GetTelegramIdFromUpdate(Update update)
         {
-            if (update.Message?.Chat.Id != null)
+            if (update.Message?.Chat?.Id != null)
                 return update.Message.Chat.Id;
             else if (update.CallbackQuery?.From?.Id != null)
                 return update.CallbackQuery.From.Id;
-            else if (update.EditedMessage.From.Id != null)
+            else if (update.EditedMessage?.From?.Id != null)
                 return update.EditedMessage.From.Id;
             else return null;
         }
@@ -427,19 +434,6 @@ namespace TelegramBot.Static
         #endregion
 
         #region UsersStuff
-
-        public static async Task<UserConfig> GetUserSettings(int userId)
-        {
-            using (AppDbContext db = new AppDbContext())
-            {
-                var user = db.Users.FirstOrDefault(x => x.Id == userId);
-                if (user == null)
-                {
-                    return null;
-                }
-                return user;
-            }
-        }
 
         public static bool IsUserBanned(Update update)
         {
