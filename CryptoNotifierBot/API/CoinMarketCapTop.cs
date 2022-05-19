@@ -20,7 +20,7 @@ namespace CryptoApi.API
         private string TopApiUrl = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest";
         private string TopPairsUrl = "https://pro-api.coinmarketcap.com/v2/cryptocurrency/market-pairs/latest";
 
-        public async Task<CoinMarketCapData.SymbolInfo[]> Get(int limit= 250)
+        public async Task<CoinMarketCapData.Datum[]> Get(int limit= 250)
         {
             var request = new RestSharp.RestRequest(TopApiUrl, Method.Get);
             request.AddHeader("X-CMC_PRO_API_KEY", TOKEN);
@@ -29,8 +29,8 @@ namespace CryptoApi.API
             request.AddHeader("UserAgent", WebHeaders.UserAgent);
             var result = await new RestClient().ExecuteAsync(request);
             if (result.StatusCode != HttpStatusCode.OK) return null;
-            var data = new JsonSerializer().Deserialize<CoinMarketCapData.Data>(new JsonTextReader(new StringReader(result.Content)));
-            return data.Symbols;
+            var data = new JsonSerializer().Deserialize<CoinMarketCapData.Rootobject>(new JsonTextReader(new StringReader(result.Content)));
+            return data.data;
 
         }
 

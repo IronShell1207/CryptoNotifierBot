@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace CryptoApi.CoinMarketCapData
 {
-    public class Data
+
+    public class Rootobject
     {
         public Status status { get; set; }
-        public SymbolInfo[] Symbols { get; set; }
+        public Datum[] data { get; set; }
     }
 
     public class Status
@@ -23,7 +24,7 @@ namespace CryptoApi.CoinMarketCapData
         public int total_count { get; set; }
     }
 
-    public class SymbolInfo
+    public class Datum
     {
         public int id { get; set; }
         public string name { get; set; }

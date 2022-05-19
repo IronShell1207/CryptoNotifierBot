@@ -36,7 +36,10 @@ namespace CryptoNotifierBot.Tests
 
             using (CoinMarketCapTop cmctop = new CoinMarketCapTop())
             {
-                await cmctop.Get(200);
+                var data= await cmctop.Get(200);
+                var btc = data.First(x => x.symbol == "BTC");
+                if (btc!=null) Assert.Pass($"{btc.symbol}: {btc.circulating_supply} {btc.date_added}");
+                else Assert.Fail($"{btc.ToString()}");
             }
 
            
