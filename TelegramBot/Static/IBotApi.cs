@@ -53,13 +53,16 @@ namespace TelegramBot.Static
         {
             using (AppDbContext dbContext = new AppDbContext())
             {
-                var userid = GetTelegramIdFromUpdate(update);
-                var user = dbContext.Users.Include(x=>x.Messages).OrderBy(x => x.Id).First(x => x.TelegramId == userid.Identifier);
-                if (update.Message?.Type != MessageType.Text ) return;
-                var msg = new MessageAccepted(user, update.Message.Text, update.Message.MessageId);
-                msg.Date = update.Message.Date;
-                user.Messages.Add(msg);
-                dbContext.SaveChangesAsync();
+                if (update.Type == UpdateType.Message)
+                {
+                    var userid = GetTelegramIdFromUpdate(update);
+                    var user = dbContext.Users.Include(x => x.Messages).OrderBy(x => x.Id).First(x => x.TelegramId == userid.Identifier);
+                    if (update.Message?.Type != MessageType.Text) return;
+                    var msg = new MessageAccepted(user, update.Message.Text, update.Message.MessageId);
+                    msg.Date = update.Message.Date;
+                    user.Messages.Add(msg);
+                    dbContext.SaveChangesAsync();
+                }
             }
         }
         #region Updates
@@ -158,9 +161,9 @@ namespace TelegramBot.Static
         }
 
         public static async void RepliedMsgHandlerAsync(ITelegramBotClient bot, Update update,
-            CancellationToken canceltoken)
+            CancellationToken canceltoken, UserConfig user)
         {
-            var user = GetUserSettings(update).Result;
+           
             var editPriceMsgRegex =
                 CommandsRegex.ConvertMessageToRegex(CultureTextRequest.GetMessageString("CPEditPair", user.Language),
                     new List<string>()
@@ -404,6 +407,8 @@ namespace TelegramBot.Static
                 return update.Message.Chat.Id;
             else if (update.CallbackQuery?.From?.Id != null)
                 return update.CallbackQuery.From.Id;
+            else if (update.EditedMessage.From.Id != null)
+                return update.EditedMessage.From.Id;
             else return null;
         }
         public static async Task BadRequestHandler(ChatId chatId, Telegram.Bot.Exceptions.ApiRequestException ex)
