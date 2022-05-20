@@ -50,6 +50,9 @@
         <div id="breakoutConfig" style="margin-left: 30px; align-self: center">
             <h1>Breakouts settings:</h1>
             <h5><label class="cl-switch"> <input type="checkbox" @bind="user.Item2.Subscribed"> <span class="switcher"></span> <span class="label">Subscription status</span></label></h5>
+            <h5><label class="cl-switch"> <input type="checkbox" @bind="user.Item2.BlackListEnable"> <span class="switcher"></span> <span class="label">Black/white list parsing enable</span></label></h5>
+            <h5><label class="cl-switch"> <input type="checkbox" @bind="user.Item2.WhitelistInsteadBlack"> <span class="switcher"></span> <span class="label">White list instead black</span></label></h5>
+            <h5>Black listed pairs count: @user.Item2.BlackListedPairsList.Count</h5>
             <h5>Platforms subscription:</h5>
             <label class="cl-switch"> <input type="checkbox" @bind="user.Item2.BinanceSub"> <span class="switcher"></span> <span class="label">Binance</span></label>
             <label class="cl-switch"> <input type="checkbox" @bind="user.Item2.BitgetSub"> <span class="switcher"></span> <span class="label">Bitget</span></label>

@@ -234,7 +234,8 @@ namespace TelegramBot.Static.MessageHandlers
                     var userBreakoutCfg = dbContext.BreakoutSubs.OrderBy(x => x.TelegramId).
                         FirstOrDefault(x=> x.TelegramId == update.Message.From.Id);
                     userBreakoutCfg.WhitelistInsteadBlack = true;
-                    userBreakoutCfg.BlackListedPairsList.Clear();
+                    userBreakoutCfg.BlackListEnable = true;
+                    userBreakoutCfg.BlackListedPairsList.RemoveAll(x => x.OwnerId == userBreakoutCfg.Id);
                     foreach (var pair in topPairs)
                     {
                         BlackListedPairs bpair = new BlackListedPairs(pair);
