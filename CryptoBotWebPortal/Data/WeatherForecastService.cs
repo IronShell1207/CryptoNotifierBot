@@ -45,7 +45,7 @@ namespace CryptoBotWebPortal.Data
                 var user = dbContext.Users.
                     Include(x => x.pairs).
                     FirstOrDefault(x=>x.Id == id);
-                var usersets = dbContext.BreakoutSubs.OrderBy(x => x.Id).FirstOrDefault(x => x.UserId == user.Id);
+                var usersets = dbContext.BreakoutSubs.Include(x=>x.BlackListedPairsList).OrderBy(x => x.Id).FirstOrDefault(x => x.UserId == user.Id);
                 return (user, usersets);
 
             }

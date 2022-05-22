@@ -606,7 +606,7 @@ namespace TelegramBot.Static.MessageHandlers
                     {
                         CryptoPair cp = pair.Item1.Clone() as CryptoPair;
                         cp.Id = 0;
-                        cp.GainOrFall = cp.GainOrFall;
+                        cp.GainOrFall = !cp.GainOrFall;
                         appDbContext.CryptoPairs.Add(cp);
                     }
                     if (pair.Item1.GainOrFall && pair.Item1.Price < pair.Item2)
