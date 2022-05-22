@@ -22,9 +22,12 @@ namespace WebApiPortal
             base.OnModelCreating(builder);
         }
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-
-        //}
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            string dbPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"/Tcryptobot/";
+            if (!Directory.Exists(dbPath)) Directory.CreateDirectory(dbPath);
+            dbPath = $"Filename={dbPath}webportalbase.db";
+            optionsBuilder.UseSqlite(dbPath);
+        }
     }
 }
