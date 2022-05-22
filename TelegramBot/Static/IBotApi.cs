@@ -19,6 +19,7 @@ using Telegram.Bot;
 using TelegramBot.Constants;
 using TelegramBot.Objects;
 using TelegramBot.Static.MessageHandlers;
+using System.Text.RegularExpressions;
 
 namespace TelegramBot.Static
 {
@@ -184,19 +185,19 @@ namespace TelegramBot.Static
                     new List<string>()
                         {@"(?<base>[a-zA-Z0-9]{2,9})(\s+|/)(?<quote>[a-zA-Z0-9]{2,6})", "(?<id>[0-9]+)"});
 
-            if (update.Message.ReplyToMessage.Text == Messages.newPairRequestingForPair)
+            if (StripHTML(update.Message.ReplyToMessage.Text) == StripHTML(Messages.newPairRequestingForPair))
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
-                    msgh.SetPairSymbolStage(update);
+                    msgh.SetPairSymbolStage(update, user);
 
-            else if (update.Message.ReplyToMessage.Text == Messages.newPairWrongPrice)
-                using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
-                    msgh.SetPriceStage(update, user);
-
-            else if (update.Message.ReplyToMessage.Text == Messages.newPairAfterExchangeSetPrice)
+            else if (StripHTML(update.Message.ReplyToMessage.Text) == StripHTML(Messages.newPairWrongPrice))
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
                     msgh.SetPriceStage(update, user);
 
-            else if (update.Message.ReplyToMessage.Text ==
+            else if (StripHTML(update.Message.ReplyToMessage.Text) == StripHTML(Messages.newPairAfterExchangeSetPrice))
+                using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
+                    msgh.SetPriceStage(update, user);
+
+            else if (StripHTML(update.Message.ReplyToMessage.Text) ==
                      CultureTextRequest.GetMessageString("ToaddToTheBlackList", user.Language))
                 using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler())
                     msgHandler.AddPairToBlackListCommandHandler(update);
@@ -222,7 +223,11 @@ namespace TelegramBot.Static
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
                     msgh.EditUserTaskCallbackHandler(update);
         }
-
+        public static string StripHTML(string input)
+        {
+            input = input.Replace("\r\n", "").Replace("\r", "").Replace("\n", "");
+            return Regex.Replace(input, "<.*?>", String.Empty);
+        }
         public static Task ErrorHandler(ITelegramBotClient botClient, Exception ex, CancellationToken csToken)
         {
             ConsoleCommandsHandler.LogWrite(ex.Message);

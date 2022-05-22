@@ -331,7 +331,7 @@ namespace TelegramBot.Static.MessageHandlers
         /// This method parses answer on replied message of creating new task without arguments
         /// </summary>
         /// <param name="update">Latest message from user, must contains only message with text "base"/"quote"</param>
-        public async void SetPairSymbolStage(Update update)
+        public async void SetPairSymbolStage(Update update, UserConfig user)
         {
             var match = RegexCombins.CryptoPairRegex.Match(update.Message?.Text);
             if (match.Success)
@@ -339,37 +339,39 @@ namespace TelegramBot.Static.MessageHandlers
                 var pair = GetTempUserTask(update).Result;
                 pair.PairBase = match.Groups["base"].Value.ToUpper();
                 pair.PairQuote = match.Groups["quote"].Value.ToUpper();
+                await SetExchangePStage(update, pair, user);
             }
             else
             {
                 await BotApi.SendMessage(update.Message.Chat.Id, "Wrong pair name!");
             }
         }
-        private async Task<bool?> SetExchangePStage(Update update, CryptoPair pair, UserConfig user)
+        private async Task SetExchangePStage(Update update, CryptoPair pair, UserConfig user)
         {
-            var exchangesForPair = await 
+            var exchangesForPair = await
                 Program.cryptoData.GetExchangesForPair(
                     new CryptoApi.Objects.TradingPair(pair.PairBase, pair.PairQuote));
             if (exchangesForPair.Any())
             {
-                if (user.SetExchangeAutomaticaly)
+                if (user.SetExchangeAutomaticaly || exchangesForPair.Count == 1)
                 {
                     pair.ExchangePlatform = exchangesForPair.First();
                     if (pair.Price != 0)
                         SetRaiseOrFallStage(update, pair);
-                    return true;
+                    else await BotApi.SendMessage(user.TelegramId,
+                     "Exchange for new crypto pair setted. Set price in next message", true);
                 }
                 else
                 {
                     var kbexchanges = Keyboards.ExchangeSelectingKeyboardMarkup(exchangesForPair);
                     await BotApi.SendMessage(user.TelegramId, $"Select crypto exchange for {pair}: ", kbexchanges);
-                    return true;
+
                 }
             }
             else
             {
                 await BotApi.SendMessage(user.TelegramId, "Wrong pair!");
-                return false;
+
             }
         }
 
@@ -455,7 +457,7 @@ namespace TelegramBot.Static.MessageHandlers
 
                 var msg = CultureTextRequest.GetSettingsMsgString("CPEditTaskCreated", user.Language);
                 var formatedmsg = $"{msg} {pair.FullTaskInfo(user.Language)}";
-                
+
                 BotApi.SendMessage(BotApi.GetTelegramIdFromUpdate(update).Identifier, formatedmsg, ParseMode.Html);
             }
         }
@@ -636,8 +638,8 @@ namespace TelegramBot.Static.MessageHandlers
                 BotApi.SendMessage(user.TelegramId, sb.ToString());
             }
         }
-#endregion
-        
+        #endregion
+
 
     }
 }
