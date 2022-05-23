@@ -34,6 +34,23 @@ namespace TelegramBot.Objects
             OwnerId = owner;
         }
 
+        public bool AreEqual(CryptoPair pair)
+        {
+            return (pair.Id == Id
+                && pair.OwnerId == OwnerId
+                && pair.OwnerId == OwnerId
+                && pair.GainOrFall == GainOrFall
+                && pair.Enabled == Enabled
+                && pair.TriggerOnce == TriggerOnce
+                && pair.Triggered == Triggered
+                && pair.Price == Price
+                && pair.Screenshot == Screenshot
+                && pair.Note == Note
+                && pair.PairQuote == PairQuote
+                && pair.PairBase == PairBase
+                && pair.ExchangePlatform == ExchangePlatform);
+        }
+
         public override string ToString() => !string.IsNullOrWhiteSpace(PairBase) && !string.IsNullOrWhiteSpace(PairQuote)
             ? $"{PairBase}/{PairQuote}"
             : "";

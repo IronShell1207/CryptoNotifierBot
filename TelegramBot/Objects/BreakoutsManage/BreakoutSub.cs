@@ -42,5 +42,29 @@ namespace TelegramBot.Objects
         public int UserId { get; set; }
         //public UserConfig? UserConfig { get; set; }
 
+        public bool AreEqual(BreakoutSub inc)
+        {
+            return (inc.Id == Id 
+                && inc.TelegramId == TelegramId
+                && inc.BinanceSub == BinanceSub
+                && inc.BitgetSub == BitgetSub
+                && inc.BlackListEnable == BlackListEnable
+                && inc.GateioSub == GateioSub
+                && inc.OkxSub == OkxSub
+                && inc.KucoinSub == KucoinSub
+                && inc.S120MinUpdates == S120MinUpdates
+                && inc.S15MinUpdates == S15MinUpdates
+                && inc.S1920MinUpdates == S1920MinUpdates
+                && inc.S240MinUpdates == S240MinUpdates
+                && inc.S2MinUpdates == S2MinUpdates
+                && inc.S45MinUpdates == S45MinUpdates
+                && inc.S30MinUpdates == S30MinUpdates
+                && inc.WhitelistInsteadBlack == WhitelistInsteadBlack
+                && inc.UserId == UserId
+                && inc.S960MinUpdates == S960MinUpdates
+                && inc.S60MinUpdates == S60MinUpdates
+                && inc.S5MinUpdates == S5MinUpdates
+                && inc.Subscribed == Subscribed);
+        }
     }
 }

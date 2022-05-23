@@ -72,6 +72,10 @@ namespace CryptoBotWebPortal.Data
                 pair.GainOrFall = pairExt.GainOrFall;
                 pair.TriggerOnce = pairExt.TriggerOnce;
                 dbContext.SaveChangesAsync();
+                var checkpair = dbContext.CryptoPairs.OrderBy(x => x.Id).FirstOrDefault(x => x.Id == pairExt.Id);
+                if (checkpair.AreEqual(pair))
+                    return (true, "Saved successfuly");
+                else return (false, "Failed to save, no changes are applyed");
             }
             
         }
@@ -124,6 +128,7 @@ namespace CryptoBotWebPortal.Data
                     var checkuser = dbContext.Users.OrderBy(x => x.Id).First(x => x.Id == userConfig.Id);
                     if (checkuser.AreEqual(user))
                         return (true, "Saved successfuly");
+                    else return (false, "Failed to save, no changes are applyed");
                 }
             }
             catch (Exception ex)

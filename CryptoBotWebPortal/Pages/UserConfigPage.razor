@@ -13,7 +13,7 @@
 @if (AlertVisible)
 {
     <div class="alert alert-success fade show">
-        <strong>Success!</strong> @AlertMessage
+        <strong> @AlertMessage </strong>
     </div>
 }
 
@@ -99,10 +99,10 @@
 
     private async Task SaveChanges()
     {
-        await ForecastService.SaveUserSettings(user.Item1, user.Item2);
-        AlertMessage = "Settings saved";
+        var result = await ForecastService.SaveUserSettings(user.Item1, user.Item2);
+        AlertMessage = result.Item2;
         AlertVisible = true;
-        await Task.Run((() => Thread.Sleep(2500)));
+        await Task.Run((() => Thread.Sleep(1500)));
         AlertVisible = false;
         NavigationManager.NavigateTo("/fetchusers");
         

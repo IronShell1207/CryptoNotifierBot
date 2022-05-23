@@ -70,13 +70,24 @@ namespace TelegramBot.Objects
 
         public bool AreEqual(UserConfig cfg)
         {
-            return (cfg.NightModeEnable == NightModeEnable
-                   && cfg.DisplayTaskEditButtonsInNotifications == DisplayTaskEditButtonsInNotifications
-                   && cfg.AntifloodIntervalAmplification == AntifloodIntervalAmplification
-                   && cfg.TriggerOneTasksByDefault == TriggerOneTasksByDefault
-                   && cfg.NotesEnable == NotesEnable
-                   && cfg.SetExchangeAutomaticaly == SetExchangeAutomaticaly
-                   && cfg.ShowMarketEvents == ShowMarketEvents);
+            return (cfg.TelegramId == TelegramId
+                    && cfg.Id == Id
+                    && cfg.NightModeEnable == NightModeEnable
+                    && cfg.DisplayTaskEditButtonsInNotifications == DisplayTaskEditButtonsInNotifications
+                    && cfg.AntifloodIntervalAmplification == AntifloodIntervalAmplification
+                    && cfg.TriggerOneTasksByDefault == TriggerOneTasksByDefault
+                    && cfg.NotesEnable == NotesEnable
+                    && cfg.SetExchangeAutomaticaly == SetExchangeAutomaticaly
+                    && cfg.ShowMarketEvents == ShowMarketEvents
+                    && cfg.MorningReport == MorningReport
+                    && cfg.RemoveLatestNotifyBeforeNew == RemoveLatestNotifyBeforeNew
+                    && cfg.CryptoNotifyStyle == CryptoNotifyStyle
+                    && cfg.Language == Language
+                    && cfg.NightModeEndsTime == NightModeEndsTime
+                    && cfg.NightModeStartTime == NightModeStartTime
+                    && cfg.NoticationsInterval == NoticationsInterval
+                    && cfg.FirstName == FirstName
+                    && cfg.UserName == UserName);
         } 
     }
 }
