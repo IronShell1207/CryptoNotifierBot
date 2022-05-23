@@ -19,11 +19,11 @@ namespace CryptoApi.Static.DataHandler
     {
         public bool UpdaterLive { get; set; } = true;
         public int DataDownloadedCounter { get; private set; } = 0;
+        public bool DataAvailable { get; set; } = false;
 
         private int Try = 30;
         public async void UpdateAllData()
         {
-            var datenow = DateTime.Now;
             StringBuilder sb = new StringBuilder($"Market data updated: ");
             var guid = Guid.NewGuid();
             using (var api = new ExchangeApi(Exchanges.Binance))
@@ -51,6 +51,8 @@ namespace CryptoApi.Static.DataHandler
                 dataSetsReady = await GetLatestDataSets();
                 Try--;
             }
+
+            DataAvailable = true;
             foreach (var dataSet in dataSetsReady)
                 sb.Append($"{dataSet.Exchange}: {dataSet.pairs.Count} ");
             Diff.LogWrite(sb.ToString());

@@ -25,16 +25,23 @@ namespace TelegramBot.Constants
 
         public static InlineKeyboardMarkup PairsSelectingKeyboardMarkup(List<CryptoPair> pairs, string dataPattern)
         {
+            var listButns = new List<List<InlineKeyboardButton>>();
             List<InlineKeyboardButton> buttons = new List<InlineKeyboardButton>();
-            foreach (CryptoPair pair in pairs)
+            for (int i = 0; i < pairs.Count; i++)
             {
-                var btnText = pair.TaskStatus();
+                
+                var btnText = pairs[i].TaskStatus();
                 InlineKeyboardButton btn = new InlineKeyboardButton(btnText);
-                btn.CallbackData = string.Format(dataPattern, arg0: pair.Id, arg1: pair.OwnerId);
+                btn.CallbackData = string.Format(dataPattern, arg0: pairs[i].Id, arg1: pairs[i].OwnerId);
                 buttons.Add(btn);
+                if ((i % 2) == 1)
+                {
+                    listButns.Add(buttons);
+                    buttons = new List<InlineKeyboardButton>();
+                }
             }
 
-            return new InlineKeyboardMarkup(buttons.ToArray());
+            return new InlineKeyboardMarkup(listButns);
         }
     }
 }
