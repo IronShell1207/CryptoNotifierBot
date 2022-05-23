@@ -59,7 +59,7 @@ namespace CryptoBotWebPortal.Data
             }
         }
 
-        public  async Task SaveTaskSettings(CryptoPair pairExt)
+        public async Task<(bool, string)> SaveTaskSettings(CryptoPair pairExt)
         {
             using (AppDbContext dbContext = new AppDbContext())
             {
@@ -76,7 +76,7 @@ namespace CryptoBotWebPortal.Data
             
         }
 
-        public async Task SaveUserSettings(UserConfig userConfig, BreakoutSub sub)
+        public async Task<(bool, string)> SaveUserSettings(UserConfig userConfig, BreakoutSub sub)
         {
             try
             {
@@ -121,11 +121,14 @@ namespace CryptoBotWebPortal.Data
                     }
 
                     dbContext.SaveChangesAsync();
+                    var checkuser = dbContext.Users.OrderBy(x => x.Id).First(x => x.Id == userConfig.Id);
+                    if (checkuser.AreEqual(user))
+                        return (true, "Saved successfuly");
                 }
             }
             catch (Exception ex)
             {
-
+                return (false, ex.Message);
             }
         }
     }

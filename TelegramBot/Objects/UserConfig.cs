@@ -67,6 +67,16 @@ namespace TelegramBot.Objects
         public int? MorningReport { get; set; } = null;
         public List<CryptoPair>? pairs { get; set; } = new();
         public List<MessageAccepted> Messages { get; set; } = new();
-        
+
+        public bool AreEqual(UserConfig cfg)
+        {
+            return (cfg.NightModeEnable == NightModeEnable
+                   && cfg.DisplayTaskEditButtonsInNotifications == DisplayTaskEditButtonsInNotifications
+                   && cfg.AntifloodIntervalAmplification == AntifloodIntervalAmplification
+                   && cfg.TriggerOneTasksByDefault == TriggerOneTasksByDefault
+                   && cfg.NotesEnable == NotesEnable
+                   && cfg.SetExchangeAutomaticaly == SetExchangeAutomaticaly
+                   && cfg.ShowMarketEvents == ShowMarketEvents);
+        } 
     }
 }
