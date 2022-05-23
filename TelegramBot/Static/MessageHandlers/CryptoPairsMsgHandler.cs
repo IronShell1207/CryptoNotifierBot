@@ -149,7 +149,7 @@ namespace TelegramBot.Static.MessageHandlers
             }
             else BotApi.SendMessage(user.TelegramId, "Pair doesnt exists");
         }
-        public void RemoveUserTaskCallbackHandler(Update update)
+        public async void RemoveUserTaskCallbackHandler(Update update)
         {
             var match = CallbackDataPatterns.DeletePairRegex.Match(update.CallbackQuery.Data);
             var user = BotApi.GetUserSettings(update).Result;
@@ -165,18 +165,18 @@ namespace TelegramBot.Static.MessageHandlers
                         if (dbh.DeletePair(pair))
                         {
                             var strMessage = CultureTextRequest.GetMessageString("cryptoPairRemoved", user.Language);
-                            BotApi.SendMessage(user.TelegramId, string.Format(strMessage, arg0: pair.TaskStatus(), arg1: pair.Id));
+                            await BotApi.SendMessage(user.TelegramId, string.Format(strMessage, arg0: pair.TaskStatus(), arg1: pair.Id));
                         }
                         else
                         {
-                            BotApi.SendMessage(user.TelegramId,
+                            await BotApi.SendMessage(user.TelegramId,
                                 string.Format(CultureTextRequest.GetMessageString("cryptoPairCantRemove", user.Language)));
                         }
                     }
                 }
             }
         }
-        public void RemoveUserTask(Update update)
+        public async void RemoveUserTask(Update update)
         {
             var match = CommandsRegex.MonitoringTaskCommands.DeletePair.Match(update.Message.Text);
             if (match.Success)
@@ -190,16 +190,12 @@ namespace TelegramBot.Static.MessageHandlers
                     using (CryptoPairDbHandler dbh = new CryptoPairDbHandler())
                     {
                         var pair = dbh.GetPairFromId(id, user.Id);
-                        if (dbh.DeletePair(pair))
-                        {
-                            var strMessage = CultureTextRequest.GetMessageString("cryptoPairRemoved", user.Language);
-                            BotApi.SendMessage(user.TelegramId, string.Format(strMessage, arg0: pair.ToString(), arg1: pair.Id));
-                        }
-                        else
-                        {
-                            BotApi.SendMessage(user.TelegramId,
-                                string.Format(CultureTextRequest.GetMessageString("cryptoPairCantRemove", user.Language)));
-                        }
+                        var strMessage = dbh.DeletePair(pair)
+                            ? string.Format(CultureTextRequest.GetMessageString("cryptoPairRemoved", user.Language), arg0: pair, arg1: pair.Id)
+                            : string.Format(CultureTextRequest.GetMessageString("cryptoPairCantRemove", user.Language));
+
+                        await BotApi.SendMessage(user.TelegramId, strMessage);
+
                     }
                 }
                 else
@@ -219,7 +215,7 @@ namespace TelegramBot.Static.MessageHandlers
                     }
                     else
                     {
-                        BotApi.SendMessage(user.TelegramId, CultureTextRequest.GetMessageString("CPRemoveEmpty", user.Language));
+                        await BotApi.SendMessage(user.TelegramId, CultureTextRequest.GetMessageString("CPRemoveEmpty", user.Language));
 
                     }
                 }
@@ -246,11 +242,11 @@ namespace TelegramBot.Static.MessageHandlers
                             pair.TaskStatus(), trigger);
                         var editresult = await dbHandler.CompletlyEditCryptoPair(pair);
                         msg = editresult ? msg : "Can't save your changes because of unexpected error!";
-                        BotApi.SendMessage(user.TelegramId, msg, ParseMode.Html);
+                        await BotApi.SendMessage(user.TelegramId, msg, ParseMode.Html);
                     }
                     else
                     {
-                        BotApi.SendMessage(user.TelegramId, "Task not exists, or not yours!");
+                        await BotApi.SendMessage(user.TelegramId, "Task not exists, or not yours!");
                     }
                 }
             }
@@ -263,15 +259,9 @@ namespace TelegramBot.Static.MessageHandlers
                 var id = int.Parse(match.Groups["id"].Value);
                 var user = await BotApi.GetUserSettings(update);
                 var task = new CryptoPairDbHandler().GetPairFromId(id, user.Id);
-                if (task != null)
-                {
-                    var msg = string.Format(CultureTextRequest.GetMessageString("CPAddComment", user.Language), task.Id, task.ToString());
-                    BotApi.SendMessage(user.TelegramId, msg, true);
-                }
-                else
-                {
-                    BotApi.SendMessage(user.TelegramId, "Task not exists, or not yours!");
-                }
+                var msg = task != null ? string.Format(CultureTextRequest.GetMessageString("CPAddComment", user.Language), task.Id, task)
+                                             : "Task not exists, or not yours!";
+                await BotApi.SendMessage(user.TelegramId, msg, true);
             }
         }
         public async void AddCommentForTaskReplyHandler(Update update)
@@ -281,7 +271,7 @@ namespace TelegramBot.Static.MessageHandlers
             {
                 @"(?<id>[0-9]*)", @"(?<base>[a-zA-Z0-9]{2,9})(\s+|/)(?<quote>[a-zA-Z0-9]{2,6})"
             });
-            var match = msgRegex.Match(update.Message.ReplyToMessage.Text);
+            var match = msgRegex.Match(update.Message?.ReplyToMessage?.Text);
             if (match.Success)
             {
                 var id = int.Parse(match.Groups["id"].Value);

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace CryptoApi.Objects.ExchangesPairs
 {
 
-    public class KucoinData : ITradingApiData
+    public class KucoinData 
     {
         public string code { get; set; }
         public KuData data { get; set; }

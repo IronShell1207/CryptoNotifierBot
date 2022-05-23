@@ -16,6 +16,16 @@ namespace TelegramBot.Static.BotLoops
         private static List<IntervaledUsersHistory> lastUpdateUsers = new List<IntervaledUsersHistory>() { };
         public static bool MonitorLoopCancellationToken { get; set; } = true;
 
+        private static async void CrtMsg(List<(CryptoPair, double)> lst, StringBuilder sb, UserConfig user, string msg = "")
+        {
+            if (lst.Any())
+            {
+                foreach (var pair in lst)
+                    sb.AppendLine(FormatNotifyEntryStock(pair.Item1, pair.Item2));
+                await BotApi.SendMessage(user.TelegramId, msg + sb);
+            }
+        }
+
         public static async void Loop()
         {
             while (MonitorLoopCancellationToken)
@@ -35,25 +45,13 @@ namespace TelegramBot.Static.BotLoops
                             foreach (var pair in pairsDefault)
                                 sb.AppendLine(FormatNotifyEntryStock(pair.Item1, pair.Item2));
                             if (user.RemoveLatestNotifyBeforeNew && lastMsg != null)
-                                 await BotApi.RemoveMessage(user.TelegramId,(int)lastMsg);
+                                await BotApi.RemoveMessage(user.TelegramId, (int)lastMsg);
                             var msg = await BotApi.SendMessage(user.TelegramId, sb.ToString());
                             var tpl = new IntervaledUsersHistory(user.Id, DateTime.Now, msg?.MessageId);
                             lastUpdateUsers.Add(tpl);
                         }
-
-                        if (pairsSingleNotify.Any())
-                        {
-                            foreach (var pair in pairsSingleNotify)
-                                sb.AppendLine(FormatNotifyEntryStock(pair.Item1, pair.Item2));
-                            await BotApi.SendMessage(user.TelegramId, sb.ToString());
-                        }
-
-                        if (pairsTriggeredButRaised.Any())
-                        {
-                            foreach (var pair in pairsTriggeredButRaised)
-                                sb.AppendLine(FormatNotifyEntryStock(pair.Item1, pair.Item2));
-                            await BotApi.SendMessage(user.TelegramId, $"⚠️Pairs triggered, but raise above or fall bellow trigger again:\n{sb.ToString()}");
-                        }
+                        CrtMsg(pairsSingleNotify, sb, user);
+                        CrtMsg(pairsTriggeredButRaised, sb, user, $"⚠️Pairs triggered, but raise above or fall bellow trigger again:\n");
                     }
                 }
                 Thread.Sleep(420);
@@ -72,7 +70,7 @@ namespace TelegramBot.Static.BotLoops
                 foreach (var pair in pairs)
                 {
                     var price = await Program.cryptoData.GetCurrentPricePairByName(pair.ToTradingPair());
-                    if (price.Price > 0 &&(price.Price > pair.Price && pair.GainOrFall || 
+                    if (price.Price > 0 && (price.Price > pair.Price && pair.GainOrFall ||
                         price.Price < pair.Price && !pair.GainOrFall))
                         tasks.Add(new(pair, price.Price));
                 }
@@ -85,7 +83,7 @@ namespace TelegramBot.Static.BotLoops
         {
             List<(CryptoPair, double)> tasksReturing = new List<(CryptoPair, double)>();
             var pairsSingle = user?.pairs?.Where(x => x.TriggerOnce && !x.Triggered)?.ToList();
-           
+
             if (pairsSingle?.Count > 0)
             {
                 foreach (var pair in pairsSingle)
@@ -128,7 +126,7 @@ namespace TelegramBot.Static.BotLoops
 
         private static string FormatNotifyEntryStock(CryptoPair pair, double newprice)
         {
-            var gorfall = pair.Price < newprice ;
+            var gorfall = pair.Price < newprice;
             var enabledSymbol = gorfall ? "▲" : "▼";
             var gainOrFallSymbol = gorfall ? "raise 📈" : "fall 📉";
             var priceDiff = gorfall ? ((newprice / pair.Price) * 100) - 100 : ((newprice / pair.Price) * 100) - 100;

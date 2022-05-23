@@ -20,7 +20,7 @@ namespace TelegramBot.Static.DbOperations
                 if (pair != null)
                 {
                     dbContext.CryptoPairs.Remove(pair);
-                    dbContext.SaveChangesAsync();
+                     dbContext.SaveChangesAsync();
                     return true;
                 }
                 return false;
@@ -54,7 +54,7 @@ namespace TelegramBot.Static.DbOperations
             SetNewPriceTriggerPair(pair.Id, pair.OwnerId, price).Result;
         public async Task<bool> SetNewPriceTriggerPair(int id, int ownerId, double price)
         {
-            using (AppDbContext dbContext = new AppDbContext())
+            using (var dbContext = new AppDbContext())
             {
                 var pair = dbContext.CryptoPairs.FirstOrDefault(x => x.Id == id && x.OwnerId == ownerId);
                 if (pair != null)
@@ -70,15 +70,9 @@ namespace TelegramBot.Static.DbOperations
 
         public CryptoPair GetPairFromId(int id, int ownerId)
         {
-            using (AppDbContext dbContext = new AppDbContext())
-            {
-                var pair = dbContext.CryptoPairs.Include(x=>x.User).FirstOrDefault(x => x.Id == id && x.User.Id == ownerId);
-                if (pair != null)
-                {
-                    return pair;
-                }
-                return null;
-            }
+            using (var dbContext = new AppDbContext())
+                return dbContext.CryptoPairs.Include(x=>x.User).
+                    FirstOrDefault(x => x.Id == id && x.User.Id == ownerId);
         }
     }
 }

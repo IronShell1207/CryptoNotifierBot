@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -29,13 +30,12 @@ namespace TelegramBot.Objects
         /// <summary>
         /// Compact pairs notifications for true value, and full info for false
         /// </summary>
-        public string? CryptoNotifyStyle { get; set; }
+        public string CryptoNotifyStyle { get; set; }
         public string Language { get; set; } = "en";
         /// <summary>
         /// If enabled, when user creates new tasks its trigger once by default
         /// </summary>
         public bool TriggerOneTasksByDefault { get; set; } = false;
-
         public bool SetExchangeAutomaticaly { get; set; } = false;
         /// <summary>
         /// Not uses and not created
@@ -64,12 +64,24 @@ namespace TelegramBot.Objects
         /// <summary>
         /// Spreads notify of selected pairs of changes in 24h and 8h in selected time
         /// </summary>
-        public int? MorningReport { get; set; } = null;
+        public int MorningReport { get; set; } = 0;
         public List<CryptoPair>? pairs { get; set; } = new();
-        public List<MessageAccepted> Messages { get; set; } = new();
+        public List<MessageAccepted>? Messages { get; set; } = new();
 
         public bool AreEqual(UserConfig cfg)
         {
+            var props = this.GetType().GetProperties().Where(x=>x.PropertyType.IsValueType);
+            foreach (var prop in props)
+            {
+                var obj1 = prop.GetValue(this);
+                var obj2 = prop.GetValue(cfg);
+                if (!obj1.Equals(obj2))
+                    return false;
+
+            }
+            return true;
+
+            //return cfg.Equals(this);
             return (cfg.TelegramId == TelegramId
                     && cfg.Id == Id
                     && cfg.NightModeEnable == NightModeEnable

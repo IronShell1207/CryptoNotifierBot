@@ -6,10 +6,6 @@ using System.Threading.Tasks;
 
 namespace CryptoApi.Objects.ExchangesPairs
 {
-    public class GateIoData : ITradingApiData
-    {
-        public List<GateIOTicker> data { get; set; }
-    }
     public class GateIOTicker : TheTradingPair
     {
         public string currency_pair { get; set; }
