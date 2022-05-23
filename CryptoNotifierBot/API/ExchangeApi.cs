@@ -47,19 +47,18 @@ namespace CryptoApi.API
         {
             foreach (var prop in props)
             {
-                if (prop.PropertyType.BaseType == typeof(TheTradingPair))
-                {
-                    var value = prop.GetValue(crdata);
+                var value = prop.GetValue(crdata);
+                if (value is IEnumerable<TheTradingPair>)
+                    return (IEnumerable<TheTradingPair>)value;
 
-                    if (value is IEnumerable<TheTradingPair>)
-                        return (IEnumerable<TheTradingPair>) value;
-                }
                 if (prop.PropertyType.IsClass && prop.PropertyType != typeof(string))
                 {
-                    GetFromProps(prop.PropertyType.GetProperties(), crdata);
+                    var h = GetFromProps(prop.PropertyType.GetProperties(), crdata);
+                    if (h.Any())
+                        return h;
                 }
             }
-            return new List<TheTradingPair>(); 
+            return new List<TheTradingPair>();
         }
 
         public List<PricedTradingPair> PairsListConverter(object crdata)
@@ -71,27 +70,8 @@ namespace CryptoApi.API
                 return Convert(obj);
             }
             var props = type.GetProperties();
-            return Convert( GetFromProps(props, crdata));
+            return Convert(GetFromProps(props, crdata));
         }
-        //public List<PricedTradingPair> PairsListConverter<T>(T crdata)
-        //{
-
-        //    if (crdata != null)
-        //    {
-        //        if (crdata is KucoinData)
-        //            return Convert((crdata as KucoinData).data.ticker.ToList());
-        //        else if (crdata is OkxData)
-        //            return Convert((crdata as OkxData).data.ToList());
-        //        else if (crdata is List<GateIOTicker>)
-        //            return Convert((crdata as List<GateIOTicker>));
-        //        else if (crdata is List<BinancePair>)
-        //            return Convert((crdata as List<BinancePair>));
-        //        else if (crdata is BitgetData)
-        //            return Convert((crdata as BitgetData).data.ToList());
-        //    }
-
-        //    return null;
-        //}
 
         public TradingPair SplitSymbolBySplitConverter(string symbol)
         {
