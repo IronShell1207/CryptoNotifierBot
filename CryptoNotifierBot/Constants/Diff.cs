@@ -29,11 +29,18 @@ namespace CryptoApi.Constants
 
         public static void LogWrite(string line)
         {
-            DateTime dt = DateTime.Now;
-            var logFile = LogPath;
-            var lineS = $"[{dt.ToString()}] {line}";
-            File.AppendAllText(logFile, lineS + "\n");
-            Console.WriteLine(lineS);
+            try
+            {
+                DateTime dt = DateTime.Now;
+                var logFile = LogPath;
+                var lineS = $"[{dt.ToString()}] {line}";
+                File.AppendAllText(logFile, lineS + "\n");
+                Console.WriteLine(lineS);
+            }
+            catch (Exception et)
+            {
+
+            }
         }
     }
 }

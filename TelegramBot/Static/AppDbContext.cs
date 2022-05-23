@@ -25,7 +25,7 @@ namespace TelegramBot.Static
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            string dbPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"/Tcryptobot/";
+            string dbPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"/Tcryptobot/";
             if (!Directory.Exists(dbPath)) Directory.CreateDirectory(dbPath);
             dbPath = $"Filename={dbPath}telegrambot.db";
             optionsBuilder.UseSqlite(dbPath);
