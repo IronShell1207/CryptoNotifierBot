@@ -65,6 +65,7 @@ namespace TelegramBot.Objects
         /// Spreads notify of selected pairs of changes in 24h and 8h in selected time
         /// </summary>
         public int MorningReport { get; set; } = 0;
+        public BreakoutSub? SubSets { get; set; }
         public List<CryptoPair>? pairs { get; set; } = new();
         public List<MessageAccepted>? Messages { get; set; } = new();
 

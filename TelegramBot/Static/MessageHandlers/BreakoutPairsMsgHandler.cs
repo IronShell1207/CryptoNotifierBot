@@ -221,7 +221,16 @@ namespace TelegramBot.Static.MessageHandlers
  
 
         }
-
+        public async Task<CommandHandlerResult> RemoveAllBlackListedPairsUser(UserConfig user)
+        {
+            using (var dbcontext = new AppDbContext())
+            {
+                var breakoutUsrCfg = dbcontext.BreakoutSubs.Include(x=>x.BlackListedPairsList).First(x => x.TelegramId == user.TelegramId);
+                breakoutUsrCfg.BlackListedPairsList?.Clear();
+                dbcontext.SaveChangesAsync();
+                return new CommandHandlerResult("Success", true);
+            }
+        }
         public async void AddWhiteTopList(Update update)
         {
             var match = CommandsRegex.BreakoutCommands.AddTopSymbolsToWhiteList.Match(update.Message.Text);

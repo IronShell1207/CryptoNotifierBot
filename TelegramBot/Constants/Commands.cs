@@ -15,6 +15,7 @@ namespace TelegramBot.Constants
         public const string SubStop = "/substop";
         public const string FlipTasks = "/fliptasks";
         public const string ShiftTasks = "/movetasks";
+        public const string RemoveAllFromBlackList = "/clearbl";
     }
 
     public class AdminCommands

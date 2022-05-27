@@ -150,6 +150,12 @@ namespace TelegramBot.Static
             else if (update.Message.Text == "/create")
                 using (CryptoPairsMsgHandler msghandler = new CryptoPairsMsgHandler())
                     msghandler.CreateTaskFirstStage(update, user);
+            else if (update.Message.Text == Commands.RemoveAllFromBlackList)
+                using (BreakoutPairsMsgHandler brkMsgHandler = new BreakoutPairsMsgHandler())
+                {
+                    var result = await brkMsgHandler.RemoveAllBlackListedPairsUser(user);
+                    SendMessage(user.TelegramId, result.Message);
+                }
 
             else if (CommandsRegex.BreakoutCommands.AddTopSymbolsToWhiteList.IsMatch(update.Message.Text))
                 using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler())
