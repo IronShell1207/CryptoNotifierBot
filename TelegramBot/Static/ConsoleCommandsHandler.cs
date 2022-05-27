@@ -15,7 +15,7 @@ namespace TelegramBot.Static
     {
         public static async Task ChangeTokenAsync()
         {
-        setbottoken:
+            setbottoken:
             LogWrite("Set telegram bot token: ");
             var reader = Console.ReadLine();
             var token = RegexCombins.TelegramBotToken.Match(reader);
@@ -65,12 +65,13 @@ namespace TelegramBot.Static
         {
             get
             {
-                var path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Tcryptobot\";
+                var path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Tcryptobot\";
                 if (!Directory.Exists(path))
                     Directory.CreateDirectory(path);
                 return path;
             }
         }
+
 
         public async static void LogWrite(string line)
         {
@@ -78,17 +79,66 @@ namespace TelegramBot.Static
             DateTime dt = DateTime.Now;
             var logFile = DataDir + "log.txt";
             var lineS = $"[{dt.ToString()}] {line}";
+            start:
             try
             {
                 File.AppendAllText(logFile, lineS + "\n");
+
             }
             catch (IOException ex)
             {
-                Console.WriteLine(ex.Message + " " + ex.HResult.ToString());
+                if (ex.HResult == -2147024864)
+                {
+                    Thread.Sleep(300);
+                    goto start;
+                }
+
             }
             Console.WriteLine(lineS);
 
 
+        }
+    }
+    internal class ConsoleSpinner
+    {
+        private int _currentAnimationFrame;
+
+        public ConsoleSpinner()
+        {
+            SpinnerAnimationFrames = new[]
+            {
+                "[#====]",
+                "[=#===]",
+                "[==#==]",
+                "[===#=]",
+                "[====#]",
+                "[===#=]",
+                "[==#==]",
+                "[=#===]",
+                "[#====]",
+            };
+        }
+
+        public string[] SpinnerAnimationFrames { get; set; }
+
+        public void UpdateProgress()
+        {
+            // Store the current position of the cursor
+            var originalX = Console.CursorLeft;
+            var originalY = Console.CursorTop;
+
+            // Write the next frame (character) in the spinner animation
+            Console.Write(SpinnerAnimationFrames[_currentAnimationFrame]);
+
+            // Keep looping around all the animation frames
+            _currentAnimationFrame++;
+            if (_currentAnimationFrame == SpinnerAnimationFrames.Length)
+            {
+                _currentAnimationFrame = 0;
+            }
+
+            // Restore cursor to original position
+            Console.SetCursorPosition(originalX, originalY);
         }
     }
 }

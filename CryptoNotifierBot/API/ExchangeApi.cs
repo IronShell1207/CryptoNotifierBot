@@ -47,7 +47,9 @@ namespace CryptoApi.API
         {
             foreach (var prop in props)
             {
-                var value = prop.GetValue(crdata);
+                if (prop.PropertyType == typeof(Int64))
+                    continue;
+                var value = prop?.GetValue(crdata);
                 if (value is IEnumerable<TheTradingPair>)
                     return (IEnumerable<TheTradingPair>)value;
 
@@ -63,7 +65,7 @@ namespace CryptoApi.API
 
         public List<PricedTradingPair> PairsListConverter(object crdata)
         {
-            var type = crdata.GetType();
+            var type = crdata?.GetType();
             if (type.IsGenericType)
             {
                 var obj = (IEnumerable<TheTradingPair>)crdata;
@@ -148,6 +150,7 @@ namespace CryptoApi.API
         public async Task<bool> GetExchangeData<T>(Guid guid = default(Guid))
         {
             var apiData = await GetTickerData<T>();
+            if (apiData == null) return false;
             var pairs = PairsListConverter(apiData);
             if (pairs != null) SavePairsToDb(ApiName, pairs, guid);
             return true;

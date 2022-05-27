@@ -30,18 +30,29 @@ namespace TelegramBot.Static
             dbPath = $"Filename={dbPath}telegrambot.db";
             optionsBuilder.UseSqlite(dbPath);
         }
-
+        private bool Migrating = false;
         public AppDbContext()
         {
             //remove this for create migrations
 #if DEBUG
             var migr = Database.GetPendingMigrations();
-
-            if (migr.Any())
+            start:
+            if (migr.Any() && !Migrating)
             {
+                Migrating = true;
+
                 foreach (var migration in migr.ToList())
                     ConsoleCommandsHandler.LogWrite($"Migration applying: {migration}");
-                Database.Migrate();
+                try
+                {
+                    Database.Migrate();
+                }
+                catch (Microsoft.Data.Sqlite.SqliteException ex)
+                {
+                    if (ex.ErrorCode == -2147467259)
+                        Thread.Sleep(100);
+                    goto start;
+                }
             }
 #endif
         }

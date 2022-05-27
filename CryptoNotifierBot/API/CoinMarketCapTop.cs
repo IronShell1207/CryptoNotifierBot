@@ -18,7 +18,6 @@ namespace CryptoApi.API
     {
         private string TOKEN = "5ea2ded4-3929-46ed-866f-84ca15192d40";
         private string TopApiUrl = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest";
-        private string TopPairsUrl = "https://pro-api.coinmarketcap.com/v2/cryptocurrency/market-pairs/latest";
 
         public async Task<CoinMarketCapData.Datum[]> Get(int limit= 250)
         {
@@ -38,8 +37,7 @@ namespace CryptoApi.API
         {
             var data = await Get(limit);
             List<TradingPair> convertedPairs = new List<TradingPair>();
-            pairsrequest:
-            DataRequester dreq = new DataRequester();
+
             foreach (var pairCmc in data)
             {
                 convertedPairs.Add(new TradingPair(pairCmc.symbol, "USDT"));

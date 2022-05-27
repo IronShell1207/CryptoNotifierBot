@@ -34,11 +34,14 @@ namespace TelegramBot.Constants
                 InlineKeyboardButton btn = new InlineKeyboardButton(btnText);
                 btn.CallbackData = string.Format(dataPattern, arg0: pairs[i].Id, arg1: pairs[i].OwnerId);
                 buttons.Add(btn);
+                
                 if ((i % 2) == 1)
                 {
                     listButns.Add(buttons);
                     buttons = new List<InlineKeyboardButton>();
                 }
+                else if (i <= pairs.Count)
+                    listButns.Add(buttons);
             }
 
             return new InlineKeyboardMarkup(listButns);

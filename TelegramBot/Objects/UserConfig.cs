@@ -81,7 +81,6 @@ namespace TelegramBot.Objects
             }
             return true;
 
-            //return cfg.Equals(this);
             return (cfg.TelegramId == TelegramId
                     && cfg.Id == Id
                     && cfg.NightModeEnable == NightModeEnable

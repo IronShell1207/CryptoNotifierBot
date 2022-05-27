@@ -15,7 +15,7 @@ namespace CryptoApi.Objects.ExchangesPairs
 
     public class KuData
     {
-        public long time { get; set; }
+        public Int64 time { get; set; }
         public KuTicker[] ticker { get; set; }
     }
 
