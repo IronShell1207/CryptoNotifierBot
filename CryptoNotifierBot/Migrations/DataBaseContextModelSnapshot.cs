@@ -34,7 +34,7 @@ namespace CryptoApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DataSet");
+                    b.ToTable("DataSet", (string)null);
                 });
 
             modelBuilder.Entity("CryptoApi.Objects.PricedTradingPair", b =>
@@ -62,23 +62,18 @@ namespace CryptoApi.Migrations
 
                     b.HasIndex("CryDbSetId");
 
-                    b.ToTable("TradingPairs");
+                    b.ToTable("TradingPairs", (string)null);
                 });
 
             modelBuilder.Entity("CryptoApi.Objects.PricedTradingPair", b =>
                 {
                     b.HasOne("CryptoApi.Objects.CryDbSet", "CryDbSet")
-                        .WithMany("pairs")
+                        .WithMany()
                         .HasForeignKey("CryDbSetId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("CryDbSet");
-                });
-
-            modelBuilder.Entity("CryptoApi.Objects.CryDbSet", b =>
-                {
-                    b.Navigation("pairs");
                 });
 #pragma warning restore 612, 618
         }

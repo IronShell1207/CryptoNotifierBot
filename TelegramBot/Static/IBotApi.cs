@@ -237,7 +237,7 @@ namespace TelegramBot.Static
         public static Task ErrorHandler(ITelegramBotClient botClient, Exception ex, CancellationToken csToken)
         {
             ConsoleCommandsHandler.LogWrite(ex.Message);
-            throw ex;
+            //throw ex;
             return Task.CompletedTask;
         }
 

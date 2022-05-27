@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using CryptoApi.Constants;
 using CryptoApi.Objects;
@@ -23,19 +24,28 @@ namespace CryptoApi.Static.DataHandler
             optionsBuilder.UseSqlite(dbPath);
         }
 
+        private bool Migrating = false;
         public DataBaseContext()
         {
             //remove this for create migrations
-#if DEBUG
             var migr = Database.GetPendingMigrations();
-            var appl = Database.GetAppliedMigrations();
-            if (migr.Any())
+            if (migr.Any() && !Migrating)
             {
+                Migrating = true;
+                try
+                {
+                    Database.Migrate();
+                }
+                catch (Microsoft.Data.Sqlite.SqliteException ex)
+                {
+                    if (ex.ErrorCode == -2147467259)
+                        Thread.Sleep(100);
+
+                }
                 foreach (var migration in migr.ToList())
                     Diff.LogWrite($"Migration applying: {migration}");
-                Database.Migrate();
             }
-#endif
+
         }
 
     }

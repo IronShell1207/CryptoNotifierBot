@@ -26,35 +26,52 @@ namespace CryptoApi.Static.DataHandler
         {
             StringBuilder sb = new StringBuilder($"Market data updated: ");
             var guid = Guid.NewGuid();
-            using (var api = new ExchangeApi(Exchanges.Binance))
-                 api.GetExchangeData<List<BinancePair>>(guid);
-
-            using (var api = new ExchangeApi(Exchanges.Bitget))
-                api.GetExchangeData<BitgetData>(guid);
-
-            using (var api = new ExchangeApi(Exchanges.Okx))
-                api.GetExchangeData<OkxData>(guid);
-
-            using (var api = new ExchangeApi(Exchanges.GateIO))
-                api.GetExchangeData<List<GateIOTicker>>(guid);
-            
-            using (var api = new ExchangeApi(Exchanges.Kucoin))
-                api.GetExchangeData<KucoinData>(guid);
-            
-
-            await Task.Run(() => Thread.Sleep(1200));
-
-            var dataSetsReady = await GetLatestDataSets();
-            while (dataSetsReady == null || dataSetsReady?.Count < 5 && Try>0)
+            var tasksPool = new List<Task>();
+            tasksPool.Add(new Task(() =>
             {
-                await Task.Run(() => Thread.Sleep(500));
-                dataSetsReady = await GetLatestDataSets();
-                Try--;
-            }
+                using (var api = new ExchangeApi(Exchanges.Binance))
+                {
+                    var result = api.GetExchangeData<List<BinancePair>>(guid).Result;
+                    sb.Append($"{api.ApiName}: {api.PairsCount} ");
+                }
+            }));
+            tasksPool.Add(new Task(() =>
+            {
+                using (var api = new ExchangeApi(Exchanges.Bitget))
+                {
+                    var result = api.GetExchangeData<BitgetData>(guid).Result;
+                    sb.Append($"{api.ApiName}: {api.PairsCount} ");
+                }
 
+            }));
+            tasksPool.Add(new Task(() =>
+            {
+                using (var api = new ExchangeApi(Exchanges.Okx))
+                {
+                   var result = api.GetExchangeData<OkxData>(guid).Result;
+                    sb.Append($"{api.ApiName}: {api.PairsCount} ");
+                }
+            }));
+            tasksPool.Add(new Task(() =>
+            {
+                using (var api = new ExchangeApi(Exchanges.GateIO))
+                {
+                    var result = api.GetExchangeData<List<GateIOTicker>>(guid).Result;
+                    sb.Append($"{api.ApiName}: {api.PairsCount} ");
+                }
+            }));
+            tasksPool.Add(new Task(() =>
+            {
+                using (var api = new ExchangeApi(Exchanges.Kucoin))
+                {
+                    var result = api.GetExchangeData<KucoinData>(guid).Result;
+                    sb.Append($"{api.ApiName}: {api.PairsCount} ");
+                }
+            }));
+            tasksPool.ForEach(x=>x.Start());
+            while (tasksPool.Any(x=>!x.IsCompleted))
+                Thread.Sleep(500);
             DataAvailable = true;
-            foreach (var dataSet in dataSetsReady)
-                sb.Append($"{dataSet.Exchange}: {dataSet.pairs.Count} ");
             Diff.LogWrite(sb.ToString());
         }
 
@@ -107,7 +124,7 @@ namespace CryptoApi.Static.DataHandler
                 var pairs = dbContext.TradingPairs.Where(x => x.CryDbSetId == dSet.Id && x.Exchange == dSet.Exchange).Take(limit).ToList();
                 return pairs;
             }
-        }
+        }   
 
         public async Task<List<CryDbSet>> GetLatestDataSets(int minutesOffset = 0)
         {

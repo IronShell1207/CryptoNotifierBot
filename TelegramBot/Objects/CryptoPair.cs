@@ -36,19 +36,16 @@ namespace TelegramBot.Objects
 
         public bool AreEqual(CryptoPair pair)
         {
-            return (pair.Id == Id
-                && pair.OwnerId == OwnerId
-                && pair.OwnerId == OwnerId
-                && pair.GainOrFall == GainOrFall
-                && pair.Enabled == Enabled
-                && pair.TriggerOnce == TriggerOnce
-                && pair.Triggered == Triggered
-                && pair.Price == Price
-                && pair.Screenshot == Screenshot
-                && pair.Note == Note
-                && pair.PairQuote == PairQuote
-                && pair.PairBase == PairBase
-                && pair.ExchangePlatform == ExchangePlatform);
+            var props = this.GetType().GetProperties().Where(x => x.PropertyType.IsValueType && x.PropertyType == typeof(string));
+            foreach (var prop in props)
+            {
+                var obj1 = prop.GetValue(this);
+                var obj2 = prop.GetValue(pair);
+                if (!obj1.Equals(obj2))
+                    return false;
+
+            }
+            return true;
         }
 
         public override string ToString() => !string.IsNullOrWhiteSpace(PairBase) && !string.IsNullOrWhiteSpace(PairQuote)
@@ -57,7 +54,6 @@ namespace TelegramBot.Objects
 
         public object Clone()
         {
-            
             return this.MemberwiseClone();
         }
 
@@ -69,7 +65,7 @@ namespace TelegramBot.Objects
             return link;
         }
 
-        private string EnabledDisabled(bool isEn) => isEn ? "enabled" : "disabled";
+        private string EnabledDisabled(bool isEn) => isEn ? "Enabled ☑️" : "Disabled ❌";
         public string TaskStatus()
         {
             var enabled = Enabled ? "✅" : "⛔️";
@@ -87,7 +83,7 @@ namespace TelegramBot.Objects
             return $"{enabled} #{Id} {this.ToStringWithLink()} {rofl}{Price} {triggered}";
         }
 
-        public string FullTaskInfo(string lang = "en")
+        public string FullTaskInfo(string lang = "en", bool tipsEnable = true)
         {
             var enableSymbol = CultureTextRequest.GetSettingsMsgString("enabled", lang);
             var disableSymbol = CultureTextRequest.GetSettingsMsgString("disabled", lang);
@@ -103,7 +99,8 @@ namespace TelegramBot.Objects
             sb.AppendLine($"{CultureTextRequest.GetSettingsMsgString("taskInfoActiveStatus", lang)}{enable}");
             sb.AppendLine($"{CultureTextRequest.GetSettingsMsgString("taskInfoTriggerPrice", lang)}{lessOrGreater}{this.Price} {lessOrGreaterSymbol}");
             sb.AppendLine($"{CultureTextRequest.GetSettingsMsgString("taskInfoExchangePlatform", lang)}{this.ExchangePlatform}");
-            if (TriggerOnce) sb.AppendLine($"Single trigger: {this.EnabledDisabled(this.TriggerOnce)} *💎 - if enabled, 🌗 - when triggered");
+            if (TriggerOnce) sb.AppendLine($"Single trigger: {this.EnabledDisabled(this.TriggerOnce)} 💎");
+            if (Triggered) sb.AppendLine("Trigger fired 🌗"); 
             if (!string.IsNullOrEmpty(Note)) sb.AppendLine($"Notes: {Note}");
             return sb.ToString();
 

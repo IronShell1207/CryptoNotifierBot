@@ -555,7 +555,7 @@ namespace TelegramBot.Static.MessageHandlers
         {
             using (AppDbContext dbContext = new AppDbContext())
             {
-                var user = dbContext.Users.FirstOrDefault(x => x.TelegramId == update.Message.Chat.Id);
+                var user = dbContext.Users?.FirstOrDefault(x => x.TelegramId == update.Message.Chat.Id);
                 if (user != null)
                 {
                     var tasks = dbContext.CryptoPairs.Where(x => x.OwnerId == user.Id).ToList();
