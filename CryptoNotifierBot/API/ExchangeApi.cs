@@ -55,7 +55,7 @@ namespace CryptoApi.API
 
                 if (prop.PropertyType.IsClass && prop.PropertyType != typeof(string))
                 {
-                    var h = GetFromProps(prop.PropertyType.GetProperties(), crdata);
+                    var h = GetFromProps(prop.PropertyType.GetProperties(), value);
                     if (h.Any())
                         return h;
                 }
