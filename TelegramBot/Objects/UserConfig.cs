@@ -27,10 +27,11 @@ namespace TelegramBot.Objects
         /// Compact notifications without any notes for true value, and full info notifications for false
         /// </summary>
         public bool NotesEnable { get; set; } = false;
+
         /// <summary>
         /// Compact pairs notifications for true value, and full info for false
         /// </summary>
-        public string CryptoNotifyStyle { get; set; }
+        public string CryptoNotifyStyle { get; set; } = "";
         public string Language { get; set; } = "en";
         /// <summary>
         /// If enabled, when user creates new tasks its trigger once by default

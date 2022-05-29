@@ -482,7 +482,7 @@ namespace TelegramBot.Static
                     };
                     db.Users.Add(user);
                     await SendMessage(chatId, Messages.welcomeMsg);
-                    db.SaveChangesAsync();
+                    await db.SaveChangesAsync();
                 }
 
                 return user;
