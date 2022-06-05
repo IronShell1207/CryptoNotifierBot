@@ -1,4 +1,4 @@
-using CryptoApi;
+﻿using CryptoApi;
 using CryptoApi.Objects;
 using CryptoApi.Static.DataHandler;
 using Microsoft.AspNetCore.Components;
@@ -80,6 +80,31 @@ namespace CryptoBotWebPortal.Data
             
         }
 
+        public async Task<(bool, string)> RemovePairFromBL(BreakoutSub user, BlackListedPairs pair)
+        {
+            try
+            {
+                using (AppDbContext dbContext = new AppDbContext())
+                {
+                    var userbreak = dbContext.BreakoutSubs.Include(x=>x.BlackListedPairsList).OrderBy(x => x.Id).First(x => x.Id == user.Id);
+                    if (userbreak != null)
+                    {
+                        //var pair = user.BlackListedPairsList.First(x => x == pair);
+                        userbreak.BlackListedPairsList.RemoveAll(x=>x.Id == pair.Id && x.OwnerId == pair.OwnerId);
+                        await dbContext.SaveChangesAsync();
+                        return (true, "Успешно удалено");
+                    }
+
+
+                }
+
+                return (false, "Ошибка");
+            }
+            catch (Exception ex)
+            {
+                return (false, ex.Message);
+            }
+        }
         public async Task<(bool, string)> SaveUserSettings(UserConfig userConfig, BreakoutSub sub)
         {
             try

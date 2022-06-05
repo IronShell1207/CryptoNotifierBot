@@ -72,21 +72,17 @@
             <h5><label class="cl-switch"> <input type="checkbox" @bind="user.Item2.S960MinUpdates"> <span class="switcher"></span> <span class="label">16 hours updates</span></label> </h5>
             <h5><label class="cl-switch"> <input type="checkbox" @bind="user.Item2.S1920MinUpdates"> <span class="switcher"></span> <span class="label">32 hours updates</span></label></h5>
 
-            <div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-white" style="width: 380px; height: 400px;">
-                <a href="/" class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
-                    <svg class="bi me-2" width="30" height="24"><use xlink:href="#bootstrap"></use></svg>
-                    <span class="fs-5 fw-semibold">Black listed pairs count: @user.Item2.BlackListedPairsList.Count</span>
-                </a>
+            <div class="container" style="width: 380px; height: 400px; overflow: auto; position: relative;">
+                <h2 class="fs-5 fw-semibold">Black listed pairs count: @user.Item2.BlackListedPairsList.Count</h2>
+                <div class="list-group" >
                 @foreach (var brkpair in user.Item2.BlackListedPairsList)
                 {
-                    <a href="#" class="list-group-item list-group-item-action py-3 lh-tight">
-                        <div class="d-flex w-100 align-items-center justify-content-between">
-                            <strong class="mb-1">@brkpair.ToString()</strong>
-                            
-                        </div>
-                       
-                    </a>
+                    <li href="#" class="list-group-item">@brkpair.ToString() 
+                        <button type="button" class="btn btn-primary btn-xs" @onclick="@(() =>  RemoveFromList(brkpair) )">Remove
+
+                        </button></li>
                 }
+                </div>
             </div>
             </div>
     }
@@ -121,9 +117,16 @@
         AlertVisible = true;
         await Task.Run((() => Thread.Sleep(1500)));
         AlertVisible = false;
-        NavigationManager.NavigateTo("/fetchusers");
-        
-
+        //NavigationManager.NavigateTo("/fetchusers");
     }
 
+    private async Task RemoveFromList(BlackListedPairs pair)
+    {
+        var result = await ForecastService.RemovePairFromBL(user.Item2, pair);
+        user.Item2.BlackListedPairsList.Remove(pair);
+        AlertMessage = result.Item2;
+        AlertVisible = true;
+        await Task.Run((() => Thread.Sleep(1500)));
+        AlertVisible = false;
+    }
 }
