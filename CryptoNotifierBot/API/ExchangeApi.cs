@@ -47,8 +47,6 @@ namespace CryptoApi.API
         {
             foreach (var prop in props)
             {
-                if (prop.PropertyType == typeof(Int64))
-                    continue;
                 var value = prop?.GetValue(crdata);
                 if (value is IEnumerable<TheTradingPair>)
                     return (IEnumerable<TheTradingPair>)value;

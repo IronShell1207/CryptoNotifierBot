@@ -15,7 +15,7 @@ namespace CryptoApi.Objects.ExchangesPairs
 
     public class KuData
     {
-        public Int64 time { get; set; }
+        public long time { get; set; }
         public KuTicker[] ticker { get; set; }
     }
 
@@ -37,7 +37,7 @@ namespace CryptoApi.Objects.ExchangesPairs
         public string makerFeeRate { get; set; }
         public string takerCoefficient { get; set; }
         public string makerCoefficient { get; set; }
-        public override string Symbol => symbol;
+        public override string Symbol => symbol;    
         public override string Price => last;
     }
 
