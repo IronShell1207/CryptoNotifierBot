@@ -40,16 +40,16 @@ namespace TelegramBot.Static.BotLoops
                         var pairsDefault = await UserTasksToNotify(user, dbContext, true);
                         var pairsSingleNotify = await UserTasksSingleNotify(user, dbContext);
                         var pairsTriggeredButRaised = await UserTriggeredTasksRaised(user, dbContext);
-                        if (pairsDefault.Any())
-                        {
-                            foreach (var pair in pairsDefault)
-                                sb.AppendLine(FormatNotifyEntryStock(pair.Item1, pair.Item2));
-                            if (user.RemoveLatestNotifyBeforeNew && lastMsg != null)
-                                await BotApi.RemoveMessage(user.TelegramId, (int)lastMsg);
-                            var msg = await BotApi.SendMessage(user.TelegramId, sb.ToString());
-                            var tpl = new IntervaledUsersHistory(user.Id, DateTime.Now, msg?.MessageId);
-                            lastUpdateUsers.Add(tpl);
-                        }
+                        //if (pairsDefault.Any())
+                        //{
+                        //    foreach (var pair in pairsDefault)
+                        //        sb.AppendLine(FormatNotifyEntryStock(pair.Item1, pair.Item2));
+                        //    if (user.RemoveLatestNotifyBeforeNew && lastMsg != null)
+                        //        await BotApi.RemoveMessage(user.TelegramId, (int)lastMsg);
+                        //    var msg = await BotApi.SendMessage(user.TelegramId, sb.ToString());
+                        //    var tpl = new IntervaledUsersHistory(user.Id, DateTime.Now, msg?.MessageId);
+                        //    lastUpdateUsers.Add(tpl);
+                        //}
                         CrtMsg(pairsSingleNotify, sb, user);
                         CrtMsg(pairsTriggeredButRaised, sb, user, $"⚠️Pairs triggered, but raise above or fall bellow trigger again:\n");
                     }
@@ -66,11 +66,12 @@ namespace TelegramBot.Static.BotLoops
                     user.NightModeStartTime, user.NightModeEndsTime,
                     dateTimenow.Hour * 60 + dateTimenow.Minute)))
             {
-                var pairs = dbContext.CryptoPairs.Where(x => x.OwnerId == user.Id && x.Enabled && !x.TriggerOnce).ToList();
-                foreach (var pair in pairs)
+
+                //var pairs = dbContext.CryptoPairs.Where(x => x.OwnerId == user.Id && x.Enabled && !x.TriggerOnce).ToList();
+                foreach (var pair in user.pairs.Where(x => x.OwnerId == user.Id && x.Enabled && !x.TriggerOnce).ToList())
                 {
                     var price = await Program.cryptoData.GetCurrentPricePairByName(pair.ToTradingPair());
-                    if (price.Price > 0 && (price.Price > pair.Price && pair.GainOrFall ||
+                    if (price?.Price > 0 && (price.Price > pair.Price && pair.GainOrFall ||
                         price.Price < pair.Price && !pair.GainOrFall))
                         tasks.Add(new(pair, price.Price));
                 }
@@ -89,14 +90,13 @@ namespace TelegramBot.Static.BotLoops
                 foreach (var pair in pairsSingle)
                 {
                     var price = await Program.cryptoData.GetCurrentPricePairByName(pair.ToTradingPair());
-                    if (price.Price > 0 && (price.Price > pair.Price && pair.GainOrFall ||
+                    if (price?.Price > 0 && (price.Price > pair.Price && pair.GainOrFall ||
                                             price.Price < pair.Price && !pair.GainOrFall))
                     {
                         tasksReturing.Add(new(pair, price.Price));
                         pair.Triggered = true;
                     }
                 }
-
                 dbContext.SaveChangesAsync();
             }
 
@@ -112,7 +112,7 @@ namespace TelegramBot.Static.BotLoops
                 foreach (var pair in pairsTriggered)
                 {
                     var price = await Program.cryptoData.GetCurrentPricePairByName(pair.ToTradingPair());
-                    if (price.Price > 0 && ((price.Price * 1.01) < pair.Price && pair.GainOrFall ||
+                    if (price?.Price > 0 && ((price.Price * 1.01) < pair.Price && pair.GainOrFall ||
                                             (price.Price * 0.99) > pair.Price && !pair.GainOrFall))
                     {
                         tasksReturing.Add(new(pair, price.Price));

@@ -221,7 +221,16 @@ namespace TelegramBot.Static.MessageHandlers
  
 
         }
-
+        public async Task<CommandHandlerResult> RemoveAllBlackListedPairsUser(UserConfig user)
+        {
+            using (var dbcontext = new AppDbContext())
+            {
+                var breakoutUsrCfg = dbcontext.BreakoutSubs.Include(x=>x.BlackListedPairsList).First(x => x.TelegramId == user.TelegramId);
+                breakoutUsrCfg.BlackListedPairsList?.Clear();
+                dbcontext.SaveChangesAsync();
+                return new CommandHandlerResult("Success", true);
+            }
+        }
         public async void AddWhiteTopList(Update update)
         {
             var match = CommandsRegex.BreakoutCommands.AddTopSymbolsToWhiteList.Match(update.Message.Text);
@@ -233,18 +242,22 @@ namespace TelegramBot.Static.MessageHandlers
                 {
                     var userBreakoutCfg = dbContext.BreakoutSubs.OrderBy(x => x.TelegramId).
                         FirstOrDefault(x=> x.TelegramId == update.Message.From.Id);
-                    userBreakoutCfg.WhitelistInsteadBlack = true;
-                    userBreakoutCfg.BlackListEnable = true;
-                    userBreakoutCfg.BlackListedPairsList.RemoveAll(x => x.OwnerId == userBreakoutCfg.Id);
-                    foreach (var pair in topPairs)
+                    if (userBreakoutCfg != null)
                     {
-                        BlackListedPairs bpair = new BlackListedPairs(pair);
-                        userBreakoutCfg.BlackListedPairsList.Add(bpair);
-                    }
+                        userBreakoutCfg.WhitelistInsteadBlack = true;
+                        userBreakoutCfg.BlackListEnable = true;
+                        userBreakoutCfg.BlackListedPairsList.RemoveAll(x => x.OwnerId == userBreakoutCfg.Id);
+                        foreach (var pair in topPairs)
+                        {
+                            BlackListedPairs bpair = new BlackListedPairs(pair);
+                            userBreakoutCfg.BlackListedPairsList.Add(bpair);
+                        }
 
-                    dbContext.SaveChangesAsync();
-                    BotApi.SendMessage(update.Message.From.Id,
-                        $"White listed pairs saved to the db in count of {topPairs.Count}");
+                        await dbContext.SaveChangesAsync();
+                        BotApi.SendMessage(update.Message.From.Id,
+                            $"White listed pairs saved to the db in count of {topPairs.Count}");
+                    }
+                    else BotApi.SendMessage(update.Message.From.Id, "You're not subscribed!");
                 }
             }
         }

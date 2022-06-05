@@ -52,7 +52,7 @@
             <h5><label class="cl-switch"> <input type="checkbox" @bind="user.Item2.Subscribed"> <span class="switcher"></span> <span class="label">Subscription status</span></label></h5>
             <h5><label class="cl-switch"> <input type="checkbox" @bind="user.Item2.BlackListEnable"> <span class="switcher"></span> <span class="label">Black/white list parsing enable</span></label></h5>
             <h5><label class="cl-switch"> <input type="checkbox" @bind="user.Item2.WhitelistInsteadBlack"> <span class="switcher"></span> <span class="label">White list instead black</span></label></h5>
-            <h5>Black listed pairs count: @user.Item2.BlackListedPairsList.Count</h5>
+            
             <h5>Platforms subscription:</h5>
             <label class="cl-switch"> <input type="checkbox" @bind="user.Item2.BinanceSub"> <span class="switcher"></span> <span class="label">Binance</span></label>
             <label class="cl-switch"> <input type="checkbox" @bind="user.Item2.BitgetSub"> <span class="switcher"></span> <span class="label">Bitget</span></label>
@@ -71,7 +71,24 @@
             <h5> <label class="cl-switch"> <input type="checkbox" @bind="user.Item2.S480MinUpdates"> <span class="switcher"></span> <span class="label">8 hours updates</span></label> </h5>
             <h5><label class="cl-switch"> <input type="checkbox" @bind="user.Item2.S960MinUpdates"> <span class="switcher"></span> <span class="label">16 hours updates</span></label> </h5>
             <h5><label class="cl-switch"> <input type="checkbox" @bind="user.Item2.S1920MinUpdates"> <span class="switcher"></span> <span class="label">32 hours updates</span></label></h5>
-        </div>
+
+            <div class="d-flex flex-column align-items-stretch flex-shrink-0 bg-white" style="width: 380px; height: 400px;">
+                <a href="/" class="d-flex align-items-center flex-shrink-0 p-3 link-dark text-decoration-none border-bottom">
+                    <svg class="bi me-2" width="30" height="24"><use xlink:href="#bootstrap"></use></svg>
+                    <span class="fs-5 fw-semibold">Black listed pairs count: @user.Item2.BlackListedPairsList.Count</span>
+                </a>
+                @foreach (var brkpair in user.Item2.BlackListedPairsList)
+                {
+                    <a href="#" class="list-group-item list-group-item-action py-3 lh-tight">
+                        <div class="d-flex w-100 align-items-center justify-content-between">
+                            <strong class="mb-1">@brkpair.ToString()</strong>
+                            
+                        </div>
+                       
+                    </a>
+                }
+            </div>
+            </div>
     }
     else
     {

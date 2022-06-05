@@ -18,6 +18,7 @@ namespace TelegramBot
         public static DataRequester cryptoData { get; private set; }
         static void Main(string[] args)
         {
+            Console.CursorVisible = false;
             CultureInfo ci = new CultureInfo("en");
             Thread.CurrentThread.CurrentCulture = ci;
             Botlogo.PrintLogo(Botlogo.LogoMain);
@@ -29,7 +30,7 @@ namespace TelegramBot
             while (!cryptoData.DataAvailable)
             {
                 spinner.UpdateProgress();
-                Thread.Sleep(550);
+                Thread.Sleep(240);
             }
             ConsoleCommandsHandler.LogWrite("Crypto notifications bot loading...");
             if (string.IsNullOrWhiteSpace(AppSettingsStatic.Settings.TelegramBotToken))
@@ -46,6 +47,7 @@ namespace TelegramBot
             ConsoleCommandsHandler.LogWrite("Crypto exchanges data updater loop has been started");
             while (true)
             {
+                Console.CursorVisible = true;
                 try
                 {
                     var reader = Console.ReadLine();

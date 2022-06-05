@@ -158,7 +158,11 @@ namespace CryptoApi.Static.DataHandler
             using (DataBaseContext dbContext = new DataBaseContext())
             {
                 if (string.IsNullOrEmpty(pairname.Exchange))
-                    pairname.Exchange = GetExchangesForPair(pairname).Result.FirstOrDefault();
+                {
+                    var exchanges = await GetExchangesForPair(pairname);
+                    if (!exchanges.Any()) return null;
+                    pairname.Exchange = exchanges.FirstOrDefault();
+                }
                 var dbSet = dbContext.DataSet.OrderBy(x => x.Id).LastOrDefault(x => x.Exchange == pairname.Exchange);
                 var pair = dbContext.TradingPairs.FirstOrDefault(x =>
                     x.CryDbSetId == dbSet.Id &&
