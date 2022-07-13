@@ -16,7 +16,8 @@ namespace TelegramBot.Static.BotLoops
         private static List<IntervaledUsersHistory> lastUpdateUsers = new List<IntervaledUsersHistory>() { };
         public static bool MonitorLoopCancellationToken { get; set; } = true;
 
-        private static async void CrtMsg(List<(CryptoPair, double)> lst, StringBuilder sb, UserConfig user, string msg = "")
+        private static async void CrtMsg(List<(CryptoPair, double)> lst, StringBuilder sb, UserConfig user,
+            string msg = "")
         {
             if (lst.Any())
             {
@@ -40,6 +41,7 @@ namespace TelegramBot.Static.BotLoops
                         var pairsDefault = await UserTasksToNotify(user, dbContext, true);
                         var pairsSingleNotify = await UserTasksSingleNotify(user, dbContext);
                         var pairsTriggeredButRaised = await UserTriggeredTasksRaised(user, dbContext);
+                        var pairMon = await UserTasksMon(user, dbContext);
                         //if (pairsDefault.Any())
                         //{
                         //    foreach (var pair in pairsDefault)
@@ -51,31 +53,58 @@ namespace TelegramBot.Static.BotLoops
                         //    lastUpdateUsers.Add(tpl);
                         //}
                         CrtMsg(pairsSingleNotify, sb, user);
-                        CrtMsg(pairsTriggeredButRaised, sb, user, $"⚠️Pairs triggered, but raise above or fall bellow trigger again:\n");
+                        CrtMsgMoon(pairMon, user);
+                        CrtMsg(pairsTriggeredButRaised, sb, user,
+                            $"⚠️Pairs triggered, but raise above or fall bellow trigger again:\n");
                     }
                 }
+
                 Thread.Sleep(420);
             }
         }
 
-        public static async Task<List<(CryptoPair, double)>> UserTasksToNotify(UserConfig user, AppDbContext dbContext, bool useInterval = true)
+        private static DateTime _lastMonNotify { get; set; } = DateTime.Now;
+
+        public static async Task<List<(MonObj, double)>> UserTasksMon(UserConfig user, AppDbContext dbContext)
+        {
+            List<(MonObj, double)> tasks = new List<(MonObj, double)>();
+            if (_lastMonNotify < DateTime.Now.AddMinutes(-1))
+            {
+                var pairs = dbContext.MonPairs.Where(x => x.OwnerId == user.Id);
+                foreach (var pair in pairs.ToList())
+                {
+                    var price = await Program.cryptoData.GetCurrentPricePairByName(pair.PairBase.ToUpper(), "USDT");
+                    if (price?.Price > 0)
+                        tasks.Add(new(pair, price.Price));
+                }
+
+                _lastMonNotify = DateTime.Now;
+            }
+            return tasks;
+        }
+
+        public static async Task<List<(CryptoPair, double)>> UserTasksToNotify(UserConfig user, AppDbContext dbContext,
+            bool useInterval = true)
         {
             List<(CryptoPair, double)> tasks = new List<(CryptoPair, double)>();
             DateTime dateTimenow = DateTime.Now;
-            if (!useInterval || UpdateIntervalExpired(user.Id, user.NoticationsInterval) && !(user.NightModeEnable && !NightTime(
-                    user.NightModeStartTime, user.NightModeEndsTime,
-                    dateTimenow.Hour * 60 + dateTimenow.Minute)))
+            if (!useInterval || UpdateIntervalExpired(user.Id, user.NoticationsInterval) && !(user.NightModeEnable &&
+                    !NightTime(
+                        user.NightModeStartTime, user.NightModeEndsTime,
+                        dateTimenow.Hour * 60 + dateTimenow.Minute)))
             {
 
                 //var pairs = dbContext.CryptoPairs.Where(x => x.OwnerId == user.Id && x.Enabled && !x.TriggerOnce).ToList();
-                foreach (var pair in user.pairs.Where(x => x.OwnerId == user.Id && x.Enabled && !x.TriggerOnce).ToList())
+                foreach (var pair in user.pairs.Where(x => x.OwnerId == user.Id && x.Enabled && !x.TriggerOnce)
+                             .ToList())
                 {
                     var price = await Program.cryptoData.GetCurrentPricePairByName(pair.ToTradingPair());
                     if (price?.Price > 0 && (price.Price > pair.Price && pair.GainOrFall ||
-                        price.Price < pair.Price && !pair.GainOrFall))
+                                             price.Price < pair.Price && !pair.GainOrFall))
                         tasks.Add(new(pair, price.Price));
                 }
             }
+
             return tasks;
         }
 
@@ -91,19 +120,21 @@ namespace TelegramBot.Static.BotLoops
                 {
                     var price = await Program.cryptoData.GetCurrentPricePairByName(pair.ToTradingPair());
                     if (price?.Price > 0 && (price.Price > pair.Price && pair.GainOrFall ||
-                                            price.Price < pair.Price && !pair.GainOrFall))
+                                             price.Price < pair.Price && !pair.GainOrFall))
                     {
                         tasksReturing.Add(new(pair, price.Price));
                         pair.Triggered = true;
                     }
                 }
+
                 dbContext.SaveChangesAsync();
             }
 
             return tasksReturing;
         }
 
-        public static async Task<List<(CryptoPair, double)>> UserTriggeredTasksRaised(UserConfig user, AppDbContext dbContext)
+        public static async Task<List<(CryptoPair, double)>> UserTriggeredTasksRaised(UserConfig user,
+            AppDbContext dbContext)
         {
             List<(CryptoPair, double)> tasksReturing = new List<(CryptoPair, double)>();
             var pairsTriggered = user?.pairs?.Where(x => x.TriggerOnce && x.Triggered)?.ToList();
@@ -113,14 +144,16 @@ namespace TelegramBot.Static.BotLoops
                 {
                     var price = await Program.cryptoData.GetCurrentPricePairByName(pair.ToTradingPair());
                     if (price?.Price > 0 && ((price.Price * 1.01) < pair.Price && pair.GainOrFall ||
-                                            (price.Price * 0.99) > pair.Price && !pair.GainOrFall))
+                                             (price.Price * 0.99) > pair.Price && !pair.GainOrFall))
                     {
                         tasksReturing.Add(new(pair, price.Price));
                         pair.Triggered = false;
                     }
                 }
+
                 dbContext.SaveChangesAsync();
             }
+
             return tasksReturing;
         }
 
@@ -131,8 +164,25 @@ namespace TelegramBot.Static.BotLoops
             var gainOrFallSymbol = gorfall ? "raise 📈" : "fall 📉";
             var priceDiff = gorfall ? ((newprice / pair.Price) * 100) - 100 : ((newprice / pair.Price) * 100) - 100;
             var plusic = gorfall ? "+" : "";
-            return $"{enabledSymbol} {pair.Id} {pair.PairBase}/{pair.PairQuote} {plusic}{string.Format("{0:##0.00#}", priceDiff)}% {gainOrFallSymbol} {pair.Price}->{newprice}";
+            return
+                $"{enabledSymbol} {pair.Id} {pair.PairBase}/{pair.PairQuote} {plusic}{string.Format("{0:##0.00#}", priceDiff)}% {gainOrFallSymbol} {pair.Price}->{newprice}";
         }
+
+        private static async void CrtMsgMoon(List<(MonObj, double)> lst, UserConfig user)
+        {
+            StringBuilder sb = new StringBuilder();
+            if (lst.Any())
+            {
+                foreach (var pair in lst)
+                    sb.AppendLine(FormatStrStock(pair.Item1, pair.Item2));
+                await BotApi.SendMessage(user.TelegramId, sb.ToString());
+            }
+        }
+        private static string FormatStrStock(MonObj pair, double price)
+        {
+            return $"{pair.PairBase} - {price}";
+        }
+
         private static string FormatNotifyEntryByUserFormat(string formater, CryptoPair pair, double newPrice)
         {
             var enabledSymbol = pair.Enabled ? "✅" : "🛑";

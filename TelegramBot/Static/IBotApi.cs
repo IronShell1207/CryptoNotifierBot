@@ -99,6 +99,14 @@ namespace TelegramBot.Static
                 using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
                     msgHandler.SetSingleTriggerForUserTask(update);
 
+            else if (CommandsRegex.AddMonPairsCommandRegex.IsMatch(update.Message.Text))
+                using (MonitorPairsMsgHandler msghandler = new MonitorPairsMsgHandler())
+                    msghandler.AddToMon(update, CommandsRegex.AddMonPairsCommandRegex.Match(update.Message.Text));
+
+            else if (CommandsRegex.DelMonPairsCommandRegex.IsMatch(update.Message.Text))
+                using (MonitorPairsMsgHandler msghandler = new MonitorPairsMsgHandler())
+                    msghandler.RemoveFromMon(update, CommandsRegex.DelMonPairsCommandRegex.Match(update.Message.Text));
+
             else if (CommandsRegex.BreakoutCommands.AddTopSymbolsToWhiteList.IsMatch(update.Message.Text))
                 using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler())
                     msgHandler.AddWhiteTopList(update);
@@ -114,10 +122,6 @@ namespace TelegramBot.Static
             else if (CommandsRegex.MonitoringTaskCommands.AddComment.IsMatch(update.Message.Text))
                 using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
                     msgHandler.AddCommentForTask(update);
-
-            else if (CommandsRegex.MonitoringTaskCommands.CreatePair.IsMatch(update.Message.Text))
-                using (CryptoPairsMsgHandler msghandler = new CryptoPairsMsgHandler())
-                    msghandler.CreateTaskFirstStage(update, user);
 
             else if (CommandsRegex.SettingsCommands.ChangeDelay.IsMatch(update.Message.Text))
                 using (SettingsManager sm = new SettingsManager())
@@ -156,6 +160,10 @@ namespace TelegramBot.Static
                     var result = await brkMsgHandler.RemoveAllBlackListedPairsUser(user);
                     SendMessage(user.TelegramId, result.Message);
                 }
+
+            else if (CommandsRegex.MonitoringTaskCommands.CreatePair.IsMatch(update.Message.Text))
+                using (CryptoPairsMsgHandler msghandler = new CryptoPairsMsgHandler())
+                    msghandler.CreateTaskFirstStage(update, user);
 
             else if (CommandsRegex.BreakoutCommands.AddTopSymbolsToWhiteList.IsMatch(update.Message.Text))
                 using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler())

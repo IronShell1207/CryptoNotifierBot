@@ -48,7 +48,7 @@ namespace CryptoApi.Static.DataHandler
             {
                 using (var api = new ExchangeApi(Exchanges.Okx))
                 {
-                   var result = api.GetExchangeData<OkxData>(guid).Result;
+                    var result = api.GetExchangeData<OkxData>(guid).Result;
                     sb.Append($"{api.ApiName}: {api.PairsCount} ");
                 }
             }));

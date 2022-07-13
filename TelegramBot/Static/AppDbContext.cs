@@ -4,6 +4,7 @@ using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using CryptoApi.Objects;
 using CryptoApi.Objects.ExchangesPairs;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
@@ -20,6 +21,7 @@ namespace TelegramBot.Static
         public DbSet<NotifyMyPos> PositionsNotify { get; set; }
         public DbSet<PositionPair> Positions { get; set; }
         public DbSet<Takes> PositionTakes { get; set; }
+        public DbSet<MonObj> MonPairs { get; set; }
         public DbSet<BannedUser> BannedUsers { get; set; }
         public DbSet<MessageAccepted> AcceptedMessages { get; set; }
 

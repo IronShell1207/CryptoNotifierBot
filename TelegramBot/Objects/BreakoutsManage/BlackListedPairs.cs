@@ -25,5 +25,16 @@ namespace TelegramBot.Objects
             Base = pair.Name;
             Quote = pair.Quote;
         }
+
+        public BlackListedPairs(string basef, string quote)
+        {
+            Base = basef;
+            Quote = quote;
+        }
+        public TradingPair ToTradingPair()
+        {
+            return new TradingPair(Base, Quote, "");
+        }
+
     }
 }

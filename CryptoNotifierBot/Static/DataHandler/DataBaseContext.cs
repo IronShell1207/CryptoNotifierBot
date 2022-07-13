@@ -18,7 +18,7 @@ namespace CryptoApi.Static.DataHandler
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.EnableDetailedErrors();
-            string dbPath = @"D:\Programs\Tbase\";//Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"/Tcryptobot/";
+            string dbPath = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"/Tcryptobot/";
             if (!Directory.Exists(dbPath)) Directory.CreateDirectory(dbPath);
             dbPath = $"Filename={dbPath}cryptodata.db";
             optionsBuilder.UseSqlite(dbPath);
