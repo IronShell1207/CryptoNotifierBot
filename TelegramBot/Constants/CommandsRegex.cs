@@ -16,6 +16,9 @@ namespace TelegramBot.Constants
         public static Regex AddMonPairsCommandRegex =
             new(
                 @"/addmon\s*(?<base>[a-zA-Z0-9]{2,9})");
+        public static Regex SetTimeZoneCommandRegex =
+            new(
+                @"/timezone\s*(?<time>[-0-9]{1,2})");
         public static Regex DelMonPairsCommandRegex =
             new(
                 @"/delmon\s*(?<base>[a-zA-Z0-9]{2,9})");

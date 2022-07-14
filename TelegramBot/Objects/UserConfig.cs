@@ -58,6 +58,9 @@ namespace TelegramBot.Objects
         /// Time in minutes (6*60 by default)
         /// </summary>
         public int NightModeEndsTime { get; set; } = 180;
+
+        public int TimezoneChange { get; set; } = 3;
+
         /// <summary>
         /// Shows Pumps and Dumps info in notifications
         /// </summary>
