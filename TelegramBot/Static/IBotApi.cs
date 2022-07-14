@@ -107,6 +107,10 @@ namespace TelegramBot.Static
                 using (MonitorPairsMsgHandler msghandler = new MonitorPairsMsgHandler())
                     msghandler.RemoveFromMon(update, CommandsRegex.DelMonPairsCommandRegex.Match(update.Message.Text));
 
+            else if (CommandsRegex.SetTimeZoneCommandRegex.IsMatch(update.Message.Text))
+                using (UserSettingsMsgHandler msghandler = new UserSettingsMsgHandler())
+                    msghandler.SetTimeZone(update);
+
             else if (CommandsRegex.BreakoutCommands.AddTopSymbolsToWhiteList.IsMatch(update.Message.Text))
                 using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler())
                     msgHandler.AddWhiteTopList(update);
@@ -474,27 +478,27 @@ namespace TelegramBot.Static
                 return true;
             }
         }
-        public static async Task<UserConfig> GetUserSettings(Update update)
+        public static async Task<UserConfig> GetUserSettings(Update update, AppDbContext dbContext = null)
         {
             var chatId = GetTelegramIdFromUpdate(update);
-            using (AppDbContext db = new AppDbContext())
-            {
-                var user = db.Users.FirstOrDefault(x => x.TelegramId == chatId.Identifier);
-                if (user == null)
-                {
-                    user = new UserConfig()
-                    {
-                        TelegramId = (long)chatId.Identifier,
-                        UserName = update.Message?.From?.Username ?? "",
-                        FirstName = update.Message?.From?.FirstName + " " + update.Message?.From?.LastName
-                    };
-                    db.Users.Add(user);
-                    await SendMessage(chatId, Messages.welcomeMsg);
-                    await db.SaveChangesAsync();
-                }
+            if (dbContext == null) dbContext = new AppDbContext();
 
-                return user;
+            var user = dbContext.Users.FirstOrDefault(x => x.TelegramId == chatId.Identifier);
+            if (user == null)
+            {
+                user = new UserConfig()
+                {
+                    TelegramId = (long)chatId.Identifier,
+                    UserName = update.Message?.From?.Username ?? "",
+                    FirstName = update.Message?.From?.FirstName + " " + update.Message?.From?.LastName
+                };
+                dbContext.Users.Add(user);
+                await SendMessage(chatId, Messages.welcomeMsg);
+                await dbContext.SaveChangesAsync();
             }
+
+            return user;
+
         }
 
         public static async Task<int> GetMessageIdFromUpdateTask(Update update)
