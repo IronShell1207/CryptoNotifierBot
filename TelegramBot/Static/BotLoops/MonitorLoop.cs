@@ -180,7 +180,7 @@ namespace TelegramBot.Static.BotLoops
         }
         private static string FormatStrStock(MonObj pair, double price)
         {
-            return $"{pair.PairBase} - {price}";
+            return $"{pair.PairBase} {price}";
         }
 
         private static string FormatNotifyEntryByUserFormat(string formater, CryptoPair pair, double newPrice)
