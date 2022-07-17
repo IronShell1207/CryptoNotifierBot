@@ -14,6 +14,7 @@ namespace TelegramBot.Static.BotLoops
     public class MonitorLoop
     {
         private static List<IntervaledUsersHistory> lastUpdateUsers = new List<IntervaledUsersHistory>() { };
+        private static List<IntervaledUsersHistory> _monUsersUpdate = new();
         public static bool MonitorLoopCancellationToken { get; set; } = true;
 
         private static async void CrtMsg(List<(CryptoPair, double)> lst, StringBuilder sb, UserConfig user,
@@ -70,7 +71,7 @@ namespace TelegramBot.Static.BotLoops
             List<(MonObj, double)> tasks = new List<(MonObj, double)>();
             DateTime dateTimenow = DateTime.Now.ToUniversalTime().AddHours(user.TimezoneChange);
 
-                if (!NightTime(user.NightModeStartTime, user.NightModeEndsTime, dateTimenow.Hour * 60 + dateTimenow.Minute))
+            if (!NightTime(user.NightModeStartTime, user.NightModeEndsTime, dateTimenow.Hour * 60 + dateTimenow.Minute))
             {
                 if (_lastMonNotify < DateTime.Now.AddMinutes(-1))
                 {
@@ -81,8 +82,10 @@ namespace TelegramBot.Static.BotLoops
                         if (price?.Price > 0)
                             tasks.Add(new(pair, price.Price));
                     }
+                    if (tasks.Count > 0)
 
-                    _lastMonNotify = DateTime.Now;
+
+                        _lastMonNotify = DateTime.Now;
                 }
             }
             return tasks;
@@ -90,144 +93,148 @@ namespace TelegramBot.Static.BotLoops
 
         public static async Task<List<(CryptoPair, double)>> UserTasksToNotify(UserConfig user, AppDbContext dbContext,
                 bool useInterval = true)
-            {
-                List<(CryptoPair, double)> tasks = new List<(CryptoPair, double)>();
-                DateTime dateTimenow = DateTime.Now.AddHours(user.TimezoneChange-3);
+        {
+            List<(CryptoPair, double)> tasks = new List<(CryptoPair, double)>();
+            DateTime dateTimenow = DateTime.Now.AddHours(user.TimezoneChange - 3);
 
-                if (!useInterval || UpdateIntervalExpired(user.Id, user.NoticationsInterval) && !(user.NightModeEnable &&
-                        !NightTime(user.NightModeStartTime, user.NightModeEndsTime, dateTimenow.Hour * 60 + dateTimenow.Minute)))
+            if (!useInterval || UpdateIntervalExpired(user.Id, user.NoticationsInterval) && !(user.NightModeEnable &&
+                    !NightTime(user.NightModeStartTime, user.NightModeEndsTime, dateTimenow.Hour * 60 + dateTimenow.Minute)))
+            {
+                //var pairs = dbContext.CryptoPairs.Where(x => x.OwnerId == user.Id && x.Enabled && !x.TriggerOnce).ToList();
+                foreach (var pair in user.pairs.Where(x => x.OwnerId == user.Id && x.Enabled && !x.TriggerOnce)
+                             .ToList())
                 {
-                    //var pairs = dbContext.CryptoPairs.Where(x => x.OwnerId == user.Id && x.Enabled && !x.TriggerOnce).ToList();
-                    foreach (var pair in user.pairs.Where(x => x.OwnerId == user.Id && x.Enabled && !x.TriggerOnce)
-                                 .ToList())
-                    {
-                        var price = await Program.cryptoData.GetCurrentPricePairByName(pair.ToTradingPair());
-                        if (price?.Price > 0 && (price.Price > pair.Price && pair.GainOrFall ||
-                                                 price.Price < pair.Price && !pair.GainOrFall))
-                            tasks.Add(new(pair, price.Price));
-                    }
-                }
-
-                return tasks;
-            }
-
-            public static async Task<List<(CryptoPair, double)>> UserTasksSingleNotify(UserConfig user,
-                AppDbContext dbContext)
-            {
-                List<(CryptoPair, double)> tasksReturing = new List<(CryptoPair, double)>();
-                var pairsSingle = user?.pairs?.Where(x => x.TriggerOnce && !x.Triggered)?.ToList();
-
-                if (pairsSingle?.Count > 0)
-                {
-                    foreach (var pair in pairsSingle)
-                    {
-                        var price = await Program.cryptoData.GetCurrentPricePairByName(pair.ToTradingPair());
-                        if (price?.Price > 0 && (price.Price > pair.Price && pair.GainOrFall ||
-                                                 price.Price < pair.Price && !pair.GainOrFall))
-                        {
-                            tasksReturing.Add(new(pair, price.Price));
-                            pair.Triggered = true;
-                        }
-                    }
-
-                    dbContext.SaveChangesAsync();
-                }
-
-                return tasksReturing;
-            }
-
-            public static async Task<List<(CryptoPair, double)>> UserTriggeredTasksRaised(UserConfig user,
-                AppDbContext dbContext)
-            {
-                List<(CryptoPair, double)> tasksReturing = new List<(CryptoPair, double)>();
-                var pairsTriggered = user?.pairs?.Where(x => x.TriggerOnce && x.Triggered)?.ToList();
-                if (pairsTriggered?.Count > 0)
-                {
-                    foreach (var pair in pairsTriggered)
-                    {
-                        var price = await Program.cryptoData.GetCurrentPricePairByName(pair.ToTradingPair());
-                        if (price?.Price > 0 && ((price.Price * 1.01) < pair.Price && pair.GainOrFall ||
-                                                 (price.Price * 0.99) > pair.Price && !pair.GainOrFall))
-                        {
-                            tasksReturing.Add(new(pair, price.Price));
-                            pair.Triggered = false;
-                        }
-                    }
-
-                    dbContext.SaveChangesAsync();
-                }
-
-                return tasksReturing;
-            }
-
-            private static string FormatNotifyEntryStock(CryptoPair pair, double newprice)
-            {
-                var gorfall = pair.Price < newprice;
-                var enabledSymbol = gorfall ? "▲" : "▼";
-                var gainOrFallSymbol = gorfall ? "raise 📈" : "fall 📉";
-                var priceDiff = gorfall ? ((newprice / pair.Price) * 100) - 100 : ((newprice / pair.Price) * 100) - 100;
-                var plusic = gorfall ? "+" : "";
-                return
-                    $"{enabledSymbol} {pair.Id} {pair.PairBase}/{pair.PairQuote} {plusic}{string.Format("{0:##0.00#}", priceDiff)}% {gainOrFallSymbol} {pair.Price}->{newprice}";
-            }
-
-            private static async void CrtMsgMoon(List<(MonObj, double)> lst, UserConfig user)
-            {
-                StringBuilder sb = new StringBuilder();
-                if (lst.Any())
-                {
-                    foreach (var pair in lst)
-                        sb.AppendLine(FormatStrStock(pair.Item1, pair.Item2));
-                    await BotApi.SendMessage(user.TelegramId, sb.ToString());
+                    var price = await Program.cryptoData.GetCurrentPricePairByName(pair.ToTradingPair());
+                    if (price?.Price > 0 && (price.Price > pair.Price && pair.GainOrFall ||
+                                             price.Price < pair.Price && !pair.GainOrFall))
+                        tasks.Add(new(pair, price.Price));
                 }
             }
-            private static string FormatStrStock(MonObj pair, double price)
-            {
-                return $"{pair.PairBase} - {price}";
-            }
 
-            private static string FormatNotifyEntryByUserFormat(string formater, CryptoPair pair, double newPrice)
-            {
-                var enabledSymbol = pair.Enabled ? "✅" : "🛑";
-                return null;
-            }
-            private static bool UpdateIntervalExpired(int userId, int interval)
-            {
-                var lastupdated = lastUpdateUsers.FirstOrDefault(x => x.UserId == userId);
-                if (lastupdated == null) return true;
-                var nowDate = DateTime.Now;
-                if (lastupdated.LastUpdateDateTime + TimeSpan.FromSeconds(interval) < nowDate)
-                {
-                    lastUpdateUsers.Remove(lastupdated);
-                    return true;
-                }
-
-                return false;
-            }
-            private static bool NightTime(int start, int end, int now)
-            {
-                if (start > now && now > end) return true;
-                return false;
-            }
+            return tasks;
         }
 
-        public class IntervaledUsersHistory
+        public static async Task<List<(CryptoPair, double)>> UserTasksSingleNotify(UserConfig user,
+            AppDbContext dbContext)
         {
-            public int UserId { get; set; }
-            public DateTime LastUpdateDateTime { get; set; }
-            public int? LastMsgId { get; set; }
-            public IntervaledUsersHistory(int userid, DateTime datetime)
+            List<(CryptoPair, double)> tasksReturing = new List<(CryptoPair, double)>();
+            var pairsSingle = user?.pairs?.Where(x => x.TriggerOnce && !x.Triggered)?.ToList();
+
+            if (pairsSingle?.Count > 0)
             {
-                UserId = userid;
-                LastUpdateDateTime = datetime;
+                foreach (var pair in pairsSingle)
+                {
+                    var price = await Program.cryptoData.GetCurrentPricePairByName(pair.ToTradingPair());
+                    if (price?.Price > 0 && (price.Price > pair.Price && pair.GainOrFall ||
+                                             price.Price < pair.Price && !pair.GainOrFall))
+                    {
+                        tasksReturing.Add(new(pair, price.Price));
+                        pair.Triggered = true;
+                    }
+                }
+
+                dbContext.SaveChangesAsync();
             }
 
-            public IntervaledUsersHistory(int userid, DateTime datetime, int? msg)
-            {
+            return tasksReturing;
+        }
 
-                UserId = userid;
-                LastUpdateDateTime = datetime;
-                LastMsgId = msg;
+        public static async Task<List<(CryptoPair, double)>> UserTriggeredTasksRaised(UserConfig user,
+            AppDbContext dbContext)
+        {
+            List<(CryptoPair, double)> tasksReturing = new List<(CryptoPair, double)>();
+            var pairsTriggered = user?.pairs?.Where(x => x.TriggerOnce && x.Triggered)?.ToList();
+            if (pairsTriggered?.Count > 0)
+            {
+                foreach (var pair in pairsTriggered)
+                {
+                    var price = await Program.cryptoData.GetCurrentPricePairByName(pair.ToTradingPair());
+                    if (price?.Price > 0 && ((price.Price * 1.01) < pair.Price && pair.GainOrFall ||
+                                             (price.Price * 0.99) > pair.Price && !pair.GainOrFall))
+                    {
+                        tasksReturing.Add(new(pair, price.Price));
+                        pair.Triggered = false;
+                    }
+                }
+
+                dbContext.SaveChangesAsync();
             }
+
+            return tasksReturing;
+        }
+
+        private static string FormatNotifyEntryStock(CryptoPair pair, double newprice)
+        {
+            var gorfall = pair.Price < newprice;
+            var enabledSymbol = gorfall ? "▲" : "▼";
+            var gainOrFallSymbol = gorfall ? "raise 📈" : "fall 📉";
+            var priceDiff = gorfall ? ((newprice / pair.Price) * 100) - 100 : ((newprice / pair.Price) * 100) - 100;
+            var plusic = gorfall ? "+" : "";
+            return
+                $"{enabledSymbol} {pair.Id} {pair.PairBase}/{pair.PairQuote} {plusic}{string.Format("{0:##0.00#}", priceDiff)}% {gainOrFallSymbol} {pair.Price}->{newprice}";
+        }
+
+        private static async void CrtMsgMoon(List<(MonObj, double)> lst, UserConfig user)
+        {
+            StringBuilder sb = new StringBuilder();
+            if (lst.Any())
+            {
+                var lastMsg = _monUsersUpdate.First(x => x.UserId == user.Id);
+                _monUsersUpdate.Remove(lastMsg);
+                if (lastMsg != null) await BotApi.RemoveMessage(lastMsg.UserId, (int)lastMsg.LastMsgId);
+                foreach (var pair in lst)
+                    sb.AppendLine(FormatStrStock(pair.Item1, pair.Item2));
+                var msg = await BotApi.SendMessage(user.TelegramId, sb.ToString());
+                _monUsersUpdate.Add(new IntervaledUsersHistory(user.Id, DateTime.Now, msg.MessageId));
+            }
+        }
+        private static string FormatStrStock(MonObj pair, double price)
+        {
+            return $"{pair.PairBase} - {price}";
+        }
+
+        private static string FormatNotifyEntryByUserFormat(string formater, CryptoPair pair, double newPrice)
+        {
+            var enabledSymbol = pair.Enabled ? "✅" : "🛑";
+            return null;
+        }
+        private static bool UpdateIntervalExpired(int userId, int interval)
+        {
+            var lastupdated = lastUpdateUsers.FirstOrDefault(x => x.UserId == userId);
+            if (lastupdated == null) return true;
+            var nowDate = DateTime.Now;
+            if (lastupdated.LastUpdateDateTime + TimeSpan.FromSeconds(interval) < nowDate)
+            {
+                lastUpdateUsers.Remove(lastupdated);
+                return true;
+            }
+
+            return false;
+        }
+        private static bool NightTime(int start, int end, int now)
+        {
+            if (start > now && now > end) return true;
+            return false;
         }
     }
+
+    public class IntervaledUsersHistory
+    {
+        public int UserId { get; set; }
+        public DateTime LastUpdateDateTime { get; set; }
+        public int? LastMsgId { get; set; }
+        public IntervaledUsersHistory(int userid, DateTime datetime)
+        {
+            UserId = userid;
+            LastUpdateDateTime = datetime;
+        }
+
+        public IntervaledUsersHistory(int userid, DateTime datetime, int? msg)
+        {
+
+            UserId = userid;
+            LastUpdateDateTime = datetime;
+            LastMsgId = msg;
+        }
+    }
+}
