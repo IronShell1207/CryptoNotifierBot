@@ -212,14 +212,8 @@ namespace TelegramBot.Static.BotLoops
 
             return false;
         }
-        private static bool NightTime(int start, int end, int now)
-        {
-            if (start > now && now > end) return true;
-            return false;
-        }
-    }
-            return false;
-        }
+      
+        
         private static bool NightTime(int start, int end, DateTime now)
         {
             int startHours = start / 60;
