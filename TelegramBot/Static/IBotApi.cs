@@ -279,7 +279,10 @@ namespace TelegramBot.Static
             {
                 await BadRequestHandler(chatId, apiException);
             }
-
+            catch (Telegram.Bot.Exceptions.RequestException reqException)
+            {
+                await BadRequestHandler(chatId, reqException);
+            }
             return null;
         }
         /// <summary>
@@ -304,6 +307,11 @@ namespace TelegramBot.Static
             {
                 await BadRequestHandler(chatId, apiException);
             }
+
+            catch (Telegram.Bot.Exceptions.RequestException reqException)
+            {
+                await BadRequestHandler(chatId, reqException);
+            }
             return null;
         }
         /// <summary>
@@ -322,6 +330,10 @@ namespace TelegramBot.Static
             catch (Telegram.Bot.Exceptions.ApiRequestException apiException)
             {
                 await BadRequestHandler(chatId, apiException);
+            }
+            catch (Telegram.Bot.Exceptions.RequestException reqException)
+            {
+                await BadRequestHandler(chatId, reqException);
             }
             return null;
         }
@@ -343,6 +355,10 @@ namespace TelegramBot.Static
             {
                 await BadRequestHandler(chatId, apiException);
             }
+            catch (Telegram.Bot.Exceptions.RequestException reqException)
+            {
+                await BadRequestHandler(chatId, reqException);
+            }
             return null;
         }
 
@@ -362,6 +378,10 @@ namespace TelegramBot.Static
             catch (Telegram.Bot.Exceptions.ApiRequestException apiException)
             {
                 await BadRequestHandler(chatId, apiException);
+            }
+            catch (Telegram.Bot.Exceptions.RequestException reqException)
+            {
+                await BadRequestHandler(chatId, reqException);
             }
             return null;
         }
@@ -449,9 +469,9 @@ namespace TelegramBot.Static
                 return update.EditedMessage.From.Id;
             else return null;
         }
-        public static async Task BadRequestHandler(ChatId chatId, Telegram.Bot.Exceptions.ApiRequestException ex)
+        public static async Task BadRequestHandler(ChatId chatId, Exception ex)
         {
-            if (ex.Message == "Bad Request: chat not found" || ex.ErrorCode == 400)
+            if (ex.Message == "Bad Request: chat not found" )
             {
                 using (AppDbContext dbContext = new AppDbContext())
                 {

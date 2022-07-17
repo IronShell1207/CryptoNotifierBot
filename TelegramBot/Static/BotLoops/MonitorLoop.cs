@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -71,7 +72,7 @@ namespace TelegramBot.Static.BotLoops
             List<(MonObj, double)> tasks = new List<(MonObj, double)>();
             DateTime dateTimenow = DateTime.Now.ToUniversalTime().AddHours(user.TimezoneChange);
 
-            if (!NightTime(user.NightModeStartTime, user.NightModeEndsTime, dateTimenow.Hour * 60 + dateTimenow.Minute))
+            if (!NightTime(user.NightModeStartTime, user.NightModeEndsTime, dateTimenow))
             {
                 if (_lastMonNotify < DateTime.Now.AddMinutes(-1))
                 {
@@ -98,7 +99,7 @@ namespace TelegramBot.Static.BotLoops
             DateTime dateTimenow = DateTime.Now.AddHours(user.TimezoneChange - 3);
 
             if (!useInterval || UpdateIntervalExpired(user.Id, user.NoticationsInterval) && !(user.NightModeEnable &&
-                    !NightTime(user.NightModeStartTime, user.NightModeEndsTime, dateTimenow.Hour * 60 + dateTimenow.Minute)))
+                    !NightTime(user.NightModeStartTime, user.NightModeEndsTime, dateTimenow)))
             {
                 //var pairs = dbContext.CryptoPairs.Where(x => x.OwnerId == user.Id && x.Enabled && !x.TriggerOnce).ToList();
                 foreach (var pair in user.pairs.Where(x => x.OwnerId == user.Id && x.Enabled && !x.TriggerOnce)
@@ -214,6 +215,24 @@ namespace TelegramBot.Static.BotLoops
         private static bool NightTime(int start, int end, int now)
         {
             if (start > now && now > end) return true;
+            return false;
+        }
+    }
+            return false;
+        }
+        private static bool NightTime(int start, int end, DateTime now)
+        {
+            int startHours = start / 60;
+            CultureInfo provider = new CultureInfo("ru-RU");
+            Thread.CurrentThread.CurrentCulture = provider;
+            System.Globalization.DateTimeStyles style = DateTimeStyles.None;
+            var daysStart = start > (now.Hour * 60 + now.Minute) && (now.Hour * 60 + now.Minute) < end ? -1 : 0;
+            var dateStart = new DateTime(now.Year, now.Month, now.Day + daysStart, startHours, start - (startHours * 60), 0);
+            int endHours = end / 60;
+            int endDay = (now.Hour * 60 + now.Minute) > end && (now.Hour * 60 + now.Minute) < start ? 1 :0;
+            var dateEnd = new DateTime(now.Year, now.Month, now.Day, endHours, end - (endHours * 60), 0).AddDays(endDay);
+            if (now > dateStart && now < dateEnd)
+                return true;
             return false;
         }
     }
