@@ -65,16 +65,20 @@ namespace TelegramBot.Static.BotLoops
             }
         }
 
-        private static DateTime _lastMonNotify { get; set; } = DateTime.Now;
-
         public static async Task<List<(MonObj, double)>> UserTasksMon(UserConfig user, AppDbContext dbContext)
         {
             List<(MonObj, double)> tasks = new List<(MonObj, double)>();
             DateTime dateTimenow = DateTime.Now.ToUniversalTime().AddHours(user.TimezoneChange);
-
-            if (!NightTime(user.NightModeStartTime, user.NightModeEndsTime, dateTimenow))
+            var lastMsg = _monUsersUpdate?.LastOrDefault(x => x.UserId == user.Id);
+            if (lastMsg == null)
             {
-                if (_lastMonNotify < DateTime.Now.AddMinutes(-1))
+                lastMsg = new IntervaledUsersHistory(user.Id, dateTimenow, user.TelegramId);
+                _monUsersUpdate?.Add(lastMsg);
+            }
+
+            if (!(user.NightModeEnable && !NightTime(user.NightModeStartTime, user.NightModeEndsTime, dateTimenow)))
+            {
+                if (lastMsg.LastUpdateDateTime < dateTimenow.AddMinutes(-1))
                 {
                     var pairs = dbContext.MonPairs.Where(x => x.OwnerId == user.Id);
                     foreach (var pair in pairs.ToList())
@@ -84,9 +88,9 @@ namespace TelegramBot.Static.BotLoops
                             tasks.Add(new(pair, price.Price));
                     }
                     if (tasks.Count > 0)
-
-
-                        _lastMonNotify = DateTime.Now;
+                    {
+                        lastMsg.LastUpdateDateTime = dateTimenow.AddMinutes(1);
+                    }
                 }
             }
             return tasks;
@@ -178,15 +182,19 @@ namespace TelegramBot.Static.BotLoops
         private static async void CrtMsgMoon(List<(MonObj, double)> lst, UserConfig user)
         {
             StringBuilder sb = new StringBuilder();
+
             if (lst.Any())
             {
-                var lastMsg = _monUsersUpdate.First(x => x.UserId == user.Id);
-                _monUsersUpdate.Remove(lastMsg);
-                if (lastMsg != null) await BotApi.RemoveMessage(lastMsg.UserId, (int)lastMsg.LastMsgId);
+                var lastMsg = _monUsersUpdate?.FirstOrDefault(x => x.UserId == user.Id);
+                if (lastMsg != null && lastMsg.LastMsgId != null)
+                {
+                    
+                    await BotApi.RemoveMessage(lastMsg.TelegramId, (int)lastMsg.LastMsgId);
+                }
                 foreach (var pair in lst)
                     sb.AppendLine(FormatStrStock(pair.Item1, pair.Item2));
                 var msg = await BotApi.SendMessage(user.TelegramId, sb.ToString());
-                _monUsersUpdate.Add(new IntervaledUsersHistory(user.Id, DateTime.Now, msg.MessageId));
+                lastMsg.LastMsgId = msg.MessageId;
             }
         }
         private static string FormatStrStock(MonObj pair, double price)
@@ -212,8 +220,8 @@ namespace TelegramBot.Static.BotLoops
 
             return false;
         }
-      
-        
+
+
         private static bool NightTime(int start, int end, DateTime now)
         {
             int startHours = start / 60;
@@ -223,7 +231,7 @@ namespace TelegramBot.Static.BotLoops
             var daysStart = start > (now.Hour * 60 + now.Minute) && (now.Hour * 60 + now.Minute) < end ? -1 : 0;
             var dateStart = new DateTime(now.Year, now.Month, now.Day + daysStart, startHours, start - (startHours * 60), 0);
             int endHours = end / 60;
-            int endDay = (now.Hour * 60 + now.Minute) > end && (now.Hour * 60 + now.Minute) < start ? 1 :0;
+            int endDay = (now.Hour * 60 + now.Minute) > end && (now.Hour * 60 + now.Minute) < start ? 1 : 0;
             var dateEnd = new DateTime(now.Year, now.Month, now.Day, endHours, end - (endHours * 60), 0).AddDays(endDay);
             if (now > dateStart && now < dateEnd)
                 return true;
@@ -235,19 +243,24 @@ namespace TelegramBot.Static.BotLoops
     {
         public int UserId { get; set; }
         public DateTime LastUpdateDateTime { get; set; }
+        public long TelegramId { get; set; }
         public int? LastMsgId { get; set; }
-        public IntervaledUsersHistory(int userid, DateTime datetime)
+        public IntervaledUsersHistory(int userid, DateTime datetime, long telegramId = 0)
         {
             UserId = userid;
             LastUpdateDateTime = datetime;
+            if (telegramId != 0)
+                TelegramId = telegramId;
         }
 
-        public IntervaledUsersHistory(int userid, DateTime datetime, int? msg)
+        public IntervaledUsersHistory(int userid, DateTime datetime, int? msg, long telegramId = 0)
         {
 
             UserId = userid;
             LastUpdateDateTime = datetime;
             LastMsgId = msg;
+            if (telegramId!= 0)
+            TelegramId = telegramId;
         }
     }
 }
