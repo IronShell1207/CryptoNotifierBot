@@ -359,6 +359,7 @@ namespace TelegramBot.Static
             {
                 await BadRequestHandler(chatId, reqException);
             }
+
             return null;
         }
 
@@ -479,6 +480,10 @@ namespace TelegramBot.Static
                     if (baduser != null) dbContext.Users.Remove(baduser);
                     ConsoleCommandsHandler.LogWrite($"Bad user {chatId.Identifier}. Removed from the database");
                 }
+            }
+            else if (ex.Message == "Exception during making request")
+            {
+                return;
             }
             else throw ex;
         }
