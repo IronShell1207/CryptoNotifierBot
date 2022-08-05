@@ -38,7 +38,7 @@ namespace CryptoBotWebPortal.Data
             }
         }
 
-        public async Task<(UserConfig, BreakoutSub)> userconfigGET(int id)
+        public async Task<(UserConfig, BreakoutSub, List<MonObj>)> userconfigGET(int id)
         {
             using (AppDbContext dbContext = new AppDbContext())
             {
@@ -46,8 +46,20 @@ namespace CryptoBotWebPortal.Data
                     Include(x => x.pairs).
                     FirstOrDefault(x=>x.Id == id);
                 var usersets = dbContext.BreakoutSubs.Include(x=>x.BlackListedPairsList).OrderBy(x => x.Id).FirstOrDefault(x => x.UserId == user.Id);
-                return (user, usersets);
+                var monTasks = dbContext.MonPairs.Where(x => x.OwnerId == user.Id)?.ToList();
+                return (user, usersets, monTasks);
 
+            }
+        }
+
+        public async Task<bool> RemoveMonPair(MonObj pair)
+        {
+            using (AppDbContext dbContext = new AppDbContext())
+            {
+                var pairMon = dbContext.MonPairs.First(x => x.Id == pair.Id && pair.OwnerId == x.Id && x.PairBase == pair.PairBase);
+                dbContext.MonPairs.Remove(pairMon);
+                await dbContext.SaveChangesAsync();
+                return true;
             }
         }
 
