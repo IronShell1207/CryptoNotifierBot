@@ -93,15 +93,15 @@
     </td>
     <td>
         <h1>Monitoring tasks</h1>
-        if (user.Item3 != null)
+        @if (user.Item3 != null)
         {
         <div class="container" style="width: 380px; height: 400px; overflow: auto; position: relative;">
-            <h2 class="fs-5 fw-semibold">Black listed pairs count: @user.Item2.BlackListedPairsList.Count</h2>
+            <h2 class="fs-5 fw-semibold">Mon listed pairs count: @user.Item3.Count</h2>
             <div class="list-group">
                 @foreach (var monPair in user.Item3)
                 {
                     <li href="#" class="list-group-item">@monPair.ToString()
-                        <button type="button" class="btn btn-primary btn-xs" @onclick="@(() => RemoveFromList(monPair))">Remove
+                        <button type="button" class="btn btn-primary btn-xs" @onclick="@(() => RemoveFromList(brkpair))">Remove
 
                         </button></li>
                 }
