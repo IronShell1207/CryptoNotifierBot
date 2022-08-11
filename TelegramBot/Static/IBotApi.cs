@@ -459,6 +459,8 @@ namespace TelegramBot.Static
             {
                 await BadRequestHandler(chatId, apiEx);
             }
+            catch (Telegram.Bot.Exceptions.RequestException) { }
+
         }
         public static ChatId GetTelegramIdFromUpdate(Update update)
         {
