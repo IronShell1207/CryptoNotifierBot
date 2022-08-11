@@ -26,7 +26,7 @@ namespace CryptoApi.API
         public int PairsCount { get; private set; }
         public DateTime LastUpdate { get; private set; }
 
-        public List<PricedTradingPair> Convert(IEnumerable<TheTradingPair> pairs)// where T : IEnumerable<TheTradingPair>
+        public List<PricedTradingPair> Convert(IEnumerable<TheTradingPair> pairs)
         {
             var listReturner = new List<PricedTradingPair>();
             foreach (var pair in pairs)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
@@ -9,9 +10,12 @@ namespace CryptoApi.Objects
 {
     public class TradingPair
     {
-        public string Name { get; set; }
-        public string Quote { get; set; }
-        public string Exchange { get; set; }
+        [Required(ErrorMessage = "No symbol specified!")]
+        public string? Name { get; set; }
+        [Required(ErrorMessage = "No quote specified!")]
+        public string? Quote { get; set; }
+        
+        public string? Exchange { get; set; }
 
         public override string ToString()
         {
