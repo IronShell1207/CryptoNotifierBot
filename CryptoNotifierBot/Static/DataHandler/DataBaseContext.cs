@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CryptoApi.Constants;
 using CryptoApi.Objects;
+using CryptoApi.Objects.ExchangesPairs;
 using Microsoft.EntityFrameworkCore;
 
 namespace CryptoApi.Static.DataHandler
@@ -15,9 +16,12 @@ namespace CryptoApi.Static.DataHandler
     {
         public DbSet<CryDbSet> DataSet { get; set; }
         public DbSet<PricedTradingPair> TradingPairs { get; set; }
+        public DbSet<KuTickerDB> KucoinPairs { get; set; }
+        public DbSet<OkxTickerDB> OkxPairs { get; set; }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.EnableDetailedErrors();
+            optionsBuilder.EnableSensitiveDataLogging();
             string dbPath = @"D:\Programs\Tbase\";
             if (!Directory.Exists(dbPath))
                  dbPath = @"C:\Soft\db\"; //Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData) + @"/Tcryptobot/";
@@ -31,6 +35,7 @@ namespace CryptoApi.Static.DataHandler
         {
             //remove this for create migrations
             var migr = Database.GetPendingMigrations();
+            
             if (migr.Any() && !Migrating)
             {
                 Migrating = true;

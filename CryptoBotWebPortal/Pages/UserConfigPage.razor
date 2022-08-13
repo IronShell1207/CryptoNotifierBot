@@ -101,7 +101,7 @@
                 @foreach (var monPair in user.Item3)
                 {
                     <li href="#" class="list-group-item">@monPair.ToString()
-                        <button type="button" class="btn btn-primary btn-xs" @onclick="@(() => RemoveFromList(brkpair))">Remove
+                        <button type="button" class="btn btn-primary btn-xs" @onclick="@(() => RemoveMonTask(monPair))">Remove
 
                         </button></li>
                 }

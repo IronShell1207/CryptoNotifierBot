@@ -38,7 +38,7 @@ namespace TelegramBot.Static
         {
             //remove this for create migrations
 #if DEBUG
-            var migr = Database.GetPendingMigrations();
+           var migr = Database.GetPendingMigrations();
             start:
             if (migr.Any() && !Migrating)
             {

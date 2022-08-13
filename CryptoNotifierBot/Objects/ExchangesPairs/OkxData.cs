@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ namespace CryptoApi.Objects.ExchangesPairs
 
     public class OkxTicker : TheTradingPair
     {
+        [NotMapped]
         public string instType { get; set; }
         public string instId { get; set; }
         public string last { get; set; }
@@ -28,8 +30,11 @@ namespace CryptoApi.Objects.ExchangesPairs
         public string low24h { get; set; }
         public string volCcy24h { get; set; }
         public string vol24h { get; set; }
+        [NotMapped]
         public string ts { get; set; }
+        [NotMapped]
         public string sodUtc0 { get; set; }
+        [NotMapped]
         public string sodUtc8 { get; set; }
 
         public override string Symbol => instId;

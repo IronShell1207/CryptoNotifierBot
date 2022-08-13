@@ -68,6 +68,59 @@ namespace CryptoApi.Static.DataHandler
                     sb.Append($"{api.ApiName}: {api.PairsCount} ");
                 }
             }));
+            tasksPool.Add(new Task(() =>
+            {
+                using (var api = new ExchangeApi(Exchanges.Kucoin))
+                {
+                    var result = api.GetTickerData<KucoinData>().Result.data.ticker; 
+                    using (DataBaseContext dbContext = new DataBaseContext())
+                    {
+                        var rows = dbContext.KucoinPairs.Where(x => x.Id > -1);
+                        Diff.LogWrite($"Rows deleted {rows.Count()} in KucoinPairs");
+                        dbContext.RemoveRange(rows);
+                       /* var rows = dbContext.Database.ExecuteSqlRaw(
+                            $"DELETE FROM KucoinPairs");*/
+                        
+
+                        for (var index = 0; index < result.Length; index++)
+                        {
+                            var tickData = result[index];
+                            dbContext.KucoinPairs.Add(new KuTickerDB(tickData));
+                           
+                        }
+
+                        dbContext.SaveChanges();
+                    }
+                    Diff.LogWrite($"{api.ApiName} data saved: {result.Length}");
+                }
+            }));
+            tasksPool.Add(new Task(() =>
+            {
+                using (var api = new ExchangeApi(Exchanges.Okx))
+                {
+                    var result = api.GetTickerData<OkxData>().Result.data; 
+                    using (DataBaseContext dbContext = new DataBaseContext())
+                    {
+                        var rows = dbContext.OkxPairs.Where(x => x.Id > -1);
+                        Diff.LogWrite($"Rows deleted {rows.Count()} in OkxPairs");
+                        dbContext.RemoveRange(rows);
+
+                       /* var rows = dbContext.Database.ExecuteSqlRaw(
+                            $"DELETE FROM OkxPairs");*/
+                        
+
+                        for (var index = 0; index < result.Length; index++)
+                        {
+                            var tickData = result[index];
+                            dbContext.OkxPairs.Add(new OkxTickerDB(tickData));
+                            
+                        }
+                        dbContext.SaveChanges();
+
+                    }
+                    Diff.LogWrite($"{api.ApiName} data saved: {result.Length}");
+                }
+            }));
             tasksPool.ForEach(x=>x.Start());
             while (tasksPool.Any(x=>!x.IsCompleted))
                 Thread.Sleep(500);

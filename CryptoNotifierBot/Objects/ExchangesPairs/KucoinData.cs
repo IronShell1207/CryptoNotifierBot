@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -33,7 +34,9 @@ namespace CryptoApi.Objects.ExchangesPairs
         public string volValue { get; set; }
         public string last { get; set; }
         public string averagePrice { get; set; }
+        [NotMapped]
         public string takerFeeRate { get; set; }
+        [NotMapped]
         public string makerFeeRate { get; set; }
         public string takerCoefficient { get; set; }
         public string makerCoefficient { get; set; }

@@ -37,7 +37,7 @@ namespace TelegramBot.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("BannedUsers");
+                    b.ToTable("BannedUsers", (string)null);
                 });
 
             modelBuilder.Entity("TelegramBot.Objects.BlackListedPairs", b =>
@@ -61,7 +61,7 @@ namespace TelegramBot.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("BlackListedPairs");
+                    b.ToTable("BlackListedPairs", (string)null);
                 });
 
             modelBuilder.Entity("TelegramBot.Objects.BreakoutSub", b =>
@@ -135,7 +135,7 @@ namespace TelegramBot.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("BreakoutSubs");
+                    b.ToTable("BreakoutSubs", (string)null);
                 });
 
             modelBuilder.Entity("TelegramBot.Objects.CryptoPair", b =>
@@ -184,7 +184,7 @@ namespace TelegramBot.Migrations
 
                     b.HasIndex("OwnerId");
 
-                    b.ToTable("CryptoPairs");
+                    b.ToTable("CryptoPairs", (string)null);
                 });
 
             modelBuilder.Entity("TelegramBot.Objects.MessageAccepted", b =>
@@ -210,7 +210,7 @@ namespace TelegramBot.Migrations
 
                     b.HasIndex("UserConfigId");
 
-                    b.ToTable("AcceptedMessages");
+                    b.ToTable("AcceptedMessages", (string)null);
                 });
 
             modelBuilder.Entity("TelegramBot.Objects.MonObj", b =>
@@ -228,7 +228,7 @@ namespace TelegramBot.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MonPairs");
+                    b.ToTable("MonPairs", (string)null);
                 });
 
             modelBuilder.Entity("TelegramBot.Objects.NotifyMyPos", b =>
@@ -245,7 +245,7 @@ namespace TelegramBot.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PositionsNotify");
+                    b.ToTable("PositionsNotify", (string)null);
                 });
 
             modelBuilder.Entity("TelegramBot.Objects.PositionPair", b =>
@@ -279,7 +279,7 @@ namespace TelegramBot.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Positions");
+                    b.ToTable("Positions", (string)null);
                 });
 
             modelBuilder.Entity("TelegramBot.Objects.Takes", b =>
@@ -299,7 +299,7 @@ namespace TelegramBot.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PositionTakes");
+                    b.ToTable("PositionTakes", (string)null);
                 });
 
             modelBuilder.Entity("TelegramBot.Objects.UserConfig", b =>
@@ -373,7 +373,7 @@ namespace TelegramBot.Migrations
 
                     b.HasIndex("SubSetsId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("TelegramBot.Objects.BannedUser", b =>
