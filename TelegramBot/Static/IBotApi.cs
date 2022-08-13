@@ -119,6 +119,10 @@ namespace TelegramBot.Static
                 using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
                     msgHandler.DropEverythingByProcent(update);
 
+            else if (CommandsRegex.SettingsCommands.SetNightTime.IsMatch(update.Message.Text))
+                using (UserSettingsMsgHandler msgHandler = new())
+                    msgHandler.SetNightTime(update);
+
             else if (CommandsRegex.MonitoringTaskCommands.ShowPair.IsMatch(update.Message.Text))
                 using (CryptoPairsMsgHandler msgHanlder = new CryptoPairsMsgHandler())
                     msgHanlder.ShowTaskInfo(update);
@@ -158,6 +162,11 @@ namespace TelegramBot.Static
             else if (update.Message.Text == "/create")
                 using (CryptoPairsMsgHandler msghandler = new CryptoPairsMsgHandler())
                     msghandler.CreateTaskFirstStage(update, user);
+
+            else if (CommandsRegex.SettingsCommands.SetEnableNight.IsMatch(update.Message.Text))
+                using (UserSettingsMsgHandler msgHandler = new())
+                    msgHandler.SetEnableNightMode(update);
+
             else if (update.Message.Text == Commands.RemoveAllFromBlackList)
                 using (BreakoutPairsMsgHandler brkMsgHandler = new BreakoutPairsMsgHandler())
                 {
