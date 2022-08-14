@@ -34,11 +34,10 @@ namespace TelegramBot.Static
             optionsBuilder.UseSqlite(dbPath);
         }
         private bool Migrating = false;
-        public AppDbContext()
+
+        public void MigrateStart()
         {
-            //remove this for create migrations
-#if DEBUG
-           var migr = Database.GetPendingMigrations();
+            var migr = Database.GetPendingMigrations();
             start:
             if (migr.Any() && !Migrating)
             {
@@ -57,7 +56,11 @@ namespace TelegramBot.Static
                     goto start;
                 }
             }
-#endif
+        }
+        public AppDbContext()
+        {
+            //remove this for create migrations
+            MigrateStart();
         }
     }
 }

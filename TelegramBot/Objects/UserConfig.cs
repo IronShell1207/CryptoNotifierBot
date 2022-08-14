@@ -50,14 +50,16 @@ namespace TelegramBot.Objects
         /// If night mode enabled and time setted correctly notifications will not be sended in that period of time.
         /// </summary>
         public bool NightModeEnable { get; set; } = false;
+
         /// <summary>
         /// Time in minutes (23*60 by default)
         /// </summary>
-        public int NightModeStartTime { get; set; } = 1380;
+        public TimeSpan NightModeStartTime { get; set; } = TimeSpan.FromHours(23);
+
         /// <summary>
         /// Time in minutes (6*60 by default)
         /// </summary>
-        public int NightModeEndsTime { get; set; } = 180;
+        public TimeSpan NightModeEndsTime { get; set; } = TimeSpan.FromHours(6);
 
         public int TimezoneChange { get; set; } = 3;
 

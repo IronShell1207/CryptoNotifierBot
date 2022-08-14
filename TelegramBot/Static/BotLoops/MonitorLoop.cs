@@ -102,7 +102,7 @@ namespace TelegramBot.Static.BotLoops
             List<(CryptoPair, double)> tasks = new List<(CryptoPair, double)>();
             DateTime dateTimenow = DateTime.Now.AddHours(user.TimezoneChange - 3);
 
-            if (!useInterval || UpdateIntervalExpired(user.Id, user.NoticationsInterval) && !(user.NightModeEnable &&
+           /* if (!useInterval || UpdateIntervalExpired(user.Id, user.NoticationsInterval) && !(user.NightModeEnable &&
                     !NightTime(user.NightModeStartTime, user.NightModeEndsTime, dateTimenow)))
             {
                 //var pairs = dbContext.CryptoPairs.Where(x => x.OwnerId == user.Id && x.Enabled && !x.TriggerOnce).ToList();
@@ -114,7 +114,7 @@ namespace TelegramBot.Static.BotLoops
                                              price.Price < pair.Price && !pair.GainOrFall))
                         tasks.Add(new(pair, price.Price));
                 }
-            }
+            }*/
 
             return tasks;
         }
@@ -222,23 +222,48 @@ namespace TelegramBot.Static.BotLoops
         }
 
 
-        private static bool NightTime(int start, int end, DateTime now)
+        private static bool NightTime(TimeSpan start, TimeSpan end, DateTime now)
         {
-            int startHours = start / 60;
+            TimeSpan timeNow = now.TimeOfDay;
             CultureInfo provider = new CultureInfo("ru-RU");
             Thread.CurrentThread.CurrentCulture = provider;
             System.Globalization.DateTimeStyles style = DateTimeStyles.None;
-            var daysStart = start > (now.Hour * 60 + now.Minute) && (now.Hour * 60 + now.Minute) < end ? -1 : 0;
+            if (DateTime.Now.TimeOfDay.IsBetween(start, end))
+            {
+                return true;
+            }
+            /*var daysStart = start > (now.Hour * 60 + now.Minute) && (now.Hour * 60 + now.Minute) < end ? -1 : 0;
             var dateStart = new DateTime(now.Year, now.Month, now.Day + daysStart, startHours, start - (startHours * 60), 0);
             int endHours = end / 60;
             int endDay = (now.Hour * 60 + now.Minute) > end && (now.Hour * 60 + now.Minute) < start ? 1 : 0;
             var dateEnd = new DateTime(now.Year, now.Month, now.Day, endHours, end - (endHours * 60), 0).AddDays(endDay);
             if (now > dateStart && now < dateEnd)
                 return true;
+            return false;*/
             return false;
         }
-    }
 
+    }
+    static class TimeSpanExtensions
+    { 
+        public static bool IsBetween(this TimeSpan time,
+            TimeSpan startTime, TimeSpan endTime)
+        {
+            if (endTime == startTime)
+            {
+                return true;
+            }
+
+            if (endTime < startTime)
+            {
+                return time <= endTime ||
+                       time >= startTime;
+            }
+
+            return time >= startTime &&
+                   time <= endTime;
+        }
+    }
     public class IntervaledUsersHistory
     {
         public int UserId { get; set; }
