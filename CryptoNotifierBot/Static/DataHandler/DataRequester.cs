@@ -106,7 +106,8 @@ namespace CryptoApi.Static.DataHandler
             {
                 using (var api = new ExchangeApi(Exchanges.Okx))
                 {
-                    var result = api.GetTickerData<OkxData>().Result.data; 
+                    var result = api.GetTickerData<OkxData>().Result?.data; 
+                    if (result != null)
                     using (DataBaseContext dbContext = new DataBaseContext())
                     {
                         var rows = dbContext.OkxPairs.Where(x => x.Id > -1);
