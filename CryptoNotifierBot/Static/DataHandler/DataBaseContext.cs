@@ -34,8 +34,14 @@ namespace CryptoApi.Static.DataHandler
         public DataBaseContext()
         {
             //remove this for create migrations
+            Migrate();
+
+        }
+
+        public void Migrate()
+        {
             var migr = Database.GetPendingMigrations();
-            
+
             if (migr.Any() && !Migrating)
             {
                 Migrating = true;
@@ -52,7 +58,6 @@ namespace CryptoApi.Static.DataHandler
                 foreach (var migration in migr.ToList())
                     Diff.LogWrite($"Migration applying: {migration}");
             }
-
         }
 
     }

@@ -1,4 +1,7 @@
-﻿using CryptoApi.Objects;
+﻿using CryptoApi.API;
+using CryptoApi.CoinMarketCapData;
+using CryptoApi.Objects;
+using CryptoApi.Objects.ExchangesPairs;
 using CryptoApi.Static.DataHandler;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -10,7 +13,6 @@ namespace WebApiPortal.Controllers
 {
     [Route("crypto")]
     [ApiController]
-    [Authorize]
     public class ValuesController : ControllerBase
     {
         private readonly ILogger<ValuesController> _logger;
@@ -20,7 +22,7 @@ namespace WebApiPortal.Controllers
             _logger = logger;
         }
 
-        
+
         [HttpGet]
         public async Task<ActionResult<string>> GetCurrentPrice(string name, string quote, string exchange)
         {
@@ -34,7 +36,7 @@ namespace WebApiPortal.Controllers
                 else return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User already exists!" });
             }
         }
-        [HttpPost]  
+        [HttpPost]
         public async Task<IActionResult> PostCurrentPrice([FromBody] TradingPair pair)
         {
             using (CryptoApi.Static.DataHandler.DataRequester requester = new DataRequester())
@@ -47,6 +49,19 @@ namespace WebApiPortal.Controllers
                 else return StatusCode(StatusCodes.Status500InternalServerError, new Response { Status = "Error", Message = "User already exists!" });
             }
         }
+        [HttpPost]
+        [Route("getKucoinData")]
+        public async Task<ActionResult<KuTickerDB>> GetKucoinPair(string name, string quote)
+        {
+            using (DataRequester requester = new())
+            {
+                var info = await requester.GetKucoinData(name, quote);
+                if (info == null)
+                    return StatusCode(StatusCodes.Status404NotFound, 
+                        new Response { Status = "Not found!", Message = "Pair not found in kucoin data!" });
+                return StatusCode(StatusCodes.Status200OK, info);
+            }
+        }
+
     }
 }
- 

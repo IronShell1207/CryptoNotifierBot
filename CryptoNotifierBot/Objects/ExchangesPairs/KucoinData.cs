@@ -40,6 +40,7 @@ namespace CryptoApi.Objects.ExchangesPairs
         public string makerFeeRate { get; set; }
         public string takerCoefficient { get; set; }
         public string makerCoefficient { get; set; }
+        [NotMapped]
         public override string Symbol => symbol;    
         public override string Price => last;
     }

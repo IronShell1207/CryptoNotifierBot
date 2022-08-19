@@ -25,7 +25,8 @@ namespace TelegramBot.Static.BotLoops
             {
                 foreach (var pair in lst)
                     sb.AppendLine(FormatNotifyEntryStock(pair.Item1, pair.Item2));
-                await BotApi.SendMessage(user.TelegramId, msg + sb);
+                var msgw = await BotApi.SendMessage(user.TelegramId, msg + sb);
+                lastUpdateUsers.Add(new IntervaledUsersHistory(user.Id, DateTime.Now, msgw.MessageId));
             }
         }
 
@@ -101,8 +102,8 @@ namespace TelegramBot.Static.BotLoops
         {
             List<(CryptoPair, double)> tasks = new List<(CryptoPair, double)>();
             DateTime dateTimenow = DateTime.Now.AddHours(user.TimezoneChange - 3);
-
-           /* if (!useInterval || UpdateIntervalExpired(user.Id, user.NoticationsInterval) && !(user.NightModeEnable &&
+            
+            if (!useInterval || UpdateIntervalExpired(user.Id, user.NoticationsInterval) && !(user.NightModeEnable &&
                     !NightTime(user.NightModeStartTime, user.NightModeEndsTime, dateTimenow)))
             {
                 //var pairs = dbContext.CryptoPairs.Where(x => x.OwnerId == user.Id && x.Enabled && !x.TriggerOnce).ToList();
@@ -114,7 +115,7 @@ namespace TelegramBot.Static.BotLoops
                                              price.Price < pair.Price && !pair.GainOrFall))
                         tasks.Add(new(pair, price.Price));
                 }
-            }*/
+            }
 
             return tasks;
         }
@@ -135,6 +136,7 @@ namespace TelegramBot.Static.BotLoops
                     {
                         tasksReturing.Add(new(pair, price.Price));
                         pair.Triggered = true;
+                      
                     }
                 }
 

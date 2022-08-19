@@ -72,27 +72,35 @@ namespace CryptoApi.Static.DataHandler
             {
                 using (var api = new ExchangeApi(Exchanges.Kucoin))
                 {
-                    var result = api.GetTickerData<KucoinData>().Result.data.ticker; 
-                    using (DataBaseContext dbContext = new DataBaseContext())
+                    var result = api.GetTickerData<KucoinData>().Result?.data?.ticker;
+                    if (result != null)
                     {
-                        var rows = dbContext.KucoinPairs.Where(x => x.Id > -1);
-                        Diff.LogWrite($"Rows deleted {rows.Count()} in KucoinPairs");
-                        dbContext.RemoveRange(rows);
-                       /* var rows = dbContext.Database.ExecuteSqlRaw(
-                            $"DELETE FROM KucoinPairs");*/
-                        
-
-                        for (var index = 0; index < result.Length; index++)
+                        using (DataBaseContext dbContext = new DataBaseContext())
                         {
-                            var tickData = result[index];
-                            dbContext.KucoinPairs.Add(new KuTickerDB(tickData));
-                           
-                        }
+                            var rows = dbContext.KucoinPairs.Where(x => x.Id > -1);
+                            Diff.LogWrite($"Rows deleted {rows.Count()} in KucoinPairs");
+                            dbContext.RemoveRange(rows);
+                            /* var rows = dbContext.Database.ExecuteSqlRaw(
+                                 $"DELETE FROM KucoinPairs");*/
 
-                        dbContext.SaveChanges();
+
+                            for (var index = 0; index < result.Length; index++)
+                            {
+                                var tickData = result[index];
+                                dbContext.KucoinPairs.Add(new KuTickerDB(tickData));
+
+                            }
+
+                            dbContext.SaveChanges();
+                        }
+                        Diff.LogWrite($"{api.ApiName} data saved: {result.Length}");
                     }
-                    Diff.LogWrite($"{api.ApiName} data saved: {result.Length}");
+                    else
+                    {
+                        Diff.LogWrite($"{api.ApiName} data load fail.");
+                    }
                 }
+
             }));
             tasksPool.Add(new Task(() =>
             {
@@ -177,7 +185,17 @@ namespace CryptoApi.Static.DataHandler
                 var pairs = dbContext.TradingPairs.Where(x => x.CryDbSetId == dSet.Id && x.Exchange == dSet.Exchange).Take(limit).ToList();
                 return pairs;
             }
-        }   
+        }
+        public async Task<KuTickerDB> GetKucoinData(string name, string quote)
+        {
+            using (DataBaseContext dbContext = new DataBaseContext())
+            {
+                string symbol = $"{name.ToUpper()}{Exchanges.ExApiSeparator(Exchanges.Kucoin)}{quote.ToUpper()}";
+                var dbData =
+                    dbContext.KucoinPairs.OrderBy(x => x.Id).FirstOrDefault(x => x.symbol == symbol);
+                return dbData;
+            }
+        }
 
         public async Task<List<CryDbSet>> GetLatestDataSets(int minutesOffset = 0)
         {
@@ -222,7 +240,7 @@ namespace CryptoApi.Static.DataHandler
                     x.Exchange == pairname.Exchange &&
                     x.Name == pairname.Name &&
                     x.Quote == pairname.Quote);
-                return pair ?? null;
+                return pair;
             }
         }
 

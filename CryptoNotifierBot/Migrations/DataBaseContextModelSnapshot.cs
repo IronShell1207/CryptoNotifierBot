@@ -34,7 +34,7 @@ namespace CryptoApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DataSet");
+                    b.ToTable("DataSet", (string)null);
                 });
 
             modelBuilder.Entity("CryptoApi.Objects.KuTickerDB", b =>
@@ -87,7 +87,7 @@ namespace CryptoApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("KucoinPairs");
+                    b.ToTable("KucoinPairs", (string)null);
                 });
 
             modelBuilder.Entity("CryptoApi.Objects.OkxTickerDB", b =>
@@ -134,7 +134,7 @@ namespace CryptoApi.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("OkxPairs");
+                    b.ToTable("OkxPairs", (string)null);
                 });
 
             modelBuilder.Entity("CryptoApi.Objects.PricedTradingPair", b =>
@@ -164,7 +164,7 @@ namespace CryptoApi.Migrations
 
                     b.HasIndex("CryDbSetId");
 
-                    b.ToTable("TradingPairs");
+                    b.ToTable("TradingPairs", (string)null);
                 });
 
             modelBuilder.Entity("CryptoApi.Objects.PricedTradingPair", b =>
