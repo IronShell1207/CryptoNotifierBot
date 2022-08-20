@@ -56,6 +56,7 @@ namespace TelegramBot.Static.BotLoops
                         //    lastUpdateUsers.Add(tpl);
                         //}
                         CrtMsg(pairsSingleNotify, sb, user);
+                        CrtMsg(pairsDefault, new StringBuilder(), user);
                         CrtMsgMoon(pairMon, user);
                         CrtMsg(pairsTriggeredButRaised, sb, user,
                             $"⚠️Pairs triggered, but raise above or fall bellow trigger again:\n");

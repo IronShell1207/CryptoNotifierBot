@@ -68,11 +68,12 @@ namespace TelegramBot.Static
         }
         #region Updates
         public static async Task UpdateHandler(ITelegramBotClient bot, Update update, CancellationToken canceltoken)
-        {
-            var user = await GetUserSettings(update);
-            SaveUserMsg(update);
+        { 
             if (IsUserBanned(update))
                 return;
+            var user = await GetUserSettings(update);
+            SaveUserMsg(update);
+           
             if (!string.IsNullOrWhiteSpace(update.Message?.ReplyToMessage?.Text))
             {
                 RepliedMsgHandlerAsync(bot, update, canceltoken, user);
@@ -255,11 +256,27 @@ namespace TelegramBot.Static
             input = input.Replace("\r\n", "").Replace("\r", "").Replace("\n", "");
             return Regex.Replace(input, "<.*?>", String.Empty);
         }
-        public static Task ErrorHandler(ITelegramBotClient botClient, Exception ex, CancellationToken csToken)
+        public static async Task ErrorHandler(ITelegramBotClient botClient, Exception ex, CancellationToken csToken)
         {
             ConsoleCommandsHandler.LogWrite(ex.Message);
             //throw ex;
-            return Task.CompletedTask;
+            return;
+        }
+
+
+        public static async Task AddUserToBanList(ChatId chatid, string banReason)
+        {
+            using (AppDbContext dbContext = new AppDbContext())
+            {
+                dbContext.BannedUsers.Add(new BannedUser()
+                {
+                    TelegramId = chatid.Identifier,
+                    UserName = chatid.Username,
+                    BanReason = banReason
+                });
+                await dbContext.SaveChangesAsync();
+                ConsoleCommandsHandler.LogWrite($"User {chatid.Identifier} banned with reason: {banReason}");
+            }
         }
 
         #endregion
@@ -291,6 +308,13 @@ namespace TelegramBot.Static
             catch (Telegram.Bot.Exceptions.RequestException reqException)
             {
                 await BadRequestHandler(chatId, reqException);
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "Forbidden: bot was blocked by the user")
+                {
+                    await AddUserToBanList(chatId, "Forbidden: bot was blocked by the user");
+                }
             }
             return null;
         }
@@ -344,6 +368,13 @@ namespace TelegramBot.Static
             {
                 await BadRequestHandler(chatId, reqException);
             }
+            catch (Exception ex)
+            {
+                if (ex.Message == "Forbidden: bot was blocked by the user")
+                {
+                    await AddUserToBanList(chatId, "Forbidden: bot was blocked by the user");
+                }
+            }
             return null;
         }
         /// <summary>
@@ -368,7 +399,13 @@ namespace TelegramBot.Static
             {
                 await BadRequestHandler(chatId, reqException);
             }
-
+            catch (Exception ex)
+            {
+                if (ex.Message == "Forbidden: bot was blocked by the user")
+                {
+                    await AddUserToBanList(chatId, "Forbidden: bot was blocked by the user");
+                }
+            }
             return null;
         }
 
@@ -393,6 +430,13 @@ namespace TelegramBot.Static
             {
                 await BadRequestHandler(chatId, reqException);
             }
+            catch (Exception ex)
+            {
+                if (ex.Message == "Forbidden: bot was blocked by the user")
+                {
+                    await AddUserToBanList(chatId, "Forbidden: bot was blocked by the user");
+                }
+            }
             return null;
         }
         /// <summary>
@@ -411,6 +455,13 @@ namespace TelegramBot.Static
             catch (ApiRequestException apiEx)
             {
                 await BadRequestHandler(chatId, apiEx);
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "Forbidden: bot was blocked by the user")
+                {
+                    await AddUserToBanList(chatId, "Forbidden: bot was blocked by the user");
+                }
             }
             return null;
         }
@@ -431,6 +482,13 @@ namespace TelegramBot.Static
             catch (ApiRequestException apiEx)
             {
                 await BadRequestHandler(chatId, apiEx);
+            }
+            catch (Exception ex)
+            {
+                if (ex.Message == "Forbidden: bot was blocked by the user")
+                {
+                    await AddUserToBanList(chatId, "Forbidden: bot was blocked by the user");
+                }
             }
             return null;
         }
@@ -469,12 +527,23 @@ namespace TelegramBot.Static
                 await BadRequestHandler(chatId, apiEx);
             }
             catch (Telegram.Bot.Exceptions.RequestException) { }
+            catch (Exception ex)
+            {
+                if (ex.Message == "Forbidden: bot was blocked by the user")
+                {
+                    await AddUserToBanList(chatId, "Forbidden: bot was blocked by the user");
+                }
+            }
 
         }
         public static ChatId GetTelegramIdFromUpdate(Update update)
         {
             if (update.Message?.Chat?.Id != null)
                 return update.Message.Chat.Id;
+            else if (update.MyChatMember?.From.Id != null)
+                return new ChatId((long)update.MyChatMember?.From?.Id);
+            else if (update.MyChatMember?.Chat.Id != null)
+                return new ChatId( (long)update.MyChatMember?.Chat?.Id);
             else if (update.CallbackQuery?.From?.Id != null)
                 return update.CallbackQuery.From.Id;
             else if (update.EditedMessage?.From?.Id != null)
@@ -491,6 +560,10 @@ namespace TelegramBot.Static
                     if (baduser != null) dbContext.Users.Remove(baduser);
                     ConsoleCommandsHandler.LogWrite($"Bad user {chatId.Identifier}. Removed from the database");
                 }
+            }
+            else if (ex.Message == "Forbidden: bot was blocked by the user")
+            {
+                await AddUserToBanList(chatId, "Forbidden: bot was blocked by the user");
             }
             else if (ex.Message == "Exception during making request")
             {
@@ -510,7 +583,7 @@ namespace TelegramBot.Static
                 var user = db.BannedUsers?.ToList().FirstOrDefault(x => x.TelegramId == userid);
                 if (user == null)
                     return false;
-                SendMessage(userid, "You are banned!");
+                //SendMessage(userid, "You are banned!");
                 return true;
             }
         }
