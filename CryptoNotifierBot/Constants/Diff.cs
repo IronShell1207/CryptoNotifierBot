@@ -27,19 +27,20 @@ namespace CryptoApi.Constants
 
         public static string LogPath => MainPath + "log.txt";
 
-        public static void LogWrite(string line)
+        public static void LogWrite(string line, ConsoleColor color = ConsoleColor.White)
         {
             try
             {
+                Console.ForegroundColor = color;
                 DateTime dt = DateTime.Now;
                 var logFile = LogPath;
                 var lineS = $"[{dt.ToString()}] {line}";
                 File.AppendAllText(logFile, lineS + "\n");
                 Console.WriteLine(lineS);
+                Console.ResetColor();
             }
             catch (Exception et)
             {
-
             }
         }
     }

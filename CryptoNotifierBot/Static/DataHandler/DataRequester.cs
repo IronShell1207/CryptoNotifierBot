@@ -22,6 +22,7 @@ namespace CryptoApi.Static.DataHandler
         public bool DataAvailable { get; set; } = false;
 
         private int Try = 30;
+
         public async void UpdateAllData()
         {
             StringBuilder sb = new StringBuilder($"Market data updated: ");
@@ -42,7 +43,6 @@ namespace CryptoApi.Static.DataHandler
                     var result = api.GetExchangeData<BitgetData>(guid).Result;
                     sb.Append($"{api.ApiName}: {api.PairsCount} ");
                 }
-
             }));
             tasksPool.Add(new Task(() =>
             {
@@ -78,17 +78,15 @@ namespace CryptoApi.Static.DataHandler
                         using (DataBaseContext dbContext = new DataBaseContext())
                         {
                             var rows = dbContext.KucoinPairs.Where(x => x.Id > -1);
-                            Diff.LogWrite($"Rows deleted {rows.Count()} in KucoinPairs");
+                            Diff.LogWrite($"Rows deleted {rows.Count()} in KucoinPairs", ConsoleColor.DarkYellow);
                             dbContext.RemoveRange(rows);
                             /* var rows = dbContext.Database.ExecuteSqlRaw(
                                  $"DELETE FROM KucoinPairs");*/
-
 
                             for (var index = 0; index < result.Length; index++)
                             {
                                 var tickData = result[index];
                                 dbContext.KucoinPairs.Add(new KuTickerDB(tickData));
-
                             }
 
                             dbContext.SaveChanges();
@@ -97,22 +95,21 @@ namespace CryptoApi.Static.DataHandler
                     }
                     else
                     {
-                        Diff.LogWrite($"{api.ApiName} data load fail.");
+                        Diff.LogWrite($"{api.ApiName} data load fail.", ConsoleColor.DarkRed);
                     }
                 }
-
             }));
             tasksPool.Add(new Task(() =>
             {
                 using (var api = new ExchangeApi(Exchanges.Okx))
                 {
-                    var result = api.GetTickerData<OkxData>().Result?.data; 
+                    var result = api.GetTickerData<OkxData>().Result?.data;
                     if (result != null)
-                    using (DataBaseContext dbContext = new DataBaseContext())
-                    {
-                        var rows = dbContext.OkxPairs.Where(x => x.Id > -1);
-                        Diff.LogWrite($"Rows deleted {rows.Count()} in OkxPairs");
-                        dbContext.RemoveRange(rows);
+                        using (DataBaseContext dbContext = new DataBaseContext())
+                        {
+                            var rows = dbContext.OkxPairs.Where(x => x.Id > -1);
+                            Diff.LogWrite($"Rows deleted {rows.Count()} in OkxPairs", ConsoleColor.DarkYellow);
+                            dbContext.RemoveRange(rows);
 
                        /* var rows = dbContext.Database.ExecuteSqlRaw(
                             $"DELETE FROM OkxPairs");*/
@@ -130,8 +127,8 @@ namespace CryptoApi.Static.DataHandler
                     Diff.LogWrite($"{api.ApiName} data saved: {result?.Length}");
                 }
             }));
-            tasksPool.ForEach(x=>x.Start());
-            while (tasksPool.Any(x=>!x.IsCompleted))
+            tasksPool.ForEach(x => x.Start());
+            while (tasksPool.Any(x => !x.IsCompleted))
                 Thread.Sleep(500);
             DataAvailable = true;
             Diff.LogWrite(sb.ToString());
@@ -146,16 +143,15 @@ namespace CryptoApi.Static.DataHandler
                 {
                     var rows = dbContext.Database.ExecuteSqlRaw(
                          $"DELETE FROM DataSet Where Id in (SELECT Id FROM DataSet Where DateTime <= \"{date.ToString()}\" ORDER BY Id LIMIT 800)");
-                    Diff.LogWrite($"Rows deleted {rows} for data older {date}");
+                    Diff.LogWrite($"Rows deleted {rows} for data older {date}", ConsoleColor.Red);
                 }
 
                 if (dbContext.DataSet.Any(x => x.IdGuid == new Guid()))
                 {
                     var rows = dbContext.Database.ExecuteSqlRaw(
                         $"DELETE FROM DataSet Where Id in (SELECT Id FROM DataSet Where IdGuid = \"{default(Guid)}\" ORDER BY Id LIMIT 500)");
-                    Diff.LogWrite($"Rows deleted {rows} for data older {date}");
+                    Diff.LogWrite($"Rows deleted {rows} for data older {date}", ConsoleColor.Red);
                 }
-
             }
         }
 
@@ -181,12 +177,13 @@ namespace CryptoApi.Static.DataHandler
         {
             using (DataBaseContext dbContext = new DataBaseContext())
             {
-                var dSet = dbContext.DataSet.Include(x=>x.pairs).OrderBy(x => x.Id).LastOrDefault(x => x.Exchange == exchange);
+                var dSet = dbContext.DataSet.Include(x => x.pairs).OrderBy(x => x.Id).LastOrDefault(x => x.Exchange == exchange);
                 return dSet.pairs.Take(limit).ToList();
                 var pairs = dbContext.TradingPairs.Where(x => x.CryDbSetId == dSet.Id && x.Exchange == dSet.Exchange).Take(limit).ToList();
                 return pairs;
             }
         }
+
         public async Task<KuTickerDB> GetKucoinData(string name, string quote)
         {
             using (DataBaseContext dbContext = new DataBaseContext())
@@ -261,7 +258,6 @@ namespace CryptoApi.Static.DataHandler
                 }
                 return exchanges;
             }
-
         }
     }
 }

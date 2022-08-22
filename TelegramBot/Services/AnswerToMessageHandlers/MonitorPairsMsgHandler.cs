@@ -12,7 +12,7 @@ namespace TelegramBot.Static.MessageHandlers
 {
     public class MonitorPairsMsgHandler : IMyDisposable
     {
-        public void AddToMon(Update update, Match match)
+        public async Task AddToMon(Update update, Match match)
         {
             using (AppDbContext dbContext = new AppDbContext())
             {
@@ -21,11 +21,12 @@ namespace TelegramBot.Static.MessageHandlers
                 var userId = dbContext.Users.First(x => x.TelegramId == update.Message.From.Id);
                 newPair.OwnerId = userId.Id;
                 dbContext.MonPairs.Add(newPair);
-                dbContext.SaveChanges();
-                BotApi.SendMessage(update.Message.Chat.Id, "Add pair to mon");
+                await dbContext.SaveChangesAsync();
+                await BotApi.SendMessage(update.Message.Chat.Id, "Add pair to mon");
             }
         }
-        public void RemoveFromMon(Update update, Match match)
+
+        public async Task RemoveFromMon(Update update, Match match)
         {
             using (AppDbContext dbContext = new AppDbContext())
             {
@@ -33,10 +34,9 @@ namespace TelegramBot.Static.MessageHandlers
                 var userId = dbContext.Users.First(x => x.TelegramId == update.Message.From.Id);
                 var newPair = dbContext.MonPairs.First(x => x.PairBase == pairBase && x.OwnerId == userId.Id);
                 newPair.OwnerId = userId.Id;
-                dbContext.SaveChanges();
-                BotApi.SendMessage(update.Message.Chat.Id, $"Removed {pairBase} pair from mon");
+                await dbContext.SaveChangesAsync();
+                await BotApi.SendMessage(update.Message.Chat.Id, $"Removed {pairBase} pair from mon");
             }
         }
-
     }
 }

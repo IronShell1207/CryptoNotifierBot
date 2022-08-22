@@ -4,18 +4,21 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Telegram.Bot.Types;
-using TelegramBot.Constants;
+using TelegramBot.Constants.Commands;
+using TelegramBot.Helpers;
 
 namespace TelegramBot.Static.MessageHandlers
 {
     public class UserSettingsMsgHandler : IDisposable
     {
         private bool disposed = false;
+
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
         protected virtual void Dispose(bool disposing)
         {
             if (!disposing)
@@ -26,24 +29,24 @@ namespace TelegramBot.Static.MessageHandlers
             }
         }
 
-        public async void SetTimeZone(Update update)
+        public async Task SetTimeZone(Update update)
         {
             using (AppDbContext dbContext = new AppDbContext())
             {
                 var user = await BotApi.GetUserSettings(update, dbContext);
-                var match = CommandsRegex.SetTimeZoneCommandRegex.Match(update.Message.Text);
+                var match = SettingsCommands.SetTimeZoneCommandRegex.Match(update.Message.Text);
                 var timez = int.Parse(match.Groups["time"].Value);
                 user.TimezoneChange = timez;
-                dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync();
                 await BotApi.SendMessage(user.TelegramId, $"Time zone setted to {timez}");
             }
         }
 
-        public async void SetNightTime(Update update)
+        public async Task SetNightTime(Update update)
         {
             using (AppDbContext dbContext = new AppDbContext())
             {
-                var match = CommandsRegex.SettingsCommands.SetNightTime.Match(update.Message?.Text);
+                var match = SettingsCommands.SetNightTime.Match(update.Message?.Text);
                 if (match.Success)
                 {
                     TimeSpan timeStart = TimeSpan.Parse(match.Groups["timestart"].Value);
@@ -51,22 +54,35 @@ namespace TelegramBot.Static.MessageHandlers
                     var userConfig = dbContext.Users.First(x => x.TelegramId == update.Message.From.Id);
                     userConfig.NightModeStartTime = timeStart;
                     userConfig.NightModeEndsTime = timeEnd;
-                    dbContext.SaveChangesAsync();
+                    await dbContext.SaveChangesAsync();
                     await BotApi.SendMessage(userConfig.TelegramId,
                         $"Night time set to: start - {timeStart}, end - {timeEnd}, enable - {userConfig.NightModeEnable}");
                 }
             }
         }
-                
-        public async void SetEnableNightMode(Update update)
+
+        public async Task SetEnableNightMode(Update update)
         {
             using (AppDbContext dbContext = new AppDbContext())
             {
                 var userConfig = dbContext.Users.First(x => x.TelegramId == update.Message.From.Id);
                 userConfig.NightModeEnable = !userConfig.NightModeEnable;
-                dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync();
                 await BotApi.SendMessage(userConfig.TelegramId,
                     $"Night time enable set to - {userConfig.NightModeEnable}");
+            }
+        }
+
+        public async Task ShowSettings(Update update)
+        {
+            using (AppDbContext dbContext = new AppDbContext())
+            {
+                var userConfig = dbContext.Users.FirstOrDefault(x =>
+                    x.TelegramId == TelegramUpdatesHelper.GetTelegramIdFromUpdate(update));
+                if (userConfig != null)
+                {
+                    await BotApi.SendMessage(userConfig.TelegramId, userConfig.GetUserSettingsString());
+                }
             }
         }
     }

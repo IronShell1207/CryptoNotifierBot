@@ -5,26 +5,27 @@ using System.Text;
 using System.Threading.Tasks;
 using TelegramBot.Objects;
 using Telegram.Bot.Types;
-using TelegramBot.Constants;
+using TelegramBot.Constants.Commands;
+using TelegramBot.Helpers;
 
 namespace TelegramBot.Static
 {
     public class SettingsManager : IMyDisposable
     {
-        public async void SetNotifyDelay(Update update)
+        public async Task SetNotifyDelay(Update update)
         {
-            var match = CommandsRegex.SettingsCommands.ChangeDelay.Match(update.Message.Text);
+            var match = SettingsCommands.ChangeDelay.Match(update.Message.Text);
             if (match.Success)
             {
-                using (AppDbContext dbContext = new AppDbContext())
+                using (var dbContext = new AppDbContext())
                 {
-                    var userId = BotApi.GetTelegramIdFromUpdate(update);
-                    var user = dbContext.Users.FirstOrDefault(x=>x.TelegramId == userId.Identifier);
+                    var userId = TelegramUpdatesHelper.GetTelegramIdFromUpdate(update);
+                    var user = dbContext.Users.FirstOrDefault(x => x.TelegramId == userId.Identifier);
                     if (user != null)
                     {
                         user.NoticationsInterval = int.Parse(match.Groups["time"].Value);
-                        dbContext.SaveChangesAsync();
-                        BotApi.SendMessage(user.TelegramId, string.Format(CultureTextRequest.GetSettingsMsgString("SetNotifyInterval", user.Language),
+                        await dbContext.SaveChangesAsync();
+                        await BotApi.SendMessage(user.TelegramId, string.Format(CultureTextRequest.GetSettingsMsgString("SetNotifyInterval", user.Language),
                             user.NoticationsInterval));
                     }
                 }
