@@ -40,7 +40,7 @@ namespace TelegramBot.Static.BotLoops
                     foreach (UserConfig user in users)
                     {
                         StringBuilder sb = new StringBuilder();
-                        var lastMsg = lastUpdateUsers?.LastOrDefault(x => x.UserId == user.Id)?.LastMsgId;
+                         var lastMsg = lastUpdateUsers?.LastOrDefault(x => x.UserId == user.Id)?.LastMsgId;
                         var pairsDefault = await UserTasksToNotify(user, dbContext, true);
                         var pairsSingleNotify = await UserTasksSingleNotify(user, dbContext);
                         var pairsTriggeredButRaised = await UserTriggeredTasksRaised(user, dbContext);
@@ -134,13 +134,14 @@ namespace TelegramBot.Static.BotLoops
                     if (price?.Price > 0 && (price.Price > pair.Price && pair.GainOrFall ||
                                              price.Price < pair.Price && !pair.GainOrFall))
                     {
-                        tasksReturing.Add(new(pair, price.Price));
                         pair.Triggered = true;
+                        tasksReturing.Add(new(pair, price.Price));
+                        
                       
                     }
                 }
 
-                dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync();
             }
 
             return tasksReturing;

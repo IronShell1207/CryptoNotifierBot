@@ -30,7 +30,7 @@ namespace TelegramBot.Static
                     Thread.Sleep(TimeSpan.FromMinutes(1));
                     Console.WriteLine($"[{dateNow.ToString()}] Morning report notified users list cleared");
                 }
-                var users = new AppDbContext().Users.Where(x => x.MorningReport != null).ToList();
+                var users = new AppDbContext().Users?.Where(x => x.MorningReport != null).ToList();
                 foreach (var userCfg in users)
                 {
                     if (NotifiedUsers.Contains(userCfg))

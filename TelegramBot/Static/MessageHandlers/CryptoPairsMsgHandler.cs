@@ -239,7 +239,7 @@ namespace TelegramBot.Static.MessageHandlers
                         var trigger = pair.TriggerOnce ? "☑️ enabled" : "❌ disabled";
                         var msg = string.Format(
                             CultureTextRequest.GetMessageString("CPTriggerOnceChange", user.Language),
-                            pair.TaskStatus(), trigger);
+                            pair.TaskStatusWithLink(), trigger);
                         var editresult = await dbHandler.CompletlyEditCryptoPair(pair);
                         msg = editresult ? msg : "Can't save your changes because of unexpected error!";
                         await BotApi.SendMessage(user.TelegramId, msg, ParseMode.Html);
