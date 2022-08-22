@@ -21,7 +21,6 @@ namespace CryptoApi.API
 {
     public class ExchangeApi : TheDisposable
     {
-
         public string ApiName { get; }
         public int PairsCount { get; private set; }
         public DateTime LastUpdate { get; private set; }
@@ -90,6 +89,7 @@ namespace CryptoApi.API
             }
             return null;
         }
+
         public TradingPair SplitSymbolConverter(string symbol)
         {
             var crp = new TradingPair();
@@ -126,12 +126,13 @@ namespace CryptoApi.API
                 else
                 {
                     Diff.LogWrite(
-                        $"{ApiName} api request failed. Status code: {response?.StatusCode}, {response?.ErrorMessage}");
+                        $"{ApiName} api request failed. Status code: {response?.StatusCode}, {response?.ErrorMessage}", ConsoleColor.DarkRed);
                     Thread.Sleep(4000);
                     return await GetTickerData<T>();
                 }
             }
         }
+
         public void SavePairsToDb(string exchange, List<PricedTradingPair> pairs, Guid guid)
         {
             using (DataBaseContext dbContext = new DataBaseContext())
@@ -145,6 +146,7 @@ namespace CryptoApi.API
                 }
             }
         }
+
         public async Task<bool> GetExchangeData<T>(Guid guid = default(Guid))
         {
             var apiData = await GetTickerData<T>();

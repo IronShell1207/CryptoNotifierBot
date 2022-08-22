@@ -37,7 +37,7 @@ namespace TelegramBot.Static
         {
             LogWrite("Starting telegram bot...");
             LogWrite("Connecting to telegram api...");
-            await Task.Run(BotApi.StartBotAsync);
+            await Task.Run(BotApi.StartBot);
             var botInfo = await BotApi.BotClient.GetMeAsync();
             LogWrite($"Bot connected! Bot info: {botInfo}");
         }

@@ -23,15 +23,15 @@ namespace CryptoApi.Static
                 var request = new RestRequest(Link);
                 request.Method = Method.Get;
                 request.Timeout = 10000;
-                request.AddHeader("UserAgent",WebHeaders.UserAgent);
+                request.AddHeader("UserAgent", WebHeaders.UserAgent);
                 var client = new RestClient();
                 var result = await client.ExecuteAsync(request);
                 if (result.StatusCode == 0)
                 {
-                    Diff.LogWrite($"No connection while requesting {exchange} ticker data. Status code: {result.StatusCode}. {result.Content}");
+                    Diff.LogWrite($"No connection while requesting {exchange} ticker data. Status code: {result.StatusCode}. {result.Content}", ConsoleColor.DarkRed);
                     client = new RestClient(ProxyClient(Link));
                 }
-                
+
                 result = await client.ExecuteAsync(request);
                 return result;
             }
@@ -45,7 +45,10 @@ namespace CryptoApi.Static
         {
             List<Uri> ProxyList = new List<Uri>()
             {
-                new Uri("http://148.251.66.8:3128")
+                new Uri("http://44.201.204.93:80"),
+                new Uri("http://85.14.243.31:3128"),
+                new Uri("http://130.41.47.235:8080"),
+                new Uri("http://130.41.15.76:8080"),
             };
             foreach (var uri in ProxyList)
             {
@@ -58,14 +61,14 @@ namespace CryptoApi.Static
                     Proxy = webProxy,
                     UseProxy = true,
                 };
-                
+
                 var httpclient = new HttpClient(proxyHttpClientHandler)
                 {
                     BaseAddress = link,
-                    DefaultRequestHeaders = { { "User-agent", WebHeaders.UserAgent} },
+                    DefaultRequestHeaders = { { "User-agent", WebHeaders.UserAgent } },
                     Timeout = TimeSpan.FromSeconds(10)
                 };
-                if (CheckProxy(httpclient).Result)
+                if (CheckProxy(httpclient, uri).Result)
                 {
                     return httpclient;
                 }
@@ -77,17 +80,17 @@ namespace CryptoApi.Static
             };
         }
 
-        private async Task<bool> CheckProxy(HttpClient client)
+        private async Task<bool> CheckProxy(HttpClient client, Uri proxy)
         {
             bool isfirstry = true;
-            start:
+        start:
             try
             {
                 var msg = new HttpRequestMessage(HttpMethod.Get, "https://google.com");
-                var result  = await client.SendAsync(msg);
+                var result = await client.SendAsync(msg);
                 if (result.IsSuccessStatusCode)
                 {
-                    Diff.LogWrite($"Proxy connected");
+                    Diff.LogWrite($"Proxy connected: {proxy} {result}", ConsoleColor.Green);
                     return true;
                 }
 
@@ -95,8 +98,9 @@ namespace CryptoApi.Static
             }
             catch (HttpRequestException ex)
             {
-                if (ex.HResult== -2146232800 && isfirstry == true)
+                if (ex.HResult == -2146232800 && isfirstry == true)
                 {
+                    Diff.LogWrite($"Proxy error: {proxy} Code: {ex.StatusCode}", ConsoleColor.Red);
                     isfirstry = false;
                     goto start;
                 }

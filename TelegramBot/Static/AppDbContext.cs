@@ -17,7 +17,7 @@ namespace TelegramBot.Static
         public DbSet<UserConfig> Users { get; set; }
         public DbSet<CryptoPair> CryptoPairs { get; set; }
         public DbSet<BlackListedPairs> BlackListedPairs { get; set; }
-        public DbSet<BreakoutSub> BreakoutSubs { get; set; } 
+        public DbSet<BreakoutSub> BreakoutSubs { get; set; }
         public DbSet<NotifyMyPos> PositionsNotify { get; set; }
         public DbSet<PositionPair> Positions { get; set; }
         public DbSet<Takes> PositionTakes { get; set; }
@@ -34,12 +34,13 @@ namespace TelegramBot.Static
             dbPath = $"Filename={dbPath}telegrambot.db";
             optionsBuilder.UseSqlite(dbPath);
         }
+
         private bool Migrating = false;
 
-        public void MigrateStart()
+        public async void MigrateStart()
         {
-            var migr = Database.GetPendingMigrations();
-            start:
+            var migr = await Database.GetPendingMigrationsAsync();
+        start:
             if (migr.Any() && !Migrating)
             {
                 Migrating = true;
@@ -48,7 +49,7 @@ namespace TelegramBot.Static
                     ConsoleCommandsHandler.LogWrite($"Migration applying: {migration}");
                 try
                 {
-                    Database.Migrate();
+                    await Database.MigrateAsync();
                 }
                 catch (Microsoft.Data.Sqlite.SqliteException ex)
                 {
@@ -58,10 +59,10 @@ namespace TelegramBot.Static
                 }
             }
         }
+
         public AppDbContext()
         {
             //remove this for create migrations
-            MigrateStart();
         }
     }
 }

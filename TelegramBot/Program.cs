@@ -16,7 +16,8 @@ namespace TelegramBot
     internal class Program
     {
         public static DataRequester cryptoData { get; private set; }
-        static void Main(string[] args)
+
+        private static void Main(string[] args)
         {
             Console.CursorVisible = false;
             CultureInfo ci = new CultureInfo("en");
@@ -27,6 +28,7 @@ namespace TelegramBot
             ConsoleSpinner spinner = new ConsoleSpinner();
             ConsoleCommandsHandler.LogWrite($"Awaiting when data will available...");
 
+            using (AppDbContext dbContext = new()) dbContext.MigrateStart();
             while (!cryptoData.DataAvailable)
             {
                 spinner.UpdateProgress();
@@ -58,10 +60,11 @@ namespace TelegramBot
                     else if (reader.ToString() == "/exit")
                         Environment.Exit(0);
                 }
-                catch (Exception ex) {}
+                catch (Exception ex) { }
             }
         }
-        private static async void Awaiter(){}
 
+        private static async void Awaiter()
+        { }
     }
 }

@@ -18,7 +18,7 @@ namespace TelegramBot.Static.BotLoops
         private static List<IntervaledUsersHistory> _monUsersUpdate = new();
         public static bool MonitorLoopCancellationToken { get; set; } = true;
 
-        private static async void CrtMsg(List<(CryptoPair, double)> lst, StringBuilder sb, UserConfig user,
+        private static async Task CrtMsg(List<(CryptoPair, double)> lst, StringBuilder sb, UserConfig user,
             string msg = "")
         {
             if (lst.Any())
@@ -45,20 +45,10 @@ namespace TelegramBot.Static.BotLoops
                         var pairsSingleNotify = await UserTasksSingleNotify(user, dbContext);
                         var pairsTriggeredButRaised = await UserTriggeredTasksRaised(user, dbContext);
                         var pairMon = await UserTasksMon(user, dbContext);
-                        //if (pairsDefault.Any())
-                        //{
-                        //    foreach (var pair in pairsDefault)
-                        //        sb.AppendLine(FormatNotifyEntryStock(pair.Item1, pair.Item2));
-                        //    if (user.RemoveLatestNotifyBeforeNew && lastMsg != null)
-                        //        await BotApi.RemoveMessage(user.TelegramId, (int)lastMsg);
-                        //    var msg = await BotApi.SendMessage(user.TelegramId, sb.ToString());
-                        //    var tpl = new IntervaledUsersHistory(user.Id, DateTime.Now, msg?.MessageId);
-                        //    lastUpdateUsers.Add(tpl);
-                        //}
-                        CrtMsg(pairsSingleNotify, sb, user);
-                        CrtMsg(pairsDefault, new StringBuilder(), user);
-                        CrtMsgMoon(pairMon, user);
-                        CrtMsg(pairsTriggeredButRaised, sb, user,
+                        await CrtMsg(pairsSingleNotify, sb, user);
+                        await CrtMsg(pairsDefault, new StringBuilder(), user);
+                        await CrtMsgMoon(pairMon, user);
+                        await CrtMsg(pairsTriggeredButRaised, sb, user,
                             $"⚠️Pairs triggered, but raise above or fall bellow trigger again:\n");
                     }
                 }
@@ -72,15 +62,10 @@ namespace TelegramBot.Static.BotLoops
             List<(MonObj, double)> tasks = new List<(MonObj, double)>();
             DateTime dateTimenow = DateTime.Now.ToUniversalTime().AddHours(user.TimezoneChange);
             var lastMsg = _monUsersUpdate?.LastOrDefault(x => x.UserId == user.Id);
-            if (lastMsg == null)
-            {
-                lastMsg = new IntervaledUsersHistory(user.Id, dateTimenow, user.TelegramId);
-                _monUsersUpdate?.Add(lastMsg);
-            }
 
-            if (!(user.NightModeEnable && !NightTime(user.NightModeStartTime, user.NightModeEndsTime, dateTimenow)))
+            if (!NightTime(user.NightModeEnable, user.NightModeStartTime, user.NightModeEndsTime, dateTimenow))
             {
-                if (lastMsg.LastUpdateDateTime < dateTimenow.AddMinutes(-1))
+                if (lastMsg == null || lastMsg.LastUpdateDateTime < dateTimenow.AddMinutes(-1))
                 {
                     var pairs = dbContext.MonPairs.Where(x => x.OwnerId == user.Id);
                     foreach (var pair in pairs.ToList())
@@ -91,7 +76,9 @@ namespace TelegramBot.Static.BotLoops
                     }
                     if (tasks.Count > 0)
                     {
-                        lastMsg.LastUpdateDateTime = dateTimenow.AddMinutes(1);
+                        if (lastMsg != null) _monUsersUpdate.Remove(lastMsg);
+                        lastMsg = new IntervaledUsersHistory(user.Id, dateTimenow.AddMinutes(1), user.TelegramId);
+                        _monUsersUpdate?.Add(lastMsg);
                     }
                 }
             }
@@ -103,9 +90,9 @@ namespace TelegramBot.Static.BotLoops
         {
             List<(CryptoPair, double)> tasks = new List<(CryptoPair, double)>();
             DateTime dateTimenow = DateTime.Now.AddHours(user.TimezoneChange - 3);
-            
-            if (!useInterval || UpdateIntervalExpired(user.Id, user.NoticationsInterval) && !(user.NightModeEnable &&
-                    !NightTime(user.NightModeStartTime, user.NightModeEndsTime, dateTimenow)))
+
+            if (!useInterval || (UpdateIntervalExpired(user.Id, user.NoticationsInterval)) &&
+                !NightTime(user.NightModeEnable, user.NightModeStartTime, user.NightModeEndsTime, dateTimenow))
             {
                 //var pairs = dbContext.CryptoPairs.Where(x => x.OwnerId == user.Id && x.Enabled && !x.TriggerOnce).ToList();
                 foreach (var pair in user.pairs.Where(x => x.OwnerId == user.Id && x.Enabled && !x.TriggerOnce)
@@ -137,7 +124,6 @@ namespace TelegramBot.Static.BotLoops
                     {
                         tasksReturing.Add(new(pair, price.Price));
                         pair.Triggered = true;
-                      
                     }
                 }
 
@@ -182,7 +168,7 @@ namespace TelegramBot.Static.BotLoops
                 $"{enabledSymbol} {pair.Id} {pair.PairBase}/{pair.PairQuote} {plusic}{string.Format("{0:##0.00#}", priceDiff)}% {gainOrFallSymbol} {pair.Price}->{newprice}";
         }
 
-        private static async void CrtMsgMoon(List<(MonObj, double)> lst, UserConfig user)
+        private static async Task CrtMsgMoon(List<(MonObj, double)> lst, UserConfig user)
         {
             StringBuilder sb = new StringBuilder();
 
@@ -191,7 +177,6 @@ namespace TelegramBot.Static.BotLoops
                 var lastMsg = _monUsersUpdate?.FirstOrDefault(x => x.UserId == user.Id);
                 if (lastMsg != null && lastMsg.LastMsgId != null)
                 {
-                    
                     await BotApi.RemoveMessage(lastMsg.TelegramId, (int)lastMsg.LastMsgId);
                 }
                 foreach (var pair in lst)
@@ -200,6 +185,7 @@ namespace TelegramBot.Static.BotLoops
                 lastMsg.LastMsgId = msg.MessageId;
             }
         }
+
         private static string FormatStrStock(MonObj pair, double price)
         {
             return $"{pair.PairBase} - {price}";
@@ -210,6 +196,7 @@ namespace TelegramBot.Static.BotLoops
             var enabledSymbol = pair.Enabled ? "✅" : "🛑";
             return null;
         }
+
         private static bool UpdateIntervalExpired(int userId, int interval)
         {
             var lastupdated = lastUpdateUsers.FirstOrDefault(x => x.UserId == userId);
@@ -224,9 +211,9 @@ namespace TelegramBot.Static.BotLoops
             return false;
         }
 
-
-        private static bool NightTime(TimeSpan start, TimeSpan end, DateTime now)
+        private static bool NightTime(bool nightEnable, TimeSpan start, TimeSpan end, DateTime now)
         {
+            if (!nightEnable) return false;
             TimeSpan timeNow = now.TimeOfDay;
             CultureInfo provider = new CultureInfo("ru-RU");
             Thread.CurrentThread.CurrentCulture = provider;
@@ -245,10 +232,10 @@ namespace TelegramBot.Static.BotLoops
             return false;*/
             return false;
         }
-
     }
-    static class TimeSpanExtensions
-    { 
+
+    internal static class TimeSpanExtensions
+    {
         public static bool IsBetween(this TimeSpan time,
             TimeSpan startTime, TimeSpan endTime)
         {
@@ -267,12 +254,14 @@ namespace TelegramBot.Static.BotLoops
                    time <= endTime;
         }
     }
+
     public class IntervaledUsersHistory
     {
         public int UserId { get; set; }
         public DateTime LastUpdateDateTime { get; set; }
         public long TelegramId { get; set; }
         public int? LastMsgId { get; set; }
+
         public IntervaledUsersHistory(int userid, DateTime datetime, long telegramId = 0)
         {
             UserId = userid;
@@ -283,12 +272,11 @@ namespace TelegramBot.Static.BotLoops
 
         public IntervaledUsersHistory(int userid, DateTime datetime, int? msg, long telegramId = 0)
         {
-
             UserId = userid;
             LastUpdateDateTime = datetime;
             LastMsgId = msg;
-            if (telegramId!= 0)
-            TelegramId = telegramId;
+            if (telegramId != 0)
+                TelegramId = telegramId;
         }
     }
 }

@@ -7,12 +7,12 @@ using CryptoApi.Constants;
 using CryptoApi.Static;
 using NUnit.Framework;
 using TelegramBot;
-using TelegramBot.Constants;
+using TelegramBot.Constants.Commands;
 using TelegramBot.Objects;
 
 namespace CryptoNotifierBot.Tests
 {
-    
+
     public class FormaterTests
     {
         [Test]
@@ -70,8 +70,8 @@ namespace CryptoNotifierBot.Tests
             string pair = "BTC/USDT";
             int id = 1231;
             var paramsList = new List<string>(){ @"(?<base>[a-zA-Z0-9]{2,9})(\s+|/)(?<quote>[a-zA-Z0-9]{2,6})", "(?<id>[0-9]+)"};
-            var reRegx = CommandsRegex.ConvertMessageToRegex(teststroke, paramsList);
-            var reRegxRus = CommandsRegex.ConvertMessageToRegex(testRusStroke, paramsList);
+            var reRegx = RegexHelper.ConvertMessageToRegex(teststroke, paramsList);
+            var reRegxRus = RegexHelper.ConvertMessageToRegex(testRusStroke, paramsList);
             var match = reRegxRus.Match(testRusStrokeResult);
             if (match.Success)
             {
