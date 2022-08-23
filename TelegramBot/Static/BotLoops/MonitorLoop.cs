@@ -61,11 +61,11 @@ namespace TelegramBot.Static.BotLoops
         {
             List<(MonObj, double)> tasks = new List<(MonObj, double)>();
             DateTime dateTimenow = DateTime.Now.ToUniversalTime().AddHours(user.TimezoneChange);
-            var lastMsg = _monUsersUpdate?.LastOrDefault(x => x.UserId == user.Id);
+            var lastMsg = _monUsersUpdate?.LastOrDefault(x => x.UserId == user.Id) ?? new IntervaledUsersHistory(0, DateTime.Now);
 
             if (!NightTime(user.NightModeEnable, user.NightModeStartTime, user.NightModeEndsTime, dateTimenow))
             {
-                if (lastMsg == null || lastMsg.LastUpdateDateTime < dateTimenow.AddMinutes(-1))
+                if (lastMsg.LastUpdateDateTime < dateTimenow.AddMinutes(-1))
                 {
                     var pairs = dbContext.MonPairs.Where(x => x.OwnerId == user.Id);
                     foreach (var pair in pairs.ToList())
@@ -73,12 +73,6 @@ namespace TelegramBot.Static.BotLoops
                         var price = await Program.cryptoData.GetCurrentPricePairByName(pair.PairBase.ToUpper(), "USDT");
                         if (price?.Price > 0)
                             tasks.Add(new(pair, price.Price));
-                    }
-                    if (tasks.Count > 0)
-                    {
-                        if (lastMsg != null) _monUsersUpdate.Remove(lastMsg);
-                        lastMsg = new IntervaledUsersHistory(user.Id, dateTimenow.AddMinutes(1), user.TelegramId);
-                        _monUsersUpdate?.Add(lastMsg);
                     }
                 }
             }
@@ -178,11 +172,13 @@ namespace TelegramBot.Static.BotLoops
                 if (lastMsg != null && lastMsg.LastMsgId != null)
                 {
                     await BotApi.RemoveMessage(lastMsg.TelegramId, (int)lastMsg.LastMsgId);
+                    _monUsersUpdate.Remove(lastMsg);
                 }
                 foreach (var pair in lst)
                     sb.AppendLine(FormatStrStock(pair.Item1, pair.Item2));
                 var msg = await BotApi.SendMessage(user.TelegramId, sb.ToString());
-                lastMsg.LastMsgId = msg.MessageId;
+                var lastMessage = new IntervaledUsersHistory(user.Id, DateTime.Now, msg.MessageId);
+                _monUsersUpdate.Add(lastMessage);
             }
         }
 
@@ -218,18 +214,10 @@ namespace TelegramBot.Static.BotLoops
             CultureInfo provider = new CultureInfo("ru-RU");
             Thread.CurrentThread.CurrentCulture = provider;
             System.Globalization.DateTimeStyles style = DateTimeStyles.None;
-            if (DateTime.Now.TimeOfDay.IsBetween(start, end))
+            if (now.TimeOfDay.IsBetween(start, end))
             {
                 return true;
             }
-            /*var daysStart = start > (now.Hour * 60 + now.Minute) && (now.Hour * 60 + now.Minute) < end ? -1 : 0;
-            var dateStart = new DateTime(now.Year, now.Month, now.Day + daysStart, startHours, start - (startHours * 60), 0);
-            int endHours = end / 60;
-            int endDay = (now.Hour * 60 + now.Minute) > end && (now.Hour * 60 + now.Minute) < start ? 1 : 0;
-            var dateEnd = new DateTime(now.Year, now.Month, now.Day, endHours, end - (endHours * 60), 0).AddDays(endDay);
-            if (now > dateStart && now < dateEnd)
-                return true;
-            return false;*/
             return false;
         }
     }

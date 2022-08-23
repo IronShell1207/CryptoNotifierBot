@@ -121,7 +121,7 @@ namespace CryptoApi.Static.DataHandler
                             }
                             dbContext.SaveChanges();
                         }
-                    Diff.LogWrite($"{api.ApiName} data saved: {result.Length}", ConsoleColor.DarkGreen);
+                    Diff.LogWrite($"{api.ApiName} data saved: {result?.Length}", ConsoleColor.DarkGreen);
                 }
             }));
             tasksPool.ForEach(x => x.Start());
