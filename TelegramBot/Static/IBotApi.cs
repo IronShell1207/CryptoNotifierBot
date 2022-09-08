@@ -105,8 +105,42 @@ namespace TelegramBot.Static
         public static async Task MessageTextHandler(ITelegramBotClient bot, Update update, CancellationToken token,
             UserConfig user)
         {
-            if (RegexCombins.CommandPattern.IsMatch(update.Message?.Text))
-                CommandsHandler(bot, update, token, user);
+            if (update.Message?.Text == BreakoutCommands.Subscribe)
+                using (BreakoutPairsMsgHandler msghandler = new BreakoutPairsMsgHandler())
+                    await msghandler.SubNewUserBreakouts(update);
+            else if (update.Message.Text == "/create")
+                using (CryptoPairsMsgHandler msghandler = new CryptoPairsMsgHandler())
+                    await msghandler.CreateTaskFirstStage(update, user);
+            else if (SettingsCommands.SetEnableNight.IsMatch(update.Message.Text))
+                using (UserSettingsMsgHandler msgHandler = new())
+                    await msgHandler.SetEnableNightMode(update);
+            else if (update.Message.Text == SimpleCommands.RemoveAllFromBlackList)
+                using (BreakoutPairsMsgHandler brkMsgHandler = new BreakoutPairsMsgHandler())
+                {
+                    var result = await brkMsgHandler.RemoveAllBlackListedPairsUser(user);
+                    await SendMessage(user.TelegramId, result.Message);
+                }
+            else if (MonitoringTaskCommands.CreatePair.IsMatch(update.Message.Text))
+                using (CryptoPairsMsgHandler msghandler = new CryptoPairsMsgHandler())
+                    await msghandler.CreateTaskFirstStage(update, user);
+            else if (BreakoutCommands.AddTopSymbolsToWhiteList.IsMatch(update.Message.Text))
+                using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler())
+                    await msgHandler.AddWhiteTopList(update);
+            else if (update.Message.Text.Contains(SimpleCommands.FlipTasks))
+                using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
+                    await msgHandler.FlipTriggeredTasks(update);
+            else if (update.Message.Text.Contains(SimpleCommands.ShiftTasks))
+                using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
+                    await msgHandler.DropEverythingByProcent(update);
+            else if (update.Message?.Text == BreakoutCommands.SubSettings)
+                using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler())
+                    await msgHandler.SubSettings(update);
+            else if (update.Message?.Text == BreakoutCommands.SubStop)
+                using (BreakoutPairsMsgHandler msgH = new BreakoutPairsMsgHandler())
+                    await msgH.StopNotify(update);
+            else if (SimpleCommands.AllTasks == update.Message.Text)
+                using (CryptoPairsMsgHandler cr = new CryptoPairsMsgHandler())
+                    await cr.ListAllTask(update);
             else if (MonitoringTaskCommands.TriggerOncePair.IsMatch(update.Message.Text))
                 using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
                     await msgHandler.SetSingleTriggerForUserTask(update);
@@ -154,42 +188,6 @@ namespace TelegramBot.Static
         public static async void CommandsHandler(ITelegramBotClient bot, Update update,
             CancellationToken cancellationToken, UserConfig user)
         {
-            if (update.Message?.Text == BreakoutCommands.Subscribe)
-                using (BreakoutPairsMsgHandler msghandler = new BreakoutPairsMsgHandler())
-                    await msghandler.SubNewUserBreakouts(update);
-            else if (update.Message.Text == "/create")
-                using (CryptoPairsMsgHandler msghandler = new CryptoPairsMsgHandler())
-                    await msghandler.CreateTaskFirstStage(update, user);
-            else if (SettingsCommands.SetEnableNight.IsMatch(update.Message.Text))
-                using (UserSettingsMsgHandler msgHandler = new())
-                    await msgHandler.SetEnableNightMode(update);
-            else if (update.Message.Text == SimpleCommands.RemoveAllFromBlackList)
-                using (BreakoutPairsMsgHandler brkMsgHandler = new BreakoutPairsMsgHandler())
-                {
-                    var result = await brkMsgHandler.RemoveAllBlackListedPairsUser(user);
-                    await SendMessage(user.TelegramId, result.Message);
-                }
-            else if (MonitoringTaskCommands.CreatePair.IsMatch(update.Message.Text))
-                using (CryptoPairsMsgHandler msghandler = new CryptoPairsMsgHandler())
-                    await msghandler.CreateTaskFirstStage(update, user);
-            else if (BreakoutCommands.AddTopSymbolsToWhiteList.IsMatch(update.Message.Text))
-                using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler())
-                    await msgHandler.AddWhiteTopList(update);
-            else if (update.Message.Text.Contains(SimpleCommands.FlipTasks))
-                using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
-                    await msgHandler.FlipTriggeredTasks(update);
-            else if (update.Message.Text.Contains(SimpleCommands.ShiftTasks))
-                using (CryptoPairsMsgHandler msgHandler = new CryptoPairsMsgHandler())
-                    await msgHandler.DropEverythingByProcent(update);
-            else if (update.Message?.Text == BreakoutCommands.SubSettings)
-                using (BreakoutPairsMsgHandler msgHandler = new BreakoutPairsMsgHandler())
-                    await msgHandler.SubSettings(update);
-            else if (update.Message?.Text == BreakoutCommands.SubStop)
-                using (BreakoutPairsMsgHandler msgH = new BreakoutPairsMsgHandler())
-                    await msgH.StopNotify(update);
-            else if (SimpleCommands.AllTasks == update.Message.Text)
-                using (CryptoPairsMsgHandler cr = new CryptoPairsMsgHandler())
-                    await cr.ListAllTask(update);
         }
 
         public static async void CallbackHandlerAsync(ITelegramBotClient bot, Update update,
