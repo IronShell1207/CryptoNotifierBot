@@ -60,7 +60,7 @@ namespace TelegramBot.Static.BotLoops
         public static async Task<List<(MonObj, double)>> UserTasksMon(UserConfig user, AppDbContext dbContext)
         {
             List<(MonObj, double)> tasks = new List<(MonObj, double)>();
-            DateTime dateTimenow = DateTime.Now.ToUniversalTime().AddHours(7);
+            DateTime dateTimenow = DateTime.Now.ToUniversalTime().AddHours(user.TimezoneChange);
             var lastMsg = _monUsersUpdate?.LastOrDefault(x => x.UserId == user.Id);
             if (lastMsg == null)
             {
