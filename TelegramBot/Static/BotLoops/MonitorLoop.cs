@@ -40,7 +40,7 @@ namespace TelegramBot.Static.BotLoops
                     foreach (UserConfig user in users)
                     {
                         StringBuilder sb = new StringBuilder();
-                         var lastMsg = lastUpdateUsers?.LastOrDefault(x => x.UserId == user.Id)?.LastMsgId;
+                        var lastMsg = lastUpdateUsers?.LastOrDefault(x => x.UserId == user.Id)?.LastMsgId;
                         var pairsDefault = await UserTasksToNotify(user, dbContext, true);
                         var pairsSingleNotify = await UserTasksSingleNotify(user, dbContext);
                         var pairsTriggeredButRaised = await UserTriggeredTasksRaised(user, dbContext);
@@ -61,7 +61,12 @@ namespace TelegramBot.Static.BotLoops
         {
             List<(MonObj, double)> tasks = new List<(MonObj, double)>();
             DateTime dateTimenow = DateTime.Now.ToUniversalTime().AddHours(user.TimezoneChange);
-            var lastMsg = _monUsersUpdate?.LastOrDefault(x => x.UserId == user.Id) ?? new IntervaledUsersHistory(0, DateTime.Now);
+            var lastMsg = _monUsersUpdate?.LastOrDefault(x => x.UserId == user.Id);
+            if (lastMsg == null)
+            {
+                lastMsg = new IntervaledUsersHistory(user.Id, DateTime.Now - TimeSpan.FromMinutes(2));
+                _monUsersUpdate?.Add(lastMsg);
+            }
 
             if (!NightTime(user.NightModeEnable, user.NightModeStartTime, user.NightModeEndsTime, dateTimenow))
             {
@@ -118,8 +123,6 @@ namespace TelegramBot.Static.BotLoops
                     {
                         pair.Triggered = true;
                         tasksReturing.Add(new(pair, price.Price));
-                        
-                      
                     }
                 }
 
