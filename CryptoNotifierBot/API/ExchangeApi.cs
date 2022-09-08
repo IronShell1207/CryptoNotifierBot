@@ -133,7 +133,7 @@ namespace CryptoApi.API
             }
         }
 
-        public void SavePairsToDb(string exchange, List<PricedTradingPair> pairs, Guid guid)
+        public async void SavePairsToDb(string exchange, List<PricedTradingPair> pairs, Guid guid)
         {
             using (DataBaseContext dbContext = new DataBaseContext())
             {
@@ -142,7 +142,24 @@ namespace CryptoApi.API
                     var dbSet = new CryDbSet(DateTime.Now, exchange, guid);
                     dbSet.pairs = pairs;
                     dbContext.DataSet.Add(dbSet);
-                    dbContext.SaveChanges();
+                    bool isCheck = false;
+                    int count = 0;
+                    while (isCheck || count > 100)
+                    {
+                        try
+                        {
+                            count++;
+                            await dbContext.SaveChangesAsync();
+                            isCheck = true;
+                        }
+                        catch (AggregateException ex)
+                        {
+                            Diff.LogWrite(
+                        $"Can't save pairs too db {count} {ex.Message}", ConsoleColor.DarkRed);
+                            await Task.Delay(30);
+                        }
+                    }
+                   
                 }
             }
         }

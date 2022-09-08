@@ -28,11 +28,12 @@ namespace CryptoApi.Static.DataHandler
             StringBuilder sb = new StringBuilder($"Market data updated: ");
             var guid = Guid.NewGuid();
             var tasksPool = new List<Task>();
-            tasksPool.Add(new Task(() =>
+            tasksPool.Add(new Task(async () =>
             {
                 using (var api = new ExchangeApi(Exchanges.Binance))
                 {
                     var result = api.GetExchangeData<List<BinancePair>>(guid).Result;
+
                     sb.Append($"{api.ApiName}: {api.PairsCount} ");
                 }
             }));

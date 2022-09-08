@@ -62,6 +62,7 @@ namespace TelegramBot.Static
 
         public AppDbContext()
         {
+           
             //remove this for create migrations
         }
     }

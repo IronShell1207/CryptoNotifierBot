@@ -16,6 +16,7 @@ namespace TelegramBot.Objects
         {
             PairBase = pairBase;
         }
+        public override string ToString() => PairBase;
 
         public MonObj()
         {
