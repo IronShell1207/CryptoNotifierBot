@@ -19,6 +19,7 @@ namespace TelegramBot.Services.MessageHandlers
     {
         public async Task HandleMessage(Update update, UserConfig user = null)
         {
+            if (user == null) user = await BotApi.GetUserSettings(update);
             var editPriceMsgRegex =
                 RegexHelper.ConvertMessageToRegex(CultureTextRequest.GetMessageString("CPEditPair", user.Language),
                     new List<string>()
