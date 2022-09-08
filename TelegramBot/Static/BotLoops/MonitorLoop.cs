@@ -64,13 +64,13 @@ namespace TelegramBot.Static.BotLoops
             var lastMsg = _monUsersUpdate?.LastOrDefault(x => x.UserId == user.Id);
             if (lastMsg == null)
             {
-                lastMsg = new IntervaledUsersHistory(user.Id, DateTime.Now - TimeSpan.FromMinutes(2));
+                lastMsg = new IntervaledUsersHistory(user.Id, dateTimenow - TimeSpan.FromMinutes(2));
                 _monUsersUpdate?.Add(lastMsg);
             }
 
             if (!NightTime(user.NightModeEnable, user.NightModeStartTime, user.NightModeEndsTime, dateTimenow))
             {
-                if (lastMsg.LastUpdateDateTime < dateTimenow.AddMinutes(-1))
+                if (lastMsg.LastUpdateDateTime < dateTimenow.AddMinutes(user.MonInterval))
                 {
                     var pairs = dbContext.MonPairs.Where(x => x.OwnerId == user.Id);
                     foreach (var pair in pairs.ToList())
@@ -182,7 +182,7 @@ namespace TelegramBot.Static.BotLoops
                 foreach (var pair in lst)
                     sb.AppendLine(FormatStrStock(pair.Item1, pair.Item2));
                 var msg = await BotApi.SendMessage(user.TelegramId, sb.ToString());
-                var lastMessage = new IntervaledUsersHistory(user.Id, DateTime.Now, msg.MessageId);
+                var lastMessage = new IntervaledUsersHistory(user.Id, DateTime.Now.ToUniversalTime().AddHours(user.TimezoneChange), msg.MessageId);
                 _monUsersUpdate.Add(lastMessage);
             }
         }

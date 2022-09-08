@@ -10,6 +10,23 @@
 @using TelegramBot.Objects
 @inject WeatherForecastService ForecastService
 
+@functions
+{
+    TimeOnly TimeStartProxy 
+    { get => TimeOnly.FromTimeSpan(user.Item1.NightModeStartTime); set
+        {
+            user.Item1.NightModeStartTime = value.ToTimeSpan();
+        }
+    }
+    TimeOnly TimeEndProxy 
+    { get => TimeOnly.FromTimeSpan(user.Item1.NightModeEndsTime); set
+        {
+        
+        user.Item1.NightModeEndsTime = value.ToTimeSpan();
+        }
+    }
+}
+
 @if (AlertVisible)
 {
     <div class="alert alert-success fade show">
@@ -30,17 +47,25 @@
                 {
                     <a style="margin: 10px 5px" type="button" class="btn btn-primary" href="/usertasks/@user.Item1.Id">Show tasks list</a>
                 } 
-            <h5>Language <input type="text" @bind="user.Item1.Language" style="max-width: 70px"/></h5>
-            <h5>Notification timeout <input type="number" @bind="user.Item1.NoticationsInterval" style="max-width: 70px"/></h5>
-            <h5><label class="cl-switch"><input type="checkbox" @bind="user.Item1.NightModeEnable" ><span class="switcher"></span><span class="label">Night mode</span></label></h5>
-            <h5>Night mode start time <input type="text" @bind="user.Item1.NightModeStartTime" style="max-width: 70px"/> <input type="text" @bind="user.Item1.NightModeEndsTime" style="max-width: 70px"/> </h5>
+            <h5>Language <input type="text" @bind="user.Item1.Language" style="max-width: 150px"/></h5>
+            <h5>Notification timeout <input type="number" @bind="user.Item1.NoticationsInterval" style="max-width: 95px"/></h5>
+                <h5><label class="cl-switch">
+                    <input type="checkbox" @bind="user.Item1.NightModeEnable">
+                    <span class="switcher">
+                    </span><span class="label">Night mode</span>
+                </label></h5>
+                <h5>Night mode start time 
+                    <input type="time" @bind="TimeStartProxy" style="max-width: 120px"/> 
+                    <input type="time" @bind="TimeEndProxy" style="max-width: 120px"/> </h5>
             <h5><label class="cl-switch"><input type="checkbox" @bind="user.Item1.DisplayTaskEditButtonsInNotifications" ><span class="switcher"></span><span class="label">Display tasks edit buttons in notifications</span></label></h5>
             <h5><label class="cl-switch"><input type="checkbox" @bind="user.Item1.ShowMarketEvents" ><span class="switcher"></span><span class="label">Show market events</span></label></h5>
             <h5><label class="cl-switch"><input type="checkbox" @bind="user.Item1.AntifloodIntervalAmplification" ><span class="switcher"></span><span class="label">Anti flood timeout auto amplification</span></label></h5>
             <h5><label class="cl-switch"><input type="checkbox" @bind="user.Item1.NotesEnable" ><span class="switcher"></span><span class="label">Show tips in notifications</span></label></h5>
             <h5><label class="cl-switch"><input type="checkbox" @bind="user.Item1.RemoveLatestNotifyBeforeNew" ><span class="switcher"></span><span class="label">Remove latest notify before sending new one</span></label></h5>
             <h5 style="max-width: 377px">Morning prices changes report (set 0 to disable or time in minutes when to notify you)</h5>
-            <input type="text" @bind="user.Item1.MorningReport" style="max-width: 120px"/>
+                <input type="text" @bind="user.Item1.MorningReport" style="max-width: 120px"/>
+                <h5 style="max-width: 377px">Timezone</h5>
+                <input type="text" @bind="user.Item1.TimezoneChange" style="max-width: 80px"/>
         </div>
     </td>
    
@@ -97,6 +122,8 @@
         {
         <div class="container" style="width: 380px; height: 400px; overflow: auto; position: relative;">
             <h2 class="fs-5 fw-semibold">Mon listed pairs count: @user.Item3.Count</h2>
+            <h5 style="max-width: 377px">Monitoring interval</h5>
+            <input type="text" @bind="user.Item1.MonInterval" style="max-width: 80px"/>
             <div class="list-group">
                 @foreach (var monPair in user.Item3)
                 {
@@ -133,18 +160,18 @@
         var result = await ForecastService.SaveUserSettings(user.Item1, user.Item2);
         AlertMessage = result.Item2;
         AlertVisible = true;
-        await Task.Run((() => Thread.Sleep(1500)));
+        await Task.Delay(1500);
+       
         AlertVisible = false;
-        //NavigationManager.NavigateTo("/fetchusers");
     }
 
     private async Task RemoveFromList(BlackListedPairs pair)
     {
         var result = await ForecastService.RemovePairFromBL(user.Item2, pair);
-        user.Item2.BlackListedPairsList.Remove(pair);
+        user.Item2?.BlackListedPairsList?.Remove(pair);
         AlertMessage = result.Item2;
         AlertVisible = true;
-        await Task.Run((() => Thread.Sleep(1500)));
+        await Task.Delay(1500);
         AlertVisible = false;
     }
 
@@ -153,7 +180,7 @@
         var result = await ForecastService.RemoveMonPair(mon);
         AlertMessage = "Pair removed";
         AlertVisible = true;
-        await Task.Run((() => Thread.Sleep(1500)));
+        await Task.Delay(1500);
         AlertVisible = false;
     }
 }

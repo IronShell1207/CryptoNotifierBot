@@ -44,6 +44,7 @@ namespace TelegramBot.Objects
         public bool TriggerOneTasksByDefault { get; set; } = false;
 
         public bool SetExchangeAutomaticaly { get; set; } = false;
+        public int MonInterval { get; set; } = 1;
 
         /// <summary>
         /// Not uses and not created

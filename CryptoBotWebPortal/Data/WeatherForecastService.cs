@@ -25,11 +25,12 @@ namespace CryptoBotWebPortal.Data
             using (AppDbContext dbContext = new AppDbContext())
             {
                 if (userid == 0)
-                    return dbContext.CryptoPairs.Include(x=>x.User).ToList();
-                else return dbContext.Users.Include(x => x.pairs).OrderBy(x=>x.Id).
-                    FirstOrDefault(x=>x.Id == userid).pairs;
+                    return dbContext.CryptoPairs.Include(x => x.User).ToList();
+                else return dbContext.Users.Include(x => x.pairs).OrderBy(x => x.Id).
+                    FirstOrDefault(x => x.Id == userid).pairs;
             }
         }
+
         public async Task<List<UserConfig>> Users()
         {
             using (AppDbContext dbContext = new AppDbContext())
@@ -44,11 +45,10 @@ namespace CryptoBotWebPortal.Data
             {
                 var user = dbContext.Users.
                     Include(x => x.pairs).
-                    FirstOrDefault(x=>x.Id == id);
-                var usersets = dbContext.BreakoutSubs.Include(x=>x.BlackListedPairsList).OrderBy(x => x.Id).FirstOrDefault(x => x.UserId == user.Id);
+                    FirstOrDefault(x => x.Id == id);
+                var usersets = dbContext.BreakoutSubs.Include(x => x.BlackListedPairsList).OrderBy(x => x.Id).FirstOrDefault(x => x.UserId == user.Id);
                 var monTasks = dbContext.MonPairs.Where(x => x.OwnerId == user.Id)?.ToList();
                 return (user, usersets, monTasks);
-
             }
         }
 
@@ -89,7 +89,6 @@ namespace CryptoBotWebPortal.Data
                     return (true, "Saved successfuly");
                 else return (false, "Failed to save, no changes are applyed");
             }
-            
         }
 
         public async Task<(bool, string)> RemovePairFromBL(BreakoutSub user, BlackListedPairs pair)
@@ -98,16 +97,14 @@ namespace CryptoBotWebPortal.Data
             {
                 using (AppDbContext dbContext = new AppDbContext())
                 {
-                    var userbreak = dbContext.BreakoutSubs.Include(x=>x.BlackListedPairsList).OrderBy(x => x.Id).First(x => x.Id == user.Id);
+                    var userbreak = dbContext.BreakoutSubs.Include(x => x.BlackListedPairsList).OrderBy(x => x.Id).First(x => x.Id == user.Id);
                     if (userbreak != null)
                     {
                         //var pair = user.BlackListedPairsList.First(x => x == pair);
-                        userbreak.BlackListedPairsList.RemoveAll(x=>x.Id == pair.Id && x.OwnerId == pair.OwnerId);
+                        userbreak.BlackListedPairsList.RemoveAll(x => x.Id == pair.Id && x.OwnerId == pair.OwnerId);
                         await dbContext.SaveChangesAsync();
                         return (true, "Успешно удалено");
                     }
-
-
                 }
 
                 return (false, "Ошибка");
@@ -117,6 +114,7 @@ namespace CryptoBotWebPortal.Data
                 return (false, ex.Message);
             }
         }
+
         public async Task<(bool, string)> SaveUserSettings(UserConfig userConfig, BreakoutSub sub)
         {
             try
@@ -124,12 +122,15 @@ namespace CryptoBotWebPortal.Data
                 using (AppDbContext dbContext = new AppDbContext())
                 {
                     var user = dbContext.Users.OrderBy(x => x.Id).First(x => x.Id == userConfig.Id);
+
                     user.Language = userConfig.Language;
                     user.MorningReport = userConfig.MorningReport;
                     user.NightModeEnable = userConfig.NightModeEnable;
                     user.NightModeEndsTime = userConfig.NightModeEndsTime;
                     user.NightModeStartTime = userConfig.NightModeStartTime;
                     user.NoticationsInterval = userConfig.NoticationsInterval;
+                    user.MonInterval = userConfig.MonInterval;
+                    user.TimezoneChange = userConfig.TimezoneChange;
                     user.TriggerOneTasksByDefault = userConfig.TriggerOneTasksByDefault;
                     user.DisplayTaskEditButtonsInNotifications = userConfig.DisplayTaskEditButtonsInNotifications;
                     user.RemoveLatestNotifyBeforeNew = userConfig.RemoveLatestNotifyBeforeNew;
