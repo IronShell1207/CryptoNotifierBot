@@ -70,7 +70,7 @@ namespace TelegramBot.Static.BotLoops
 
             if (!NightTime(user.NightModeEnable, user.NightModeStartTime, user.NightModeEndsTime, dateTimenow))
             {
-                if (lastMsg.LastUpdateDateTime < dateTimenow.AddMinutes(user.MonInterval))
+                if (lastMsg.LastUpdateDateTime  + TimeSpan.FromMinutes(user.MonInterval) < dateTimenow)
                 {
                     var pairs = dbContext.MonPairs.Where(x => x.OwnerId == user.Id);
                     foreach (var pair in pairs.ToList())
@@ -177,8 +177,9 @@ namespace TelegramBot.Static.BotLoops
                 if (lastMsg != null && lastMsg.LastMsgId != null)
                 {
                     await BotApi.RemoveMessage(lastMsg.TelegramId, (int)lastMsg.LastMsgId);
-                    _monUsersUpdate.Remove(lastMsg);
+                   
                 }
+                _monUsersUpdate.Remove(lastMsg);
                 foreach (var pair in lst)
                     sb.AppendLine(FormatStrStock(pair.Item1, pair.Item2));
                 var msg = await BotApi.SendMessage(user.TelegramId, sb.ToString());

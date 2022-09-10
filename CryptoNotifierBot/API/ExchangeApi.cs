@@ -142,23 +142,10 @@ namespace CryptoApi.API
                     var dbSet = new CryDbSet(DateTime.Now, exchange, guid);
                     dbSet.pairs = pairs;
                     dbContext.DataSet.Add(dbSet);
-                    bool isCheck = false;
-                    int count = 0;
-                    while (isCheck || count > 100)
-                    {
-                        try
-                        {
-                            count++;
+                  
                             await dbContext.SaveChangesAsync();
-                            isCheck = true;
-                        }
-                        catch (AggregateException ex)
-                        {
-                            Diff.LogWrite(
-                        $"Can't save pairs too db {count} {ex.Message}", ConsoleColor.DarkRed);
-                            await Task.Delay(30);
-                        }
-                    }
+                        
+                   
                    
                 }
             }
