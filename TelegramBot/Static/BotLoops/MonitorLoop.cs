@@ -34,11 +34,18 @@ namespace TelegramBot.Static.BotLoops
         {
             while (MonitorLoopCancellationToken)
             {
+                Stopwatch timer = new Stopwatch();
+                timer.Start();
                 using (AppDbContext dbContext = new AppDbContext())
                 {
                     var users = dbContext.Users.Include(x => x.pairs).OrderBy(x => x.Id).ToList();
-                    foreach (UserConfig user in users)
+
+                    var options = new ParallelOptions();
+                    CancellationTokenSource ct = new CancellationTokenSource();
+
+                    await Parallel.ForEachAsync(users, async (user, ct) =>
                     {
+                        if (ct.IsCancellationRequested) return;
                         StringBuilder sb = new StringBuilder();
                         var lastMsg = lastUpdateUsers?.LastOrDefault(x => x.UserId == user.Id)?.LastMsgId;
                         var pairsDefault = await UserTasksToNotify(user, dbContext, true);
@@ -50,10 +57,11 @@ namespace TelegramBot.Static.BotLoops
                         await CrtMsgMoon(pairMon, user);
                         await CrtMsg(pairsTriggeredButRaised, sb, user,
                             $"⚠️Pairs triggered, but raise above or fall bellow trigger again:\n");
-                    }
+                    });
                 }
-
-                Thread.Sleep(420);
+                timer.Stop();
+                Console.WriteLine($"Data sended. Time elapsed: {timer.Elapsed} secs.");
+                Thread.Sleep(3000);
             }
         }
 
@@ -70,7 +78,7 @@ namespace TelegramBot.Static.BotLoops
 
             if (!NightTime(user.NightModeEnable, user.NightModeStartTime, user.NightModeEndsTime, dateTimenow))
             {
-                if (lastMsg.LastUpdateDateTime  + TimeSpan.FromMinutes(user.MonInterval) < dateTimenow)
+                if (lastMsg.LastUpdateDateTime + TimeSpan.FromMinutes(user.MonInterval) < dateTimenow)
                 {
                     var pairs = dbContext.MonPairs.Where(x => x.OwnerId == user.Id);
                     foreach (var pair in pairs.ToList())
@@ -177,7 +185,6 @@ namespace TelegramBot.Static.BotLoops
                 if (lastMsg != null && lastMsg.LastMsgId != null)
                 {
                     await BotApi.RemoveMessage(lastMsg.TelegramId, (int)lastMsg.LastMsgId);
-                   
                 }
                 _monUsersUpdate.Remove(lastMsg);
                 foreach (var pair in lst)

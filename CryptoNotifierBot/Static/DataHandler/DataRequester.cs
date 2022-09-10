@@ -77,8 +77,7 @@ namespace CryptoApi.Static.DataHandler
                         var rows = dbContext.KucoinPairs.Where(x => x.Id > -1);
                         Diff.LogWrite($"Rows deleted {rows.Count()} in KucoinPairs", ConsoleColor.DarkYellow);
                         dbContext.RemoveRange(rows);
-                        var rows = dbContext.Database.ExecuteSqlRaw(
-                            $"DELETE FROM KucoinPairs");
+                        //var rows = dbContext.Database.ExecuteSqlRaw($"DELETE FROM KucoinPairs");
 
                         for (var index = 0; index < result.Length; index++)
                         {
@@ -109,8 +108,7 @@ namespace CryptoApi.Static.DataHandler
                         Diff.LogWrite($"Rows deleted {rows.Count()} in OkxPairs", ConsoleColor.DarkYellow);
                         dbContext.RemoveRange(rows);
 
-                        var rows = dbContext.Database.ExecuteSqlRaw(
-                            $"DELETE FROM OkxPairs");
+                        //var rows = dbContext.Database.ExecuteSqlRaw($"DELETE FROM OkxPairs");
 
                         for (var index = 0; index < result.Length; index++)
                         {
@@ -145,7 +143,6 @@ namespace CryptoApi.Static.DataHandler
             });
         }
 
-
         public void RemoveOldData()
         {
             var date = DateTime.Now - TimeSpan.FromHours(60);
@@ -173,6 +170,7 @@ namespace CryptoApi.Static.DataHandler
             {
                 UpdateParallelly();
                 RemoveOldData();
+                DataAvailable = true;
                 await Task.Delay(30000);
             }
         }

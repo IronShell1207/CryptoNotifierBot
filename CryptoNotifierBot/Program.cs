@@ -15,7 +15,7 @@ namespace CryptoApi
 {
     internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             CultureInfo ci = new CultureInfo("en");
             Thread.CurrentThread.CurrentCulture = ci;
@@ -26,7 +26,6 @@ namespace CryptoApi
 
             DataRequester re = new DataRequester();
             re.UpdateParallelly();
-            re.UpdateAllData();
 
             // var data = OkxApi.GetExchangeData();
             //Task.Run(()=>
