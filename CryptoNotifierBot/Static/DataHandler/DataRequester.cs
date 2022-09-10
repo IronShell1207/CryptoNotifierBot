@@ -1,20 +1,129 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using CryptoApi.API;
+﻿using CryptoApi.API;
 using CryptoApi.Constants;
 using CryptoApi.Objects;
 using CryptoApi.Objects.ExchangesPairs;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Diagnostics;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace CryptoApi.Static.DataHandler
 {
+    public class DataLoader
+    {
+        public void GetBinanceData(Guid guid)
+        {
+            Stopwatch timer = new Stopwatch();
+            timer.Start();
+
+            using var api = new ExchangeApi(Exchanges.Binance);
+            var result = api.GetExchangeData<List<BinancePair>>(guid).Result;
+
+            timer.Stop();
+            Console.WriteLine($"{api.ApiName}: {api.PairsCount} in {timer.Elapsed} secs.");
+        }
+
+        public void GetOkxData(Guid guid)
+        {
+            Stopwatch timer = new Stopwatch();
+            timer.Start();
+
+            using var api = new ExchangeApi(Exchanges.Okx);
+            var result = api.GetExchangeData<OkxData>(guid).Result;
+
+            timer.Stop();
+            Console.WriteLine($"{api.ApiName}: {api.PairsCount} in {timer.Elapsed} secs.");
+        }
+
+        public void GetGateIOData(Guid guid)
+        {
+            Stopwatch timer = new Stopwatch();
+            timer.Start();
+
+            using var api = new ExchangeApi(Exchanges.GateIO);
+            var result = api.GetExchangeData<List<GateIOTicker>>(guid).Result;
+
+            timer.Stop();
+            Console.WriteLine($"{api.ApiName}: {api.PairsCount} in {timer.Elapsed} secs.");
+        }
+
+        public void GetKuData(Guid guid)
+        {
+            Stopwatch timer = new Stopwatch();
+            timer.Start();
+
+            using var api = new ExchangeApi(Exchanges.Kucoin);
+            var result = api.GetExchangeData<KucoinData>(guid).Result;
+
+            timer.Stop();
+            Console.WriteLine($"{api.ApiName}: {api.PairsCount} in {timer.Elapsed} secs.");
+        }
+
+        public void GetKucoinFullData(Guid guid)
+        {
+            using (var api = new ExchangeApi(Exchanges.Kucoin))
+            {
+                var result = api.GetTickerData<KucoinData>().Result?.data?.ticker;
+                if (result != null)
+                {
+                    using (DataBaseContext dbContext = new DataBaseContext())
+                    {
+                        var rows = dbContext.KucoinPairs.Where(x => x.Id > -1);
+                        Diff.LogWrite($"Rows deleted {rows.Count()} in KucoinPairs", ConsoleColor.DarkYellow);
+                        dbContext.RemoveRange(rows);
+                        var rows = dbContext.Database.ExecuteSqlRaw(
+                            $"DELETE FROM KucoinPairs");
+
+                        for (var index = 0; index < result.Length; index++)
+                        {
+                            var tickData = result[index];
+                            dbContext.KucoinPairs.Add(new KuTickerDB(tickData));
+                        }
+
+                        dbContext.SaveChanges();
+                    }
+                    Diff.LogWrite($"{api.ApiName} data saved: {result.Length}");
+                }
+                else
+                {
+                    Diff.LogWrite($"{api.ApiName} data load fail.", ConsoleColor.DarkRed);
+                }
+            }
+        }
+
+        public void GetOkxFullData(Guid guid)
+        {
+            using (var api = new ExchangeApi(Exchanges.Okx))
+            {
+                var result = api.GetTickerData<OkxData>().Result?.data;
+                if (result != null)
+                    using (DataBaseContext dbContext = new DataBaseContext())
+                    {
+                        var rows = dbContext.OkxPairs.Where(x => x.Id > -1);
+                        Diff.LogWrite($"Rows deleted {rows.Count()} in OkxPairs", ConsoleColor.DarkYellow);
+                        dbContext.RemoveRange(rows);
+
+                        var rows = dbContext.Database.ExecuteSqlRaw(
+                            $"DELETE FROM OkxPairs");
+
+                        for (var index = 0; index < result.Length; index++)
+                        {
+                            var tickData = result[index];
+                            dbContext.OkxPairs.Add(new OkxTickerDB(tickData));
+                        }
+                        dbContext.SaveChanges();
+                    }
+                Diff.LogWrite($"{api.ApiName} data saved: {result?.Length}", ConsoleColor.DarkGreen);
+            }
+        }
+    }
+
     public class DataRequester : TheDisposable
     {
         public bool UpdaterLive { get; set; } = true;
@@ -23,114 +132,19 @@ namespace CryptoApi.Static.DataHandler
 
         private int Try = 30;
 
-        public async void UpdateAllData()
+        public void UpdateParallelly()
         {
-            StringBuilder sb = new StringBuilder($"Market data updated: ");
-            var guid = Guid.NewGuid();
-            var tasksPool = new List<Task>();
-            tasksPool.Add(new Task(async () =>
+            Guid guid = Guid.NewGuid();
+            var methods = typeof(DataLoader).GetMethods(BindingFlags.Public | BindingFlags.Instance);
+            var parfams = new List<object> { guid };
+            ;
+            Parallel.ForEach(methods, (method) =>
             {
-                using (var api = new ExchangeApi(Exchanges.Binance))
-                {
-                    var result = api.GetExchangeData<List<BinancePair>>(guid).Result;
-
-                    sb.Append($"{api.ApiName}: {api.PairsCount} ");
-                }
-            }));
-            tasksPool.Add(new Task(() =>
-            {
-                using (var api = new ExchangeApi(Exchanges.Bitget))
-                {
-                    var result = api.GetExchangeData<BitgetData>(guid).Result;
-                    sb.Append($"{api.ApiName}: {api.PairsCount} ");
-                }
-            }));
-            tasksPool.Add(new Task(() =>
-            {
-                using (var api = new ExchangeApi(Exchanges.Okx))
-                {
-                    var result = api.GetExchangeData<OkxData>(guid).Result;
-                    sb.Append($"{api.ApiName}: {api.PairsCount} ");
-                }
-            }));
-            tasksPool.Add(new Task(() =>
-            {
-                using (var api = new ExchangeApi(Exchanges.GateIO))
-                {
-                    var result = api.GetExchangeData<List<GateIOTicker>>(guid).Result;
-                    sb.Append($"{api.ApiName}: {api.PairsCount} ");
-                }
-            }));
-            tasksPool.Add(new Task(() =>
-            {
-                using (var api = new ExchangeApi(Exchanges.Kucoin))
-                {
-                    var result = api.GetExchangeData<KucoinData>(guid).Result;
-                    sb.Append($"{api.ApiName}: {api.PairsCount} ");
-                }
-            }));
-            tasksPool.Add(new Task(() =>
-            {
-                using (var api = new ExchangeApi(Exchanges.Kucoin))
-                {
-                    var result = api.GetTickerData<KucoinData>().Result?.data?.ticker;
-                    if (result != null)
-                    {
-                        using (DataBaseContext dbContext = new DataBaseContext())
-                        {
-                            var rows = dbContext.KucoinPairs.Where(x => x.Id > -1);
-                            Diff.LogWrite($"Rows deleted {rows.Count()} in KucoinPairs", ConsoleColor.DarkYellow);
-                            dbContext.RemoveRange(rows);
-                            /* var rows = dbContext.Database.ExecuteSqlRaw(
-                                 $"DELETE FROM KucoinPairs");*/
-
-                            for (var index = 0; index < result.Length; index++)
-                            {
-                                var tickData = result[index];
-                                dbContext.KucoinPairs.Add(new KuTickerDB(tickData));
-                            }
-
-                            dbContext.SaveChanges();
-                        }
-                        Diff.LogWrite($"{api.ApiName} data saved: {result.Length}");
-                    }
-                    else
-                    {
-                        Diff.LogWrite($"{api.ApiName} data load fail.", ConsoleColor.DarkRed);
-                    }
-                }
-            }));
-            tasksPool.Add(new Task(() =>
-            {
-                using (var api = new ExchangeApi(Exchanges.Okx))
-                {
-                    var result = api.GetTickerData<OkxData>().Result?.data;
-                    if (result != null)
-                        using (DataBaseContext dbContext = new DataBaseContext())
-                        {
-                            var rows = dbContext.OkxPairs.Where(x => x.Id > -1);
-                            Diff.LogWrite($"Rows deleted {rows.Count()} in OkxPairs", ConsoleColor.DarkYellow);
-                            dbContext.RemoveRange(rows);
-
-                            /* var rows = dbContext.Database.ExecuteSqlRaw(
-                                 $"DELETE FROM OkxPairs");*/
-
-                            for (var index = 0; index < result.Length; index++)
-                            {
-                                var tickData = result[index];
-                                dbContext.OkxPairs.Add(new OkxTickerDB(tickData));
-                            }
-                            dbContext.SaveChanges();
-                        }
-                    Diff.LogWrite($"{api.ApiName} data saved: {result?.Length}", ConsoleColor.DarkGreen);
-                }
-            }));
-            tasksPool.ForEach(x => x.Start());
-            while (tasksPool.Any(x => !x.IsCompleted))
-                Thread.Sleep(500);
-            DataAvailable = true;
-            Diff.LogWrite(sb.ToString());
+                if (method.ReturnType.Name == "Void")
+                    method.Invoke(new DataLoader(), parfams.ToArray());
+            });
         }
+
 
         public void RemoveOldData()
         {
@@ -155,19 +169,11 @@ namespace CryptoApi.Static.DataHandler
 
         public async Task UpdateDataLoop()
         {
-            //if (DataDownloadedCounter > 3000)
-            //    using (DataBaseContext dbContext = new DataBaseContext())
-            //    {
-            //        var rows = dbContext.Database.ExecuteSqlRaw(
-            //                 "DELETE FROM DataSet WHERE Id in (SELECT Id FROM DataSet ORDER BY Id LIMIT 200)");
-            //        Diff.LogWrite($"Rows deleted {rows} for data when storage overflow");
-            //    }
             while (UpdaterLive)
             {
-                UpdateAllData();
+                UpdateParallelly();
                 RemoveOldData();
-                DataDownloadedCounter++;
-                Thread.Sleep(29900);
+                await Task.Delay(30000);
             }
         }
 

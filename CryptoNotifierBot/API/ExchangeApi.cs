@@ -143,10 +143,7 @@ namespace CryptoApi.API
                     dbSet.pairs = pairs;
                     dbContext.DataSet.Add(dbSet);
                   
-                            await dbContext.SaveChangesAsync();
-                        
-                   
-                   
+                    await dbContext.SaveChangesAsync();
                 }
             }
         }

@@ -12,7 +12,7 @@ using TelegramBot.Objects;
 
 namespace CryptoNotifierBot.Tests
 {
-
+    
     public class FormaterTests
     {
         [Test]

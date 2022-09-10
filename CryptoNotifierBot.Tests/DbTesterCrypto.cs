@@ -41,10 +41,8 @@ namespace CryptoNotifierBot.Tests
                 if (btc!=null) Assert.Pass($"{btc.symbol}: {btc.circulating_supply} {btc.date_added}");
                 else Assert.Fail($"{btc.ToString()}");
             }
-
-           
-
-
         }
+
+        
     }
 }

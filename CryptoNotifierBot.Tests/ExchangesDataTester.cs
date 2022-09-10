@@ -179,5 +179,19 @@ namespace CryptoApi.Tests
                 Assert.Pass(await GetBtcPrice(Exchanges.Bitget));
             }
         }
+
+        [Test]
+        public void ParrallelTest()
+        {
+            DataRequester re = new DataRequester();
+            re.UpdateParallelly();
+        }
+        [Test]
+        public void NormalTest()
+        {
+            DataRequester re = new DataRequester();
+            re.UpdateAllData();
+        }
+
     }
 }
