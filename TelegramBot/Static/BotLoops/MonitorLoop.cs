@@ -48,15 +48,19 @@ namespace TelegramBot.Static.BotLoops
                         if (ct.IsCancellationRequested) return;
                         StringBuilder sb = new StringBuilder();
                         var lastMsg = lastUpdateUsers?.LastOrDefault(x => x.UserId == user.Id)?.LastMsgId;
+
                         var pairsDefault = await UserTasksToNotify(user, dbContext, true);
-                        var pairsSingleNotify = await UserTasksSingleNotify(user, dbContext);
-                        var pairsTriggeredButRaised = await UserTriggeredTasksRaised(user, dbContext);
-                        var pairMon = await UserTasksMon(user, dbContext);
-                        await CrtMsg(pairsSingleNotify, sb, user);
                         await CrtMsg(pairsDefault, new StringBuilder(), user);
-                        await CrtMsgMoon(pairMon, user);
+
+                        var pairsSingleNotify = await UserTasksSingleNotify(user, dbContext);
+                        await CrtMsg(pairsSingleNotify, sb, user);
+
+                        var pairsTriggeredButRaised = await UserTriggeredTasksRaised(user, dbContext);
                         await CrtMsg(pairsTriggeredButRaised, sb, user,
                             $"⚠️Pairs triggered, but raise above or fall bellow trigger again:\n");
+
+                        var pairMon = await UserTasksMon(user, dbContext);
+                        await CrtMsgMoon(pairMon, user);
                     });
                 }
                 timer.Stop();
