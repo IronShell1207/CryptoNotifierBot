@@ -29,6 +29,9 @@ namespace TelegramBot.Services.MessageHandlers
                 == TelegramUpdatesHelper.StripHTML(Messages.newPairRequestingForPair))
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())
                     await msgh.SetPairSymbolStage(update, user);
+            else if (update?.Message.Text == SimpleCommands.EnableCleaning)
+                using (UserSettingsMsgHandler msgHandler = new())
+                    await msgHandler.TurnLastMsgCleaning(update);
             else if (TelegramUpdatesHelper.StripHTML(update.Message.ReplyToMessage.Text)
                      == TelegramUpdatesHelper.StripHTML(Messages.newPairWrongPrice))
                 using (CryptoPairsMsgHandler msgh = new CryptoPairsMsgHandler())

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Diagnostics.Tracing.Parsers.MicrosoftWindowsTCPIP;
 using Telegram.Bot.Types;
 using TelegramBot.Constants.Commands;
 using TelegramBot.Helpers;
@@ -82,6 +83,22 @@ namespace TelegramBot.Static.MessageHandlers
                 if (userConfig != null)
                 {
                     await BotApi.SendMessage(userConfig.TelegramId, userConfig.GetUserSettingsString());
+                }
+            }
+        }
+
+        public async Task TurnLastMsgCleaning(Update update)
+        {
+            using (AppDbContext dbContext = new AppDbContext())
+            {
+                var sk = TelegramUpdatesHelper.GetTelegramIdFromUpdate(update);
+                var userCfg = dbContext.Users.FirstOrDefault(x =>
+                    x.TelegramId == sk.Identifier);
+                if (userCfg != null)
+                {
+                    userCfg.RemoveLatestNotifyBeforeNew = true;
+                    await dbContext.SaveChangesAsync();
+                    await BotApi.SendMessage(userCfg.TelegramId, $"Last message cleaning status: {userCfg.RemoveLatestNotifyBeforeNew}");
                 }
             }
         }

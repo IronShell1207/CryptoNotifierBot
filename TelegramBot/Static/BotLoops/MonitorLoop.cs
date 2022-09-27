@@ -1,32 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using CryptoApi.Objects;
-using Microsoft.EntityFrameworkCore;
-using Telegram.Bot.Types;
 using TelegramBot.Objects;
 
 namespace TelegramBot.Static.BotLoops
 {
     public class MonitorLoop
     {
-        private static List<IntervaledUsersHistory> lastUpdateUsers = new List<IntervaledUsersHistory>() { };
-        private static List<IntervaledUsersHistory> _monUsersUpdate = new();
+        private static List<UsersLastMessageIds> lastUpdateUsers = new();
         public static bool MonitorLoopCancellationToken { get; set; } = true;
 
         private static async Task CrtMsg(List<(CryptoPair, double)> lst, StringBuilder sb, UserConfig user,
-            string msg = "")
+            string msg = "", bool saveLastId = false)
         {
             if (lst.Any())
             {
                 foreach (var pair in lst)
                     sb.AppendLine(FormatNotifyEntryStock(pair.Item1, pair.Item2));
                 var msgw = await BotApi.SendMessage(user.TelegramId, msg + sb);
-                lastUpdateUsers.Add(new IntervaledUsersHistory(user.Id, DateTime.Now, msgw.MessageId));
+
+                if (saveLastId)
+                {
+                    var userMsgH = lastUpdateUsers.FirstOrDefault(x => x.User.TelegramId == user.TelegramId);
+                    if (userMsgH == null)
+                    {
+                        userMsgH = new UsersLastMessageIds(user);
+                        lastUpdateUsers.Add(userMsgH);
+                    }
+
+                    if (user.RemoveLatestNotifyBeforeNew && userMsgH.NormalMsg?.MsgId != null)
+                    {
+                        await BotApi.RemoveMessage(user.TelegramId, (int)userMsgH.NormalMsg.MsgId);
+                    }
+                    if (msgw != null)
+                        userMsgH.NormalMsg = new SentMsg(DateTime.Now.ToUniversalTime(), msgw.MessageId);
+                }
             }
         }
 
@@ -43,11 +52,10 @@ namespace TelegramBot.Static.BotLoops
                     var options = new ParallelOptions();
                     CancellationTokenSource ct = new CancellationTokenSource();
 
-                    await Parallel.ForEachAsync(users, async (user, ct) =>
+                    await Parallel.ForEachAsync(users, ct.Token, async (user, ct) =>
                     {
                         if (ct.IsCancellationRequested) return;
                         StringBuilder sb = new StringBuilder();
-                        var lastMsg = lastUpdateUsers?.LastOrDefault(x => x.UserId == user.Id)?.LastMsgId;
 
                         var pairsDefault = await UserTasksToNotify(user, dbContext, true);
                         await CrtMsg(pairsDefault, new StringBuilder(), user);
@@ -64,8 +72,8 @@ namespace TelegramBot.Static.BotLoops
                     });
                 }
                 timer.Stop();
-                Console.WriteLine($"Data sended. Time elapsed: {timer.Elapsed} secs.");
-                Thread.Sleep(3000);
+                //Console.WriteLine($"Data sended. Time elapsed: {timer.Elapsed} secs.");
+                Thread.Sleep(4000);
             }
         }
 
@@ -73,24 +81,16 @@ namespace TelegramBot.Static.BotLoops
         {
             List<(MonObj, double)> tasks = new List<(MonObj, double)>();
             DateTime dateTimenow = DateTime.Now.ToUniversalTime().AddHours(user.TimezoneChange);
-            var lastMsg = _monUsersUpdate?.LastOrDefault(x => x.UserId == user.Id);
-            if (lastMsg == null)
-            {
-                lastMsg = new IntervaledUsersHistory(user.Id, dateTimenow - TimeSpan.FromMinutes(2));
-                _monUsersUpdate?.Add(lastMsg);
-            }
 
-            if (!NightTime(user.NightModeEnable, user.NightModeStartTime, user.NightModeEndsTime, dateTimenow))
+            if (!NightTime(user.NightModeEnable, user.NightModeStartTime, user.NightModeEndsTime, dateTimenow)
+                && UpdateMonIntervalExpired(user.Id, user.MonInterval))
             {
-                if (lastMsg.LastUpdateDateTime + TimeSpan.FromMinutes(user.MonInterval) < dateTimenow)
+                var pairs = dbContext.MonPairs.Where(x => x.OwnerId == user.Id);
+                foreach (var pair in pairs.ToList())
                 {
-                    var pairs = dbContext.MonPairs.Where(x => x.OwnerId == user.Id);
-                    foreach (var pair in pairs.ToList())
-                    {
-                        var price = await Program.cryptoData.GetCurrentPricePairByName(pair.PairBase.ToUpper(), "USDT");
-                        if (price?.Price > 0)
-                            tasks.Add(new(pair, price.Price));
-                    }
+                    var price = await Program.cryptoData.GetCurrentPricePairByName(pair.PairBase.ToUpper(), "USDT");
+                    if (price?.Price > 0)
+                        tasks.Add(new(pair, price.Price));
                 }
             }
             return tasks;
@@ -100,12 +100,11 @@ namespace TelegramBot.Static.BotLoops
                 bool useInterval = true)
         {
             List<(CryptoPair, double)> tasks = new List<(CryptoPair, double)>();
-            DateTime dateTimenow = DateTime.Now.AddHours(user.TimezoneChange - 3);
+            DateTime dateTimenow = DateTime.Now.ToUniversalTime().AddHours(user.TimezoneChange);
 
             if (!useInterval || (UpdateIntervalExpired(user.Id, user.NoticationsInterval)) &&
                 !NightTime(user.NightModeEnable, user.NightModeStartTime, user.NightModeEndsTime, dateTimenow))
             {
-                //var pairs = dbContext.CryptoPairs.Where(x => x.OwnerId == user.Id && x.Enabled && !x.TriggerOnce).ToList();
                 foreach (var pair in user.pairs.Where(x => x.OwnerId == user.Id && x.Enabled && !x.TriggerOnce)
                              .ToList())
                 {
@@ -185,17 +184,28 @@ namespace TelegramBot.Static.BotLoops
 
             if (lst.Any())
             {
-                var lastMsg = _monUsersUpdate?.FirstOrDefault(x => x.UserId == user.Id);
-                if (lastMsg != null && lastMsg.LastMsgId != null)
-                {
-                    await BotApi.RemoveMessage(lastMsg.TelegramId, (int)lastMsg.LastMsgId);
-                }
-                _monUsersUpdate.Remove(lastMsg);
                 foreach (var pair in lst)
                     sb.AppendLine(FormatStrStock(pair.Item1, pair.Item2));
+                
+
+                var userMsgH = lastUpdateUsers.FirstOrDefault(x => x.User.TelegramId == user.TelegramId);
+                if (userMsgH == null)
+                {
+                    userMsgH = new UsersLastMessageIds(user);
+                    lastUpdateUsers.Add(userMsgH);
+                }
+
+                if (user.RemoveLatestNotifyBeforeNew && userMsgH.MonitorMsg?.MsgId != null)
+                {
+                    await BotApi.RemoveMessage(user.TelegramId, (int)userMsgH.MonitorMsg.MsgId);
+                }
+
                 var msg = await BotApi.SendMessage(user.TelegramId, sb.ToString());
-                var lastMessage = new IntervaledUsersHistory(user.Id, DateTime.Now.ToUniversalTime().AddHours(user.TimezoneChange), msg.MessageId);
-                _monUsersUpdate.Add(lastMessage);
+
+                if (msg != null) 
+                    userMsgH.MonitorMsg = new SentMsg(DateTime.Now.ToUniversalTime(), msg.MessageId);
+
+                //var lastMessage = new UsersLastMessageIds(user.Id, DateTime.Now.ToUniversalTime().AddHours(user.TimezoneChange), msg.MessageId);
             }
         }
 
@@ -212,12 +222,28 @@ namespace TelegramBot.Static.BotLoops
 
         private static bool UpdateIntervalExpired(int userId, int interval)
         {
-            var lastupdated = lastUpdateUsers.FirstOrDefault(x => x.UserId == userId);
-            if (lastupdated == null) return true;
-            var nowDate = DateTime.Now;
-            if (lastupdated.LastUpdateDateTime + TimeSpan.FromSeconds(interval) < nowDate)
+            var lastUpdated = lastUpdateUsers.FirstOrDefault(x => x.User.Id == userId);
+            if (lastUpdated?.NormalMsg == null) return true;
+
+            if (lastUpdated.NormalMsg.SentDateTime + TimeSpan.FromSeconds(interval)
+                < DateTime.Now.ToUniversalTime())
             {
-                lastUpdateUsers.Remove(lastupdated);
+                return true;
+            }
+
+            return false;
+        }
+
+        private static bool UpdateMonIntervalExpired(int userId, int interval)
+        {
+            var lastUpdated = lastUpdateUsers.FirstOrDefault(x => x.User.Id == userId);
+            if (lastUpdated?.MonitorMsg == null) return true;
+
+            var dateNow = DateTime.Now.ToUniversalTime();
+
+            if (lastUpdated.MonitorMsg.SentDateTime + TimeSpan.FromSeconds(interval)
+                < dateNow)
+            {
                 return true;
             }
 
@@ -260,28 +286,27 @@ namespace TelegramBot.Static.BotLoops
         }
     }
 
-    public class IntervaledUsersHistory
+    public class UsersLastMessageIds
     {
-        public int UserId { get; set; }
-        public DateTime LastUpdateDateTime { get; set; }
-        public long TelegramId { get; set; }
-        public int? LastMsgId { get; set; }
+        public UserConfig User { get; set; }
+        public SentMsg NormalMsg { get; set; }
+        public SentMsg MonitorMsg { get; set; }
 
-        public IntervaledUsersHistory(int userid, DateTime datetime, long telegramId = 0)
+        public UsersLastMessageIds(UserConfig user, long telegramId = 0)
         {
-            UserId = userid;
-            LastUpdateDateTime = datetime;
-            if (telegramId != 0)
-                TelegramId = telegramId;
+            User = user;
         }
+    }
 
-        public IntervaledUsersHistory(int userid, DateTime datetime, int? msg, long telegramId = 0)
+    public class SentMsg
+    {
+        public DateTime SentDateTime { get; set; }
+        public int? MsgId { get; set; }
+
+        public SentMsg(DateTime date, int? msgId)
         {
-            UserId = userid;
-            LastUpdateDateTime = datetime;
-            LastMsgId = msg;
-            if (telegramId != 0)
-                TelegramId = telegramId;
+            MsgId = msgId;
+            SentDateTime = date;
         }
     }
 }

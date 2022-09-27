@@ -172,7 +172,7 @@ namespace CryptoApi.Static.DataHandler
                 UpdateParallelly();
                 RemoveOldData();
                 DataAvailable = true;
-                await Task.Delay(30000);
+                await Task.Delay(45000);
             }
         }
 

@@ -33,6 +33,11 @@ namespace TelegramBot.Constants.Commands
         /// Показать настройки.
         /// </summary>
         public const string ShowSettings = "/showsetts";
+
+        /// <summary>
+        /// Удалять последнее сообщение автоматически.
+        /// </summary>
+        public const string EnableCleaning = "/cleanlast";
     }
 
     public class AdminCommands

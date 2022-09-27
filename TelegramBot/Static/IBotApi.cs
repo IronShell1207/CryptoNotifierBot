@@ -120,6 +120,9 @@ namespace TelegramBot.Static
                     var result = await brkMsgHandler.RemoveAllBlackListedPairsUser(user);
                     await SendMessage(user.TelegramId, result.Message);
                 }
+            else if (update?.Message.Text == SimpleCommands.EnableCleaning)
+                using (UserSettingsMsgHandler msgHandler = new())
+                    await msgHandler.TurnLastMsgCleaning(update);
             else if (MonitoringTaskCommands.CreatePair.IsMatch(update.Message.Text))
                 using (CryptoPairsMsgHandler msghandler = new CryptoPairsMsgHandler())
                     await msghandler.CreateTaskFirstStage(update, user);
