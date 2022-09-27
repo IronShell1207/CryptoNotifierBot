@@ -162,7 +162,7 @@ namespace TelegramBot.Static.BotLoops
                     }
                 }
 
-                dbContext.SaveChangesAsync();
+                await dbContext.SaveChangesAsync();
             }
 
             return tasksReturing;
