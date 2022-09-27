@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 namespace CryptoApi.Objects.ExchangesPairs
 {
-
     public class BinanceSymbolsData
     {
         public string timezone { get; set; }
@@ -64,5 +63,4 @@ namespace CryptoApi.Objects.ExchangesPairs
         public int maxNumAlgoOrders { get; set; }
         public string maxPosition { get; set; }
     }
-
 }

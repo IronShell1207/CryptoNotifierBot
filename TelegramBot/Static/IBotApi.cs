@@ -185,11 +185,6 @@ namespace TelegramBot.Static
                     await msg.SetTimings(update);
         }
 
-        public static async void CommandsHandler(ITelegramBotClient bot, Update update,
-            CancellationToken cancellationToken, UserConfig user)
-        {
-        }
-
         public static async void CallbackHandlerAsync(ITelegramBotClient bot, Update update,
             CancellationToken cancellationToken)
         {

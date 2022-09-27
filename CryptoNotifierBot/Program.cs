@@ -15,7 +15,7 @@ namespace CryptoApi
 {
     internal class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             CultureInfo ci = new CultureInfo("en");
             Thread.CurrentThread.CurrentCulture = ci;

@@ -142,7 +142,7 @@ namespace CryptoApi.API
                     var dbSet = new CryDbSet(DateTime.Now, exchange, guid);
                     dbSet.pairs = pairs;
                     dbContext.DataSet.Add(dbSet);
-                  
+
                     await dbContext.SaveChangesAsync();
                 }
             }
