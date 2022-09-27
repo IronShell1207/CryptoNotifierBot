@@ -190,7 +190,7 @@ namespace CryptoApi.Tests
         public void NormalTest()
         {
             DataRequester re = new DataRequester();
-            re.UpdateAllData();
+           // re.UpdateAllData();
         }
 
     }

@@ -26,7 +26,7 @@ namespace CryptoApi
 
             DataRequester re = new DataRequester();
             re.UpdateParallelly();
-            re.UpdateAllData();
+            //re.UpdateAllData();
 
             // var data = OkxApi.GetExchangeData();
             //Task.Run(()=>
