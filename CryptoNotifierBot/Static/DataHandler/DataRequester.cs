@@ -54,7 +54,7 @@ namespace CryptoApi.Static.DataHandler
             Console.WriteLine($"{api.ApiName}: {api.PairsCount} in {timer.Elapsed} secs.");
         }
 
-        public void GetKuData(Guid guid)
+        public void GetKucoinData(Guid guid)
         {
             Stopwatch timer = new Stopwatch();
             timer.Start();
@@ -128,6 +128,7 @@ namespace CryptoApi.Static.DataHandler
         public bool UpdaterLive { get; set; } = true;
         public int DataDownloadedCounter { get; private set; } = 0;
         public bool DataAvailable { get; set; } = false;
+        public TimeSpan UpdateDelay { get; set; } = TimeSpan.FromSeconds(10);
 
         private int Try = 30;
 
@@ -144,9 +145,31 @@ namespace CryptoApi.Static.DataHandler
             });
         }
 
-        public void RemoveOldData()
+        public void UpdateByExchange(string exchange)
         {
-            var date = DateTime.Now - TimeSpan.FromHours(60);
+            Guid guid = Guid.NewGuid();
+            var methods = typeof(DataLoader).GetMethods(BindingFlags.Public | BindingFlags.Instance);
+            var parfams = new List<object> { guid };
+
+            foreach (var method in methods)
+                if (method.ReturnType.Name == "Void" && method.Name.ToLower().Contains(exchange.ToLower()))
+                    method.Invoke(new DataLoader(), parfams.ToArray());
+        }
+
+        public void UpdateKucoinData()
+        {
+            Guid guid = Guid.NewGuid();
+            var methods = typeof(DataLoader).GetMethods(BindingFlags.Public | BindingFlags.Instance);
+            var parfams = new List<object> { guid };
+
+            foreach (var method in methods)
+                if (method.ReturnType.Name == "Void" && method.Name == "GetKucoinFullData")
+                    method.Invoke(new DataLoader(), parfams.ToArray());
+        }
+
+        public void RemoveOldData(TimeSpan time)
+        {
+            var date = DateTime.Now - time;
             using (DataBaseContext dbContext = new DataBaseContext())
             {
                 if (dbContext.DataSet.Any(x => x.DateTime < date))
@@ -170,9 +193,30 @@ namespace CryptoApi.Static.DataHandler
             while (UpdaterLive)
             {
                 UpdateParallelly();
-                RemoveOldData();
+                RemoveOldData(TimeSpan.FromHours(60));
                 DataAvailable = true;
                 await Task.Delay(45000);
+            }
+        }
+
+        public async Task UpdateDataLoop(string exchange)
+        {
+            while (UpdaterLive)
+            {
+                UpdateByExchange(exchange);
+                RemoveOldData(TimeSpan.FromMinutes(2));
+                DataAvailable = true;
+                await Task.Delay(UpdateDelay);
+            }
+        }
+
+        public async Task UpdateKucoinLoop()
+        {
+            while (UpdaterLive)
+            {
+                UpdateKucoinData();
+                DataAvailable = true;
+                await Task.Delay(UpdateDelay);
             }
         }
 
@@ -181,7 +225,7 @@ namespace CryptoApi.Static.DataHandler
             using (DataBaseContext dbContext = new DataBaseContext())
             {
                 var dSet = dbContext.DataSet.Include(x => x.pairs).OrderBy(x => x.Id).LastOrDefault(x => x.Exchange == exchange);
-                return dSet.pairs.Take(limit).ToList();
+                return dSet?.pairs?.Take(limit)?.ToList();
                 var pairs = dbContext.TradingPairs.Where(x => x.CryDbSetId == dSet.Id && x.Exchange == dSet.Exchange).Take(limit).ToList();
                 return pairs;
             }

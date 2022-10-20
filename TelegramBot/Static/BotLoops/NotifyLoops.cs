@@ -18,7 +18,7 @@ namespace TelegramBot.Static
 {
     public class NotifyLoops
     {
-        public static async void MainLoop()
+        public static void MainLoop()
         {
             Task.Run(BreakoutMonitor.BreakoutLoop);
             Task.Run(BotLoops.MonitorLoop.Loop);

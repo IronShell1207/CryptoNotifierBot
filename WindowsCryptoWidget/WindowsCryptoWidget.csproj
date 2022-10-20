@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Assets\iconadd.png" />
+    <None Remove="Assets\icons8_close_pane_50px.png" />
+    <None Remove="Assets\icons8_collapse_arrow_24px.png" />
+    <None Remove="Assets\icons8_expand_arrow_24px.png" />
+    <None Remove="Assets\icons8_open_pane_50px.png" />
+    <None Remove="Assets\icons8_remove_24px.png" />
+    <None Remove="Assets\ico_close.png" />
+    <None Remove="Assets\settings_24px.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.0.0" />
+    <PackageReference Include="MaterialDesignColors" Version="2.0.9" />
+    <PackageReference Include="MaterialDesignThemes" Version="4.6.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CryptoNotifierBot\CryptoApi.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\iconadd.png" />
+    <Resource Include="Assets\icons8_close_pane_50px.png" />
+    <Resource Include="Assets\icons8_collapse_arrow_24px.png" />
+    <Resource Include="Assets\icons8_expand_arrow_24px.png" />
+    <Resource Include="Assets\icons8_open_pane_50px.png" />
+    <Resource Include="Assets\icons8_remove_24px.png" />
+    <Resource Include="Assets\ico_close.png" />
+    <Resource Include="Assets\settings_24px.png" />
+  </ItemGroup>
+
+</Project>
