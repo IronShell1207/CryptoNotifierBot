@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Globalization;
 using System.Text;
+using Telegram.Bot.Types;
 using TelegramBot.Objects;
 
 namespace TelegramBot.Static.BotLoops
@@ -11,32 +12,17 @@ namespace TelegramBot.Static.BotLoops
         private static List<UsersLastMessageIds> lastUpdateUsers = new();
         public static bool MonitorLoopCancellationToken { get; set; } = true;
 
-        private static async Task CrtMsg(List<(CryptoPair, double)> lst, StringBuilder sb, UserConfig user,
+        private static async Task<Message> CrtMsg(List<(CryptoPair, double)> lst, StringBuilder sb, UserConfig user,
             string msg = "", bool saveLastId = false)
         {
             if (lst.Any())
             {
                 foreach (var pair in lst)
                     sb.AppendLine(FormatNotifyEntryStock(pair.Item1, pair.Item2));
-                var msgw = await BotApi.SendMessage(user.TelegramId, msg + sb);
-
-                if (saveLastId)
-                {
-                    var userMsgH = lastUpdateUsers.FirstOrDefault(x => x.User.TelegramId == user.TelegramId);
-                    if (userMsgH == null)
-                    {
-                        userMsgH = new UsersLastMessageIds(user);
-                        lastUpdateUsers.Add(userMsgH);
-                    }
-
-                    if (user.RemoveLatestNotifyBeforeNew && userMsgH.NormalMsg?.MsgId != null)
-                    {
-                        await BotApi.RemoveMessage(user.TelegramId, (int)userMsgH.NormalMsg.MsgId);
-                    }
-                    if (msgw != null)
-                        userMsgH.NormalMsg = new SentMsg(DateTime.Now.ToUniversalTime(), msgw.MessageId);
-                }
+                return await BotApi.SendMessage(user.TelegramId, msg + sb);
             }
+
+            return null;
         }
 
         public static async void Loop()
@@ -45,32 +31,50 @@ namespace TelegramBot.Static.BotLoops
             {
                 Stopwatch timer = new Stopwatch();
                 timer.Start();
-                using (AppDbContext dbContext = new AppDbContext())
+                AppDbContext dbContext = new AppDbContext();
+
+                var users = dbContext.Users.Include(x => x.pairs).OrderBy(x => x.Id).ToList();
+                dbContext.Dispose();
+                var options = new ParallelOptions();
+                CancellationTokenSource ct = new CancellationTokenSource();
+
+                await Parallel.ForEachAsync(users, ct.Token, async (user, ct) =>
                 {
-                    var users = dbContext.Users.Include(x => x.pairs).OrderBy(x => x.Id).ToList();
-
-                    var options = new ParallelOptions();
-                    CancellationTokenSource ct = new CancellationTokenSource();
-
-                    await Parallel.ForEachAsync(users, ct.Token, async (user, ct) =>
+                    using (AppDbContext pContext = new AppDbContext())
                     {
                         if (ct.IsCancellationRequested) return;
                         StringBuilder sb = new StringBuilder();
 
-                        var pairsDefault = await UserTasksToNotify(user, dbContext, true);
-                        await CrtMsg(pairsDefault, new StringBuilder(), user);
+                        var pairsDefault = await UserTasksToNotify(user, pContext, true);
+                        var message = await CrtMsg(pairsDefault, new StringBuilder(), user);
 
-                        var pairsSingleNotify = await UserTasksSingleNotify(user, dbContext);
+                        if (message?.MessageId > 0)
+                        {
+                            var userMsgH = lastUpdateUsers.FirstOrDefault(x => x.User.TelegramId == user.TelegramId);
+                            if (userMsgH == null)
+                            {
+                                userMsgH = new UsersLastMessageIds(user);
+                                lastUpdateUsers.Add(userMsgH);
+                            }
+
+                            if (user.RemoveLatestNotifyBeforeNew && userMsgH.NormalMsg?.MsgId != null)
+                                await BotApi.RemoveMessage(user.TelegramId, (int)userMsgH.NormalMsg.MsgId);
+
+                            userMsgH.NormalMsg = new SentMsg(DateTime.Now.ToUniversalTime(), message.MessageId);
+                        }
+
+                        var pairsSingleNotify = await UserTasksSingleNotify(user, pContext);
                         await CrtMsg(pairsSingleNotify, sb, user);
 
-                        var pairsTriggeredButRaised = await UserTriggeredTasksRaised(user, dbContext);
+                        var pairsTriggeredButRaised = await UserTriggeredTasksRaised(user, pContext);
                         await CrtMsg(pairsTriggeredButRaised, sb, user,
                             $"⚠️Pairs triggered, but raise above or fall bellow trigger again:\n");
 
-                        var pairMon = await UserTasksMon(user, dbContext);
+                        var pairMon = await UserTasksMon(user, pContext);
                         await CrtMsgMoon(pairMon, user);
-                    });
-                }
+                    }
+                });
+
                 timer.Stop();
                 //Console.WriteLine($"Data sended. Time elapsed: {timer.Elapsed} secs.");
                 Thread.Sleep(4000);
@@ -186,7 +190,6 @@ namespace TelegramBot.Static.BotLoops
             {
                 foreach (var pair in lst)
                     sb.AppendLine(FormatStrStock(pair.Item1, pair.Item2));
-                
 
                 var userMsgH = lastUpdateUsers.FirstOrDefault(x => x.User.TelegramId == user.TelegramId);
                 if (userMsgH == null)
@@ -202,7 +205,7 @@ namespace TelegramBot.Static.BotLoops
 
                 var msg = await BotApi.SendMessage(user.TelegramId, sb.ToString());
 
-                if (msg != null) 
+                if (msg != null)
                     userMsgH.MonitorMsg = new SentMsg(DateTime.Now.ToUniversalTime(), msg.MessageId);
 
                 //var lastMessage = new UsersLastMessageIds(user.Id, DateTime.Now.ToUniversalTime().AddHours(user.TimezoneChange), msg.MessageId);

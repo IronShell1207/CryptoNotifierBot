@@ -45,8 +45,6 @@ namespace CryptoApi.Static
         {
             List<Uri> ProxyList = new List<Uri>()
             {
-                new Uri("http://44.201.204.93:80"),
-                new Uri("http://85.14.243.31:3128"),
                 new Uri("http://130.41.47.235:8080"),
                 new Uri("http://130.41.15.76:8080"),
             };
