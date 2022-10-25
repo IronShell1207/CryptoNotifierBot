@@ -5,6 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:WindowsCryptoWidget"
         xmlns:materal="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        xmlns:viewModels="clr-namespace:WindowsCryptoWidget.ViewModels"
         mc:Ignorable="d"
         AllowsTransparency="True"
         Background="Transparent"
@@ -15,7 +17,7 @@
         ShowInTaskbar="False"
         WindowStartupLocation="CenterScreen"
         MouseDown="Window_MouseDown"
-        Title="MainWindow" Height="50" Width="140">
+        Title="MainWindow" Height="45" Width="140">
     <Grid>
         <Grid x:Name="Ushko" VerticalAlignment="Top" Height="45" Margin="0 40" Width="240" Visibility="Collapsed">
             <Grid.ColumnDefinitions>
@@ -35,12 +37,12 @@
                     </CombinedGeometry>
                 </Path.Data>
             </Path>
-            <Button Style="{StaticResource MaterialDesignFlatButton}" Grid.Column="0"  Click="ButtonRestoreWindow_Click"  Width="55" Height="45">
+            <Button  Grid.Column="0"  Click="ButtonRestoreWindow_Click"  Width="55" Height="45">
                 <Button.Content>
                     <Image Opacity="1" Height="20" Width="20" Source="{StaticResource openpanel_img}" />
                 </Button.Content>
             </Button>
-            <Button Style="{StaticResource MaterialDesignFlatButton}" materal:ButtonAssist.CornerRadius ="15"  Click="ButtonRestoreWindow_Click" Grid.Column="2"  Width="55" Height="45">
+            <Button Click="ButtonRestoreWindow_Click" Grid.Column="2"  Width="55" Height="45">
                 <Button.Content>
                     <Image Opacity="1" Height="20" Width="20" Source="{StaticResource openpanel_img}">
                         <Image.RenderTransform>
@@ -56,27 +58,62 @@
                 <Grid Margin="0 10 0 0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="1.2*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <Button Width="26" Click="ButtonSettings_Click"  Height="26" Grid.Column="0" Style="{StaticResource MaterialDesignIconButton}" Cursor="Hand">
-                        <Button.Content>
-                            <Image Opacity="0.4" Height="20" Width="20" Source="{StaticResource settings_img}" />
-                        </Button.Content>
+                    <Button Width="30" Click="ButtonSettings_Click" ui:ControlHelper.CornerRadius="15" Height="26" Grid.Column="0"
+                            Margin="10 0"
+                            BorderThickness="0"
+                            Style="{StaticResource FlatButtonStyle}" Cursor="Hand">
+                        <Image Opacity="0.4" Height="20" Width="20" Source="{StaticResource settings_img}" />
                     </Button>
-                    <Button Width="26" Height="26" Grid.Column="2"
-                            Click="Button_Click" Style="{StaticResource MaterialDesignIconButton}">
-                        <Button.Content>
-                            <Image Opacity="0.4" Height="20" Width="20" Source="{StaticResource hidepanel_img}" />
-                        </Button.Content>
+                    <Button Width="26" Margin="0 0 5 0"
+                            BorderThickness="0" Height="26" Grid.Column="2"
+                            Click="Button_Click" Style="{StaticResource FlatButtonStyle}">
+                        <Image Opacity="0.4" Height="20" Width="20" Source="{StaticResource hidepanel_img}" />
                     </Button>
                 </Grid>
-                <StackPanel x:Name="CurrenciesWigdet">
-                </StackPanel>
+
+                <ui:GridView ItemsSource="{Binding PairsList}" ItemContainerStyle="{StaticResource GridViewItemStyle}">
+
+                    <ui:GridView.ItemTemplate>
+                        <DataTemplate DataType="viewModels:PairModel">
+                            <StackPanel HorizontalAlignment="Center" Width="155" Margin="0 3">
+                                <TextBlock Text="{Binding Title}"
+                                           Foreground="White"
+                                           FontSize="20"
+                                           Cursor="Hand"
+                                           d:Text="BTC/USDT"
+                                           FontFamily="Segoe UI"
+                                           HorizontalAlignment="Center" />
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                    <TextBlock d:Text="▼"
+                                           Text="{Binding ArrowSymbol}"
+                                           Foreground="{Binding IsPumping, Converter={StaticResource BoolRedGreenConverter}}"
+                                           FontSize="16"
+                                           Margin="5 0"
+                                           TextAlignment="Center" />
+                                    <TextBlock Foreground="White"
+                                               d:Text="3231.02"
+                                               Text="{Binding Price}"
+                                               FontSize="20"
+                                               Margin="0 0 14 0"
+                                               FontFamily="Segoe UI"
+                                               TextAlignment="Center" />
+                                </StackPanel>
+                                <TextBlock Text="{Binding ProcentChanging}"
+                                           Foreground="{Binding ProcentDoubleChanging, Converter={StaticResource DoubleToRedGreenConverter}}"
+                                           FontSize="14"
+                                           TextAlignment="Center" />
+                                <TextBlock Text="{Binding PriceChangingDouble}"
+                                           FontSize="10"
+                                           Foreground="{Binding PriceChangingDouble, Converter={StaticResource DoubleToRedGreenConverter}}"
+                                           TextAlignment="Center" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ui:GridView.ItemTemplate>
+                </ui:GridView>
             </StackPanel>
-            <Grid.RenderTransform>
-                <ScaleTransform x:Name="FormScaler" ScaleX="1" ScaleY="1" />
-            </Grid.RenderTransform>
         </Grid>
     </Grid>
-</Window>
+</Window>   

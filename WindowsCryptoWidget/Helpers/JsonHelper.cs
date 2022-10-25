@@ -16,15 +16,20 @@ namespace WindowsCryptoWidget.Helpers
             }
         }
 
-        public static T LoadRCS<T>(string path)
+        public static T LoadJson<T>(string path)
         {
-            using (StreamReader jsReader = new StreamReader(path))
+            if (File.Exists(path))
             {
-                JsonReader json = new JsonTextReader(jsReader);
-                JsonSerializer jsonSerializer = new JsonSerializer();
-                var list = jsonSerializer.Deserialize<T>(json);
-                return list;
+                using (StreamReader jsReader = new StreamReader(path))
+                {
+                    JsonReader json = new JsonTextReader(jsReader);
+                    JsonSerializer jsonSerializer = new JsonSerializer();
+                    var list = jsonSerializer.Deserialize<T>(json);
+                    return list;
+                }
             }
+
+            return default(T);
         }
     }
 }

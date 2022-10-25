@@ -15,7 +15,6 @@
         Foreground="White"
         MouseDown="SettingsWindow_OnMouseDown"
         FontFamily="Segoe UI Light"
-        materialDesign:ThemeAssist.Theme="Dark"
         Title="SettingsWindow" Height="650" Width="420">
     <Grid>
         <Border CornerRadius="23" BorderThickness="1" BorderBrush="#f9f9f9">
@@ -34,7 +33,7 @@
                     </Grid.RowDefinitions>
                     <StackPanel Grid.Column="4" Cursor="Hand">
                         <Button Click="ButtonClose_Click"
-                            Style="{DynamicResource MaterialDesignIconButton}"
+
                             Width="25" Height="25">
                             <Button.Content>
                                 <Image Height="16"
@@ -55,15 +54,13 @@
                         <TextBlock  Margin="10" FontSize="16" Text="Crypto tracking list" HorizontalAlignment="Center" />
                         <DockPanel Grid.Row="1" Grid.ColumnSpan="4" Margin="0 5">
                             <TextBox x:Name="TB_CurName" Foreground="White"
-                                 materialDesign:TextFieldAssist.UnderlineBrush="White"
-                                 Style="{StaticResource MaterialDesignFilledTextBox}"
-                                 KeyUp="TB_CurName_KeyUp"
 
-                                 Width="270" materialDesign:HintAssist.Hint="Pair name" />
+                                 KeyUp="TB_CurName_KeyUp"
+                                     Width="270" />
                             <Button BorderBrush="#99FFFFFF"
                                 x:Name="ButtonAdd"
                                 Click="ButtonAdd_Click"
-                                BorderThickness="1" Style="{StaticResource MaterialDesignPaperButton}"
+                                BorderThickness="1"
                                 HorizontalAlignment="Right" Width="100" Height="44" Margin="5 0">
                                 <DockPanel HorizontalAlignment="Center" Margin="-5 0 0 0">
                                     <Image Source="{StaticResource add_img}" Margin="5 0" Width="18" Height="18" />
@@ -71,21 +68,13 @@
                                 </DockPanel>
                             </Button>
                         </DockPanel>
-                        <ListView x:Name="listView_currienses"  materialDesign:ScrollViewerAssist.IsAutoHideEnabled="True"
-                                  MaxHeight="230" materialDesign:ScrollViewerAssist.ShowSeparators="True">
+                        <ListView x:Name="listView_currienses"
+                                  MaxHeight="230">
                             <ListViewItem Content="There is nothing for now! Add any currency bellow!" />
                         </ListView>
                     </StackPanel>
-
-                    <!--Настройки прозначности, выбор крипты, количество отслеживаемых на виджете, размер виджета
-            автозапуск виджета с системой, частота обновления-->
                 </Grid>
             </Border>
         </Border>
-        <materialDesign:Snackbar Background="#2A2A2A"
-            x:Name="SnackbarTwo" IsActive="False" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Foreground="White" Margin="25 0 25 1">
-            <materialDesign:SnackbarMessage  Content="Pair added succesfully">
-            </materialDesign:SnackbarMessage>
-        </materialDesign:Snackbar>
     </Grid>
 </Window>

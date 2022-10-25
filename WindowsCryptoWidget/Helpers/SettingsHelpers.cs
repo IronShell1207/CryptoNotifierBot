@@ -1,9 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace WindowsCryptoWidget.Helpers
 {
@@ -22,33 +19,24 @@ namespace WindowsCryptoWidget.Helpers
 
         public static string FavCursPath = MainFolder + "favcurs.json";
 
-        private static Settings _SettingsH;
+        private static Settings _settingsConfig;
 
-        public static Settings SettingsH
+        public static Settings SettingsConfig
         {
             get
             {
-                if (_SettingsH != null)
-                    return _SettingsH;
-                if (File.Exists(FavCursPath))
-                {
-                    _SettingsH = JsonHelper.LoadRCS<Settings>(FavCursPath);
-                    return _SettingsH;
-                }
-                _SettingsH = new Settings { FavPairs = new List<string> { }, WSize = 0.8, WOpacity = 0.5 };
-                return _SettingsH;
-            }
-            set
-            {
-                _SettingsH = value;
+                if (_settingsConfig != null)
+                    return _settingsConfig;
+
+                return _settingsConfig = JsonHelper.LoadJson<Settings>(FavCursPath) ?? new Settings();
             }
         }
     }
 
     public class Settings
     {
-        public List<string> FavPairs { get; set; }
-        public double WOpacity { get; set; }
-        public double WSize { get; set; }
+        public List<string> FavPairs { get; set; } = new List<string>();
+        public double WOpacity { get; set; } = 0.8;
+        public double WSize { get; set; } = 0.5;
     }
 }

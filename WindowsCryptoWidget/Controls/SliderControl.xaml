@@ -7,10 +7,10 @@
              mc:Ignorable="d"
              Foreground="White"
              FontFamily="Segoe UI Light"
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="100" d:DesignWidth="200">
     <StackPanel>
         <TextBlock x:Name="TitleTextBox" Text="Widget size" HorizontalAlignment="Center" FontSize="16"  Margin="5 0" />
-        <Slider Value="80" ValueChanged="Slider_ValueChanged" Maximum="100" Minimum="45"   Margin="5" Style="{StaticResource MaterialDesignDiscreteSlider}"
+        <Slider Value="80" ValueChanged="Slider_ValueChanged" Maximum="100" Minimum="45"   Margin="5"
                 TickFrequency="5" x:Name="Slider"  TickPlacement="BottomRight" />
         <Grid>
             <Grid.ColumnDefinitions>

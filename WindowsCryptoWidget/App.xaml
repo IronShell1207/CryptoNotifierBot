@@ -3,20 +3,20 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:WindowsCryptoWidget"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:ui="http://schemas.modernwpf.com/2019"
+             xmlns:converters="clr-namespace:WindowsCryptoWidget.Converters"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Dark.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Light.xaml" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
-                <materialDesign:BundledTheme x:Name="designTheme" BaseTheme="Dark" PrimaryColor="Grey" SecondaryColor="LightGreen" />
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Defaults.xaml" />
-
+                <ui:ThemeResources />
+                <ui:XamlControlsResources />
                 <ResourceDictionary Source="/Resources/GenericResources.xaml" />
-
-                <ResourceDictionary Source="pack://application:,,,/MaterialDesignColors;component/Themes/Recommended/Accent/MaterialDesignColor.Lime.xaml" />
+                <ResourceDictionary Source="/Resources/FlatButtonStyle.xaml" />
+                <ResourceDictionary Source="/Resources/GridviewItemStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            <converters:BoolRedGreenConverter x:Key="BoolRedGreenConverter" />
+            <converters:DoubleToRedGreenConverter x:Key="DoubleToRedGreenConverter" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

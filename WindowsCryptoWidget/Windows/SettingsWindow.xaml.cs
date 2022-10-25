@@ -18,18 +18,15 @@ namespace WindowsCryptoWidget.Windows
         private ScaleTransform Scaller;
         private Rectangle rectang;
 
-        public SettingsWindow(UIElementCollection pairsVs, ScaleTransform scaler, Rectangle rect)
+        public SettingsWindow()
         {
             InitializeComponent();
-            uisS = pairsVs;
-            Scaller = scaler;
-            rectang = rect;
         }
 
         private void Slide_Transperency_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            SettingsHelpers.SettingsH.WOpacity = rectang.Opacity = ((Slider)sender).Value / 100;
-            JsonHelper.SaveJson(SettingsHelpers.SettingsH, SettingsHelpers.FavCursPath);
+            SettingsHelpers.SettingsConfig.WOpacity = rectang.Opacity = ((Slider)sender).Value / 100;
+            JsonHelper.SaveJson(SettingsHelpers.SettingsConfig, SettingsHelpers.FavCursPath);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -41,10 +38,10 @@ namespace WindowsCryptoWidget.Windows
 
         private void CreateCurlist()
         {
-            if (SettingsHelpers.SettingsH.FavPairs.Count > 0)
+            if (SettingsHelpers.SettingsConfig.FavPairs.Count > 0)
             {
                 listView_currienses.Items.Clear();
-                foreach (string pair in SettingsHelpers.SettingsH.FavPairs)
+                foreach (string pair in SettingsHelpers.SettingsConfig.FavPairs)
                 {
                     var element = new SettingsCryptoElementControl { CurrName = pair };
                     element.ButtonRemove_click += ElementRemoveClick;
@@ -60,13 +57,13 @@ namespace WindowsCryptoWidget.Windows
             string curname = TB_CurName.Text.Trim().ToUpper();
             if (!String.IsNullOrWhiteSpace(curname))
             {
-                if (!SettingsHelpers.SettingsH.FavPairs.Contains(curname))
+                if (!SettingsHelpers.SettingsConfig.FavPairs.Contains(curname))
                 {
-                    SettingsHelpers.SettingsH.FavPairs.Add(curname);
-                    JsonHelper.SaveJson(SettingsHelpers.SettingsH, SettingsHelpers.FavCursPath);
+                    SettingsHelpers.SettingsConfig.FavPairs.Add(curname);
+                    JsonHelper.SaveJson(SettingsHelpers.SettingsConfig, SettingsHelpers.FavCursPath);
                     CreateCurlist();
                     TB_CurName.Text = "";
-                    ControlsAssists.Snackbarer(SnackbarTwo, 1.5, "Pair has been added!", this).Start();
+                    //ControlsAssists.Snackbarer(SnackbarTwo, 1.5, "Pair has been added!", this).Start();
                 }
             }
         }
@@ -80,22 +77,22 @@ namespace WindowsCryptoWidget.Windows
         private void ElementRemoveClick(object sender, RoutedEventArgs e)
         {
             var Curname = ((SettingsCryptoElementControl)(((StackPanel)(((Button)sender).Parent)).Parent)).CurrName;
-            SettingsHelpers.SettingsH.FavPairs.Remove(Curname);
-            JsonHelper.SaveJson(SettingsHelpers.SettingsH, SettingsHelpers.FavCursPath);
+            SettingsHelpers.SettingsConfig.FavPairs.Remove(Curname);
+            JsonHelper.SaveJson(SettingsHelpers.SettingsConfig, SettingsHelpers.FavCursPath);
             CreateCurlist();
-            ControlsAssists.Snackbarer(SnackbarTwo, 1.5, "Pair has been removed!", this).Start();
+            //ControlsAssists.Snackbarer(SnackbarTwo, 1.5, "Pair has been removed!", this).Start();
         }
 
         private void ElementDownClick(object sender, RoutedEventArgs e)
         {
             var Curname = ((SettingsCryptoElementControl)(((StackPanel)(((Button)sender).Parent)).Parent)).CurrName;
 
-            var currentId = SettingsHelpers.SettingsH.FavPairs.FindIndex(x => x == Curname);
-            if (currentId < SettingsHelpers.SettingsH.FavPairs.Count - 1)
+            var currentId = SettingsHelpers.SettingsConfig.FavPairs.FindIndex(x => x == Curname);
+            if (currentId < SettingsHelpers.SettingsConfig.FavPairs.Count - 1)
             {
-                SettingsHelpers.SettingsH.FavPairs.Remove(Curname);
-                SettingsHelpers.SettingsH.FavPairs.Insert(currentId + 1, Curname);
-                JsonHelper.SaveJson(SettingsHelpers.SettingsH, SettingsHelpers.FavCursPath);
+                SettingsHelpers.SettingsConfig.FavPairs.Remove(Curname);
+                SettingsHelpers.SettingsConfig.FavPairs.Insert(currentId + 1, Curname);
+                JsonHelper.SaveJson(SettingsHelpers.SettingsConfig, SettingsHelpers.FavCursPath);
                 CreateCurlist();
             }
         }
@@ -104,12 +101,12 @@ namespace WindowsCryptoWidget.Windows
         {
             var Curname = ((SettingsCryptoElementControl)(((StackPanel)(((Button)sender).Parent)).Parent)).CurrName;
 
-            var currentId = SettingsHelpers.SettingsH.FavPairs.FindIndex(x => x == Curname);
+            var currentId = SettingsHelpers.SettingsConfig.FavPairs.FindIndex(x => x == Curname);
             if (currentId > 0)
             {
-                SettingsHelpers.SettingsH.FavPairs.Remove(Curname);
-                SettingsHelpers.SettingsH.FavPairs.Insert(currentId - 1, Curname);
-                JsonHelper.SaveJson(SettingsHelpers.SettingsH, SettingsHelpers.FavCursPath);
+                SettingsHelpers.SettingsConfig.FavPairs.Remove(Curname);
+                SettingsHelpers.SettingsConfig.FavPairs.Insert(currentId - 1, Curname);
+                JsonHelper.SaveJson(SettingsHelpers.SettingsConfig, SettingsHelpers.FavCursPath);
                 CreateCurlist();
             }
         }
@@ -132,9 +129,9 @@ namespace WindowsCryptoWidget.Windows
 
         private void Slider_Scaler_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
-            SettingsHelpers.SettingsH.WSize = Scaller.ScaleX = ((Slider)sender).Value * 0.01;
+            SettingsHelpers.SettingsConfig.WSize = Scaller.ScaleX = ((Slider)sender).Value * 0.01;
             Scaller.ScaleY = ((Slider)sender).Value * 0.01;
-            JsonHelper.SaveJson(SettingsHelpers.SettingsH, SettingsHelpers.FavCursPath);
+            JsonHelper.SaveJson(SettingsHelpers.SettingsConfig, SettingsHelpers.FavCursPath);
         }
 
         private void TB_CurName_KeyUp(object sender, KeyEventArgs e)
