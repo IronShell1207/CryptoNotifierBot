@@ -36,7 +36,6 @@ namespace CryptoApi.Objects.ExchangesPairs
         public string sodUtc0 { get; set; }
         [NotMapped]
         public string sodUtc8 { get; set; }
-
         public override string Symbol => instId;
         public override string Price => last;
     }

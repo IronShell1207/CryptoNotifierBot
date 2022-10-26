@@ -132,7 +132,9 @@
                         </Button>
                     </Grid>
 
-                    <ui:GridView ItemContainerStyle="{StaticResource GridViewItemStyle}" ItemsSource="{Binding PairsList}">
+                    <ui:GridView ItemContainerStyle="{StaticResource GridViewItemStyle}"
+                                 IsHitTestVisible="False"
+                                 ItemsSource="{Binding PairsList}">
 
                         <ui:GridView.ItemTemplate>
                             <DataTemplate DataType="viewModels:PairModel">

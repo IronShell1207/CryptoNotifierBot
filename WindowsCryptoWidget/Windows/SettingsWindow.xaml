@@ -10,7 +10,7 @@
     xmlns:viewModels="clr-namespace:WindowsCryptoWidget.ViewModels"
     Title="SettingsWindow"
     Width="420"
-    Height="650"
+    Height="850"
     ui:ThemeManager.RequestedTheme="Dark"
     AllowsTransparency="True"
     Background="Transparent"

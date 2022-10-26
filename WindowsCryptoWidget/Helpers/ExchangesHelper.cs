@@ -15,7 +15,7 @@ namespace WindowsCryptoWidget.Helpers
         public void StartLoop()
         {
             LocalDataRequester = new DataRequester();
-            Task.Run(() => LocalDataRequester.UpdateKucoinLoop());
+            Task.Run(() => LocalDataRequester.UpdateOkxLoop());
         }
     }
 }

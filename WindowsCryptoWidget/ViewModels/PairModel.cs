@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using System;
+using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace WindowsCryptoWidget.ViewModels
 {
@@ -69,6 +70,24 @@ namespace WindowsCryptoWidget.ViewModels
         {
             get => _procentChanging;
             set => SetProperty(ref _procentChanging, value);
+        }
+
+        /// <inheritdoc cref="Open24h"/>
+        private double _open24h;
+
+        /// <summary>
+        /// Цена открытия 24часа назад
+        /// </summary>
+        public double Open24h
+        {
+            get => _open24h;
+            set
+            {
+                SetProperty(ref _open24h, value);
+                ProcentDoubleChanging = ( Price / value -1) * 100;
+                ProcentDoubleChanging = Math.Round(ProcentDoubleChanging, 2);
+                PriceChangingDouble = Math.Round(Price - value, 5);
+            }
         }
 
         /// <summary>

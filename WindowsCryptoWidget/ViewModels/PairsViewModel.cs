@@ -194,15 +194,16 @@ namespace WindowsCryptoWidget.ViewModels
                     {
                         string pairBase = pair.Title.Split("/").First();
                         string pairQuote = pair.Title.Split("/").Last();
-                        var pairFromExchange = await ExchangesHelper.LocalDataRequester.GetKucoinData(pairBase, pairQuote);
+                        var pairFromExchange = await ExchangesHelper.LocalDataRequester.GetOkxData(pairBase, pairQuote);
                         if (pairFromExchange != null && pair.Price != double.Parse(pairFromExchange.Price))
                         {
                             double lastPrice = pair.Price;
                             pair.Price = double.Parse(pairFromExchange.Price);
                             pair.IsPumping = lastPrice < pair.Price;
                             pair.ArrowSymbol = lastPrice < pair.Price ? "▲" : "▼";
-                            pair.PriceChangingDouble = double.Parse(pairFromExchange.changePrice);
-                            pair.ProcentDoubleChanging = Math.Round(double.Parse(pairFromExchange.changeRate) * 100, 3);
+                            pair.Open24h = double.Parse(pairFromExchange.open24h);
+                            //pair.PriceChangingDouble = double.Parse(pairFromExchange.changePrice);
+                            //pair.ProcentDoubleChanging = Math.Round(double.Parse(pairFromExchange.changeRate) * 100, 3);
                             Lastupdate = DateTime.Now;
                         }
                     }

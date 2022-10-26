@@ -166,6 +166,16 @@ namespace CryptoApi.Static.DataHandler
                 if (method.ReturnType.Name == "Void" && method.Name == "GetKucoinFullData")
                     method.Invoke(new DataLoader(), parfams.ToArray());
         }
+        public void UpdateOkcData()
+        {
+            Guid guid = Guid.NewGuid();
+            var methods = typeof(DataLoader).GetMethods(BindingFlags.Public | BindingFlags.Instance);
+            var parfams = new List<object> { guid };
+
+            foreach (var method in methods)
+                if (method.ReturnType.Name == "Void" && method.Name == "GetOkxFullData")
+                    method.Invoke(new DataLoader(), parfams.ToArray());
+        }
 
         public void RemoveOldData(TimeSpan time)
         {
@@ -220,6 +230,17 @@ namespace CryptoApi.Static.DataHandler
                 await Task.Delay(UpdateDelay);
             }
         }
+        public async Task UpdateOkxLoop()
+        {
+            while (UpdaterLive)
+            {
+                UpdateOkcData();
+                RemoveOldData(TimeSpan.FromMinutes(2));
+                DataAvailable = true;
+                await Task.Delay(UpdateDelay);
+            }
+        }
+
 
         public async Task<List<PricedTradingPair>> GetLatestDataByExchangeName(string exchange, int limit = 9999)
         {
@@ -240,6 +261,24 @@ namespace CryptoApi.Static.DataHandler
                 var dbData =
                     dbContext.KucoinPairs.OrderBy(x => x.Id).FirstOrDefault(x => x.symbol == symbol);
                 return dbData;
+            }
+        }
+        public async Task<OkxTickerDB> GetOkxData(string name, string quote)
+        {
+            using (DataBaseContext dbContext = new DataBaseContext())
+            {
+                try
+                {
+                    string symbol = $"{name.ToUpper()}{Exchanges.ExApiSeparator(Exchanges.Okx)}{quote.ToUpper()}";
+                    var dbData =
+                        dbContext.OkxPairs.OrderByDescending(x => x.Id);
+                    var par = dbData.FirstOrDefault(x => x.instId == symbol);
+                    return par;
+                }
+                catch (Exception ex)
+                {
+                    return null;
+                }
             }
         }
 
