@@ -215,6 +215,7 @@ namespace CryptoApi.Static.DataHandler
             while (UpdaterLive)
             {
                 UpdateKucoinData();
+                RemoveOldData(TimeSpan.FromMinutes(2));
                 DataAvailable = true;
                 await Task.Delay(UpdateDelay);
             }

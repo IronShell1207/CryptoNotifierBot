@@ -10,14 +10,14 @@ namespace WindowsCryptoWidget.Helpers
         {
             get
             {
-                string dir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\ACryptoWidgets\";
+                string dir = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\CryptoWidgets\";
                 if (!Directory.Exists(dir))
                     Directory.CreateDirectory(dir);
                 return dir;
             }
         }
 
-        public static string FavCursPath = MainFolder + "favcurs.json";
+        public static string FavCursPath => MainFolder + "favcurs.json";
 
         private static Settings _settingsConfig;
 
@@ -35,8 +35,9 @@ namespace WindowsCryptoWidget.Helpers
 
     public class Settings
     {
-        public List<string> FavPairs { get; set; } = new List<string>();
-        public double WOpacity { get; set; } = 0.8;
-        public double WSize { get; set; } = 0.5;
+        public List<string> SavedPairs { get; set; } = new List<string>();
+        public double WidgetOpacity { get; set; } = 0.8;
+        public double WidgetFontsOpacity { get; set; } = 0.8;
+        public double WidgetScale { get; set; } = 1.0;
     }
 }

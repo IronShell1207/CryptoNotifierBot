@@ -20,6 +20,25 @@ namespace WindowsCryptoWidget.Controls
     /// </summary>
     public partial class SliderControl : UserControl
     {
+        /// <inheritdoc cref="Value"/>
+        public static readonly DependencyProperty ValueProperty =
+            DependencyProperty.Register
+            (
+                nameof(Value),
+                typeof(double),
+                typeof(SliderControl),
+                new PropertyMetadata(default(double))
+            );
+
+        /// <summary>
+        /// Значение.
+        /// </summary>
+        public double Value
+        {
+            get => (double)GetValue(ValueProperty);
+            set => SetValue(ValueProperty, value);
+        }
+
         public double MinValue
         {
             get
@@ -41,18 +60,6 @@ namespace WindowsCryptoWidget.Controls
             set
             {
                 Slider.Maximum = value;
-            }
-        }
-
-        public double Value
-        {
-            get
-            {
-                return Slider.Value;
-            }
-            set
-            {
-                Slider.Value = value;
             }
         }
 
@@ -102,22 +109,6 @@ namespace WindowsCryptoWidget.Controls
             {
                 Slider.TickFrequency = value;
             }
-        }
-
-        public event System.Windows.RoutedPropertyChangedEventHandler<double> ValueChanged
-        {
-            add
-            {
-                Slider.ValueChanged += value;
-            }
-            remove
-            {
-                Slider.ValueChanged -= value;
-            }
-        }
-
-        private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
-        {
         }
 
         public SliderControl()
