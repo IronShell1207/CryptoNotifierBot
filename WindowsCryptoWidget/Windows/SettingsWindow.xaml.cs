@@ -32,5 +32,10 @@ namespace WindowsCryptoWidget.Windows
             if (MouseButtonState.Pressed == e.LeftButton)
                 DragMove();
         }
+
+        private void CloseButtonOnClick(object sender, RoutedEventArgs e)
+        {
+            DialogResult = true;
+        }
     }
 }

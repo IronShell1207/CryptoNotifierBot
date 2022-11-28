@@ -20,73 +20,136 @@
     WindowStartupLocation="CenterScreen"
     WindowStyle="None"
     mc:Ignorable="d">
+    <Window.Resources>
+        <DataTemplate x:Key="DefaultWidgetTemplate" DataType="viewModels:PairModel">
+            <StackPanel
+                Width="155"
+                Margin="0,3"
+                HorizontalAlignment="Center">
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    d:Text="BTC/USDT"
+                    Cursor="Hand"
+                    FontFamily="Segoe UI"
+                    FontSize="20"
+                    Foreground="White"
+                    Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
+                    Text="{Binding Title}" />
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                    <TextBlock
+                        Margin="5,0"
+                        d:Text="▼"
+                        FontSize="16"
+                        Foreground="{Binding IsPumping, Converter={StaticResource BoolRedGreenConverter}}"
+                        Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
+                        Text="{Binding ArrowSymbol}"
+                        TextAlignment="Center" />
+                    <TextBlock
+                        Margin="0,0,14,0"
+                        d:Text="3231.02"
+                        FontFamily="Segoe UI"
+                        FontSize="20"
+                        Foreground="White"
+                        Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
+                        Text="{Binding Price}"
+                        TextAlignment="Center" />
+                </StackPanel>
+                <TextBlock
+                    FontSize="14"
+                    Foreground="{Binding ProcentDoubleChanging, Converter={StaticResource DoubleToRedGreenConverter}}"
+                    Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
+                    Text="{Binding ProcentChanging}"
+                    TextAlignment="Center" />
+                <TextBlock
+                    FontSize="10"
+                    Foreground="{Binding PriceChangingDouble, Converter={StaticResource DoubleToRedGreenConverter}}"
+                    Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
+                    Text="{Binding PriceChangingDouble}"
+                    TextAlignment="Center" />
+            </StackPanel>
+        </DataTemplate>
+
+
+        <DataTemplate x:Key="SimpleWidgetTemplate" DataType="viewModels:PairModel">
+            <StackPanel
+                Width="325"
+                Margin="0,3"
+                HorizontalAlignment="Center">
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    d:Text="BTC/USDT"
+                    Cursor="Hand"
+                    FontFamily="Segoe UI"
+                    FontSize="18"
+                    Foreground="White"
+                    Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
+                    Text="{Binding Title}" />
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                    <TextBlock
+                        Margin="5,0"
+                        d:Text="▼"
+                        FontSize="16"
+                        Foreground="{Binding IsPumping, Converter={StaticResource BoolRedGreenConverter}}"
+                        Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
+                        Text="{Binding ArrowSymbol}"
+                        TextAlignment="Center" />
+                    <TextBlock
+                        Margin="0,0,14,0"
+                        d:Text="3231.02"
+                        FontFamily="Segoe UI"
+                        FontSize="20"
+                        Foreground="White"
+                        Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
+                        Text="{Binding Price}"
+                        TextAlignment="Center" />
+                </StackPanel>
+            </StackPanel>
+        </DataTemplate>
+        <DataTemplate x:Key="InLineWidgetTemplate" DataType="viewModels:PairModel">
+            <StackPanel
+                Width="205"
+                Margin="0,3"
+                HorizontalAlignment="Center"
+                Orientation="Horizontal">
+                <TextBlock
+                    Margin="10,0"
+                    HorizontalAlignment="Center"
+                    d:Text="BTC/USDT"
+                    Cursor="Hand"
+                    FontFamily="Segoe UI"
+                    FontSize="18"
+                    Foreground="White"
+                    Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
+                    Text="{Binding Title}" />
+
+                <TextBlock
+                    Margin="5,0"
+                    d:Text="3231.02"
+                    FontFamily="Segoe UI"
+                    FontSize="20"
+                    Foreground="White"
+                    Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
+                    Text="{Binding Price}"
+                    TextAlignment="Center" />
+                <TextBlock
+                    Margin="5,0"
+                    d:Text="▼"
+                    FontSize="16"
+                    Foreground="{Binding IsPumping, Converter={StaticResource BoolRedGreenConverter}}"
+                    Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
+                    Text="{Binding ArrowSymbol}"
+                    TextAlignment="Center" />
+
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
     <Viewbox>
         <Grid
             x:Name="MainGrid"
             Width="140"
             Height="45">
-            <Grid
-                x:Name="Ushko"
-                Width="240"
-                Height="45"
-                Margin="0,40"
-                VerticalAlignment="Top"
-                Visibility="Collapsed">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="auto" />
-                </Grid.ColumnDefinitions>
-                <Path
-                    Grid.ColumnSpan="3"
-                    Fill="Black"
-                    Opacity="{Binding ElementName=MainBackground, Path=Opacity}">
-                    <Path.Data>
-                        <CombinedGeometry GeometryCombineMode="Xor">
-                            <CombinedGeometry.Geometry1>
-                                <RectangleGeometry
-                                    RadiusX="15"
-                                    RadiusY="15"
-                                    Rect="0 0 240 45" />
-                            </CombinedGeometry.Geometry1>
-                            <CombinedGeometry.Geometry2>
-                                <RectangleGeometry Rect="50 0 140 45" />
-                            </CombinedGeometry.Geometry2>
-                        </CombinedGeometry>
-                    </Path.Data>
-                </Path>
-                <Button
-                    Grid.Column="0"
-                    Width="55"
-                    Height="45"
-                    Click="ButtonRestoreWindow_Click">
-                    <Button.Content>
-                        <Image
-                            Width="20"
-                            Height="20"
-                            Opacity="1"
-                            Source="{StaticResource openpanel_img}" />
-                    </Button.Content>
-                </Button>
-                <Button
-                    Grid.Column="2"
-                    Width="55"
-                    Height="45"
-                    Click="ButtonRestoreWindow_Click">
-                    <Button.Content>
-                        <Image
-                            Width="20"
-                            Height="20"
-                            Opacity="1"
-                            Source="{StaticResource openpanel_img}">
-                            <Image.RenderTransform>
-                                <RotateTransform Angle="180" CenterX="10" CenterY="10" />
-                            </Image.RenderTransform>
-                        </Image>
-                    </Button.Content>
-                </Button>
-            </Grid>
-            <Grid MaxWidth="140">
+
+            <Grid MaxWidth="300">
                 <Rectangle
                     x:Name="MainBackground"
                     Fill="Black"
@@ -122,7 +185,7 @@
                             Height="26"
                             Margin="0,0,5,0"
                             BorderThickness="0"
-                            Click="Button_Click"
+                            Click="ButtonCollapceOnClick"
                             Style="{StaticResource FlatButtonStyle}">
                             <Image
                                 Width="20"
@@ -131,61 +194,11 @@
                                 Source="{StaticResource hidepanel_img}" />
                         </Button>
                     </Grid>
-
-                    <ui:GridView ItemContainerStyle="{StaticResource GridViewItemStyle}"
-                                 IsHitTestVisible="False"
-                                 ItemsSource="{Binding PairsList}">
-
-                        <ui:GridView.ItemTemplate>
-                            <DataTemplate DataType="viewModels:PairModel">
-                                <StackPanel
-                                    Width="155"
-                                    Margin="0,3"
-                                    HorizontalAlignment="Center">
-                                    <TextBlock
-                                        HorizontalAlignment="Center"
-                                        d:Text="BTC/USDT"
-                                        Cursor="Hand"
-                                        FontFamily="Segoe UI"
-                                        FontSize="20"
-                                        Foreground="White"
-                                        Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
-                                        Text="{Binding Title}" />
-                                    <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
-                                        <TextBlock
-                                            Margin="5,0"
-                                            d:Text="▼"
-                                            FontSize="16"
-                                            Foreground="{Binding IsPumping, Converter={StaticResource BoolRedGreenConverter}}"
-                                            Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
-                                            Text="{Binding ArrowSymbol}"
-                                            TextAlignment="Center" />
-                                        <TextBlock
-                                            Margin="0,0,14,0"
-                                            d:Text="3231.02"
-                                            FontFamily="Segoe UI"
-                                            FontSize="20"
-                                            Foreground="White"
-                                            Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
-                                            Text="{Binding Price}"
-                                            TextAlignment="Center" />
-                                    </StackPanel>
-                                    <TextBlock
-                                        FontSize="14"
-                                        Foreground="{Binding ProcentDoubleChanging, Converter={StaticResource DoubleToRedGreenConverter}}"
-                                        Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
-                                        Text="{Binding ProcentChanging}"
-                                        TextAlignment="Center" />
-                                    <TextBlock
-                                        FontSize="10"
-                                        Foreground="{Binding PriceChangingDouble, Converter={StaticResource DoubleToRedGreenConverter}}"
-                                        Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
-                                        Text="{Binding PriceChangingDouble}"
-                                        TextAlignment="Center" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </ui:GridView.ItemTemplate>
-                    </ui:GridView>
+                    <ui:GridView
+                        IsHitTestVisible="False"
+                        ItemContainerStyle="{StaticResource GridViewItemStyle}"
+                        ItemTemplate="{StaticResource InLineWidgetTemplate}"
+                        ItemsSource="{Binding PairsList}" />
                 </StackPanel>
             </Grid>
         </Grid>

@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using WindowsCryptoWidget.Helpers;
 using WindowsCryptoWidget.ViewModels;
@@ -31,6 +32,9 @@ namespace WindowsCryptoWidget
             MainViewModel = new PairsViewModel();
             DataContext = MainViewModel;
             InitializeComponent();
+
+            WidgetWindowHelper.Instance.Initialize(this);
+
             AppEventsHelper.PairsCountChanged += Model_PairsCountChanged;
             Model_PairsCountChanged(MainViewModel.PairsList.Count);
             MainViewModel.ScaleChanged += Model_ScaleChanged;
@@ -41,19 +45,19 @@ namespace WindowsCryptoWidget
 
         #region Private Methods
 
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            lastpos = this.Left;
-            this.Left = -190;
-            Ushko.Visibility = Visibility.Visible;
-            this.Width = 240;
-        }
+        private object MainContent { get; set; }
+        private object HiddenTemplate { get; set; }
+
+        private (double, double) MainWindowSize { get; set; }
+        private (double, double) MainWindowLastPoint { get; set; }
 
         private void ButtonRestoreWindow_Click(object sender, RoutedEventArgs e)
         {
-            this.Left = lastpos;
-            Ushko.Visibility = Visibility.Collapsed;
-            this.Width = 140;
+            Content = MainContent;
+            Width = MainWindowSize.Item1;
+            Height = MainWindowSize.Item2;
+            Left = MainWindowLastPoint.Item1;
+            Top = MainWindowLastPoint.Item2;
         }
 
         private void ButtonSettings_Click(object sender, RoutedEventArgs e)
@@ -76,6 +80,7 @@ namespace WindowsCryptoWidget
             this.Width = 140 * MainViewModel.WidgetScale;
             this.Height = BaseHeight * MainViewModel.WidgetScale;
         }
+
         private void Window_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (MouseButtonState.Pressed == e.LeftButton)
@@ -83,5 +88,27 @@ namespace WindowsCryptoWidget
         }
 
         #endregion Private Methods
+
+        private void ButtonCollapceOnClick(object sender, RoutedEventArgs e)
+        {
+            MainContent = this.Content;
+            MainWindowSize = (Width, Height);
+            MainWindowLastPoint = (Left, Top);
+            Content = null;
+            var restoreButton = new Button()
+            {
+                Width = 30,
+                Height = 30,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                VerticalAlignment = VerticalAlignment.Stretch,
+                Content = ">",
+            };
+            restoreButton.Click += ButtonRestoreWindow_Click;
+            Content = restoreButton;
+            HiddenTemplate = Content;
+            Left = 0;
+            Width = 30;
+            Height = 30;
+        }
     }
 }

@@ -48,6 +48,7 @@
                         <Button
                             Width="25"
                             Height="25"
+                            Click="CloseButtonOnClick"
                             BorderThickness="0"
                             Style="{StaticResource FlatButtonStyle}">
                             <Button.Content>
@@ -92,7 +93,7 @@
                             MinValue="0.4"
                             StepVal="1"
                             Value="{Binding WidgetScale, Mode=TwoWay}" />
-                       
+
                         <controls:SliderControl
                             x:Name="Slider_UpdateDelay"
                             MaxText="250 sec"
