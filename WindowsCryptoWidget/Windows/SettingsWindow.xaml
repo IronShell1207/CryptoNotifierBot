@@ -32,7 +32,7 @@
                 BorderBrush="#121212"
                 BorderThickness="15"
                 CornerRadius="15">
-                <Grid Background="#121212">
+                <Grid Background="#121212" >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto" />
                         <ColumnDefinition Width="*" />
@@ -209,7 +209,7 @@
                         </ListView>
                         <TextBox
                             MaxHeight="100"
-                            ui:TextBoxHelper.IsDeleteButton="False"
+                            
                             MaxLines="100"
                             Text="{Binding ConsoleHelper.LogOutput}" />
                     </StackPanel>

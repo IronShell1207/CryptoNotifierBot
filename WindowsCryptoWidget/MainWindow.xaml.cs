@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using System.Windows.Input;
 using WindowsCryptoWidget.Helpers;
+using WindowsCryptoWidget.Models;
 using WindowsCryptoWidget.ViewModels;
 using WindowsCryptoWidget.Windows;
 
@@ -39,6 +40,7 @@ namespace WindowsCryptoWidget
             Model_PairsCountChanged(MainViewModel.PairsList.Count);
             MainViewModel.ScaleChanged += Model_ScaleChanged;
             Model_ScaleChanged();
+            MainGrid.Width = UsedStyle.DataWidth;
         }
 
         #endregion Public Constructors
@@ -62,22 +64,26 @@ namespace WindowsCryptoWidget
 
         private void ButtonSettings_Click(object sender, RoutedEventArgs e)
         {
-            SettingsWindow sw = new SettingsWindow(DataContext as PairsViewModel);
+            //SettingsWindow sw = new SettingsWindow(DataContext as PairsViewModel);
+            ModernSettingsWindow sw = new ModernSettingsWindow(DataContext as PairsViewModel);
+           // SettingsWindow sw = new SettingsWindow(DataContext as PairsViewModel);
             sw.ShowDialog();
         }
+
+        public WidgetStyle UsedStyle { get; set; } = WidgetStyles.InLineWidgetTemplate;
 
         private void Model_PairsCountChanged(int obj)
         {
             if (MainGrid != null)
             {
-                MainGrid.Height = 45 + (obj * 94);
+                MainGrid.Height = 45 + (obj * UsedStyle.DataHeight);    
                 BaseHeight = MainGrid.Height;
             }
         }
 
         private void Model_ScaleChanged()
-        {
-            this.Width = 140 * MainViewModel.WidgetScale;
+        {   
+            this.Width = UsedStyle.DataWidth * MainViewModel.WidgetScale;
             this.Height = BaseHeight * MainViewModel.WidgetScale;
         }
 
