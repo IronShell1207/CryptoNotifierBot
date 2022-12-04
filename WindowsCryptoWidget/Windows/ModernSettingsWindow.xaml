@@ -11,7 +11,7 @@
     xmlns:viewModels="clr-namespace:WindowsCryptoWidget.ViewModels"
     Title="Widget settings"
     Width="800"
-    Height="450"
+    Height="600"
     ui:ThemeManager.RequestedTheme="Dark"
     ui:WindowHelper.UseModernWindowStyle="True"
     Background="Black"
@@ -75,6 +75,12 @@
                     StepVal="1"
                     TitleText="Update prices delay"
                     Value="0.8" />
+
+                <ui:RadioButtons SelectedIndex="{Binding SelectedStyle, Mode=TwoWay}">
+                    <RadioButton Content="Default style" />
+                    <RadioButton Content="Simple style" />
+                    <RadioButton Content="Compact style" />
+                </ui:RadioButtons>
             </StackPanel>
         </StackPanel>
         <StackPanel Grid.Column="1">

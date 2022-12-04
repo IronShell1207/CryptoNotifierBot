@@ -1,0 +1,130 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:WindowsCryptoWidget"
+    xmlns:viewModels="clr-namespace:WindowsCryptoWidget.ViewModels">
+
+    <DataTemplate x:Key="DefaultWidgetTemplate" DataType="viewModels:PairModel">
+        <Viewbox>
+            <StackPanel
+                Width="155"
+                Margin="0,3"
+                HorizontalAlignment="Center">
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    FontFamily="Segoe UI"
+                    FontSize="20"
+                    Foreground="White"
+                    Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
+                    Text="{Binding Title}" />
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                    <TextBlock
+                        Margin="5,0"
+                        FontSize="16"
+                        Foreground="{Binding IsPumping, Converter={StaticResource BoolRedGreenConverter}}"
+                        Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
+                        Text="{Binding ArrowSymbol}"
+                        TextAlignment="Center" />
+                    <TextBlock
+                        Margin="0,0,14,0"
+                        FontFamily="Segoe UI"
+                        FontSize="20"
+                        Foreground="White"
+                        Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
+                        Text="{Binding Price}"
+                        TextAlignment="Center" />
+                </StackPanel>
+                <TextBlock
+                    FontSize="14"
+                    Foreground="{Binding ProcentDoubleChanging, Converter={StaticResource DoubleToRedGreenConverter}}"
+                    Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
+                    Text="{Binding ProcentChanging}"
+                    TextAlignment="Center" />
+                <TextBlock
+                    FontSize="10"
+                    Foreground="{Binding PriceChangingDouble, Converter={StaticResource DoubleToRedGreenConverter}}"
+                    Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
+                    Text="{Binding PriceChangingDouble}"
+                    TextAlignment="Center" />
+            </StackPanel>
+        </Viewbox>
+    </DataTemplate>
+    <DataTemplate x:Key="SimpleWidgetTemplate" DataType="viewModels:PairModel">
+        <Viewbox>
+            <StackPanel
+                Width="140"
+                Margin="0,3"
+                HorizontalAlignment="Center">
+                <TextBlock
+                    HorizontalAlignment="Center"
+                    Cursor="Hand"
+                    FontFamily="Segoe UI"
+                    FontSize="18"
+                    Foreground="White"
+                    Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
+                    Text="{Binding Title}" />
+                <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+                    <TextBlock
+                        Margin="5,0"
+                        FontSize="16"
+                        Foreground="{Binding IsPumping, Converter={StaticResource BoolRedGreenConverter}}"
+                        Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
+                        Text="{Binding ArrowSymbol}"
+                        TextAlignment="Center" />
+                    <TextBlock
+                        Margin="0,0,14,0"
+                        FontFamily="Segoe UI"
+                        FontSize="20"
+                        Foreground="White"
+                        Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
+                        Text="{Binding Price}"
+                        TextAlignment="Center" />
+                </StackPanel>
+            </StackPanel>
+        </Viewbox>
+    </DataTemplate>
+    <DataTemplate x:Key="InLineWidgetTemplate" DataType="viewModels:PairModel">
+        <Viewbox>
+            <Grid
+                Width="200"
+                Height="30"
+                Margin="10,0"
+                HorizontalAlignment="Center">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="76" />
+                    <ColumnDefinition Width="30" />
+                </Grid.ColumnDefinitions>
+                <TextBlock
+                    Grid.Column="0"
+                    HorizontalAlignment="Left"
+                    Cursor="Hand"
+                    FontFamily="Segoe UI"
+                    FontSize="18"
+                    Foreground="White"
+                    Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
+                    Text="{Binding Title}" />
+
+                <TextBlock
+                    Grid.Column="1"
+                    Margin="5,0"
+                    HorizontalAlignment="Right"
+                    FontFamily="Segoe UI"
+                    FontSize="18"
+                    Foreground="White"
+                    Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
+                    Text="{Binding Price}"
+                    TextAlignment="Center" />
+                <TextBlock
+                    Grid.Column="2"
+                    Margin="5,0"
+                    FontSize="18"
+                    Foreground="{Binding IsPumping, Converter={StaticResource BoolRedGreenConverter}}"
+                    Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
+                    Text="{Binding ArrowSymbol}"
+                    TextAlignment="Center" />
+
+            </Grid>
+        </Viewbox>
+    </DataTemplate>
+</ResourceDictionary>

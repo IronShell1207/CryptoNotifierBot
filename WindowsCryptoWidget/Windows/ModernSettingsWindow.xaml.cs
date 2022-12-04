@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using System.Windows.Controls;
 using WindowsCryptoWidget.ViewModels;
 
 namespace WindowsCryptoWidget.Windows
@@ -15,6 +16,11 @@ namespace WindowsCryptoWidget.Windows
             viewModel = vm;
             DataContext = viewModel;
             InitializeComponent();
+        }
+
+        private void RadioButtons_OnSelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            
         }
     }
 }

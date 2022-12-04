@@ -1,12 +1,16 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.Input;
+using ModernWpf.Controls;
 using WindowsCryptoWidget.Helpers;
+using WindowsCryptoWidget.Models;
 
 namespace WindowsCryptoWidget.ViewModels
 {
@@ -33,6 +37,9 @@ namespace WindowsCryptoWidget.ViewModels
         /// <inheritdoc cref="PairsList"/>
         private ObservableCollection<PairModel> _pairsList = new ObservableCollection<PairModel>();
 
+        /// <inheritdoc cref="SelectedStyle"/>
+        private int _selectedStyle = SettingsHelpers.SettingsConfig.SelectedStyleIndex;
+
         /// <inheritdoc cref="Transparency"/>
         private double _transparency = SettingsHelpers.SettingsConfig.WidgetOpacity;
 
@@ -48,6 +55,8 @@ namespace WindowsCryptoWidget.ViewModels
 
         /// <inheritdoc cref="AddPair"/>
         public RelayCommand AddPairCommand { get; }
+
+        public WidgetStyle UsedStyle { get; set; } = WidgetStyles.DefaultWidgetStyle;
 
         /// <summary>
         /// Прозрачность фона окна.
@@ -124,6 +133,27 @@ namespace WindowsCryptoWidget.ViewModels
             }
         }
 
+        /// <summary>
+        /// Выбранный стиль.
+        /// </summary>
+        public int SelectedStyle
+        {
+            get => _selectedStyle;
+            set
+            {
+                SetProperty(ref _selectedStyle, value);
+                if (value > -1)
+                {
+                    UsedStyle = WidgetStyles.AllStyles.First(x => x.Index == value);
+                    OnPropertyChanged(nameof(UsedStyle));
+                    SettingsHelpers.SettingsConfig.SelectedStyleIndex = value;
+                    JsonHelper.SaveJson(SettingsHelpers.SettingsConfig, SettingsHelpers.FavCursPath);
+                    StyleChanged?.Invoke();
+                }
+            }
+        }
+
+        public event Action StyleChanged;
         /// <summary>
         /// Прозрачность виджета
         /// </summary>
@@ -254,5 +284,6 @@ namespace WindowsCryptoWidget.ViewModels
         }
 
         #endregion Private Methods
+
     }
 }

@@ -39,5 +39,6 @@ namespace WindowsCryptoWidget.Helpers
         public double WidgetOpacity { get; set; } = 0.8;
         public double WidgetFontsOpacity { get; set; } = 0.8;
         public double WidgetScale { get; set; } = 1.0;
+        public int SelectedStyleIndex { get; set; } = 0;
     }
 }
