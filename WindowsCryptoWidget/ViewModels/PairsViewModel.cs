@@ -21,7 +21,6 @@ namespace WindowsCryptoWidget.ViewModels
     {
         #region Private Fields
 
-
         /// <inheritdoc cref="BackgroundTransparency"/>
         private double _backgroundTransparency = SettingsHelpers.SettingsConfig.WidgetOpacity;
 
@@ -70,11 +69,10 @@ namespace WindowsCryptoWidget.ViewModels
                     SettingsHelpers.SettingsConfig.UsedExchange = _selectedExchange;
                     JsonHelper.SaveJson(SettingsHelpers.SettingsConfig, SettingsHelpers.FavCursPath);
                 }
-
             }
         }
 
-    #endregion Private Fields
+        #endregion Private Fields
 
         #region Public Properties
 
@@ -257,23 +255,38 @@ namespace WindowsCryptoWidget.ViewModels
             {
                 if (PairsList.Count > 0 && ExchangesHelper.Instance.LatestDataSet != null)
                 {
-                    switch (SettingsHelpers.SettingsConfig.UsedExchange)
+                    try
                     {
-                        case ExchangeEnum.Okx:
-                            HandleOkxData(ExchangesHelper.Instance.GetOkxLatestData());
-                            break;
-                        case ExchangeEnum.Binance:
-                            HandleBinanceData(ExchangesHelper.Instance.GetBinanceLatestData());
-                            break;
-                        case ExchangeEnum.Bitget:
-                            HandleBitgetData(ExchangesHelper.Instance.GetBitgetLatestData());
-                            break;
-                        case ExchangeEnum.Kucoin:
-                            HandleKucointData(ExchangesHelper.Instance.GetKucoinLatestData());
-                            break;
-                        default:    
-                            HandleOkxData(ExchangesHelper.Instance.GetOkxLatestData());
-                            break;
+                        switch (SettingsHelpers.SettingsConfig.UsedExchange)
+                        {
+                            case ExchangeEnum.Okx:
+                                HandleOkxData(ExchangesHelper.Instance.GetOkxLatestData());
+                                break;
+
+                            case ExchangeEnum.Binance:
+                                if (SelectedStyle == 0)
+                                {
+                                    SelectedStyle = 1;
+                                }
+
+                                HandleBinanceData(ExchangesHelper.Instance.GetBinanceLatestData());
+                                break;
+
+                            case ExchangeEnum.Bitget:
+                                HandleBitgetData(ExchangesHelper.Instance.GetBitgetLatestData());
+                                break;
+
+                            case ExchangeEnum.Kucoin:
+                                HandleKucointData(ExchangesHelper.Instance.GetKucoinLatestData());
+                                break;
+
+                            default:
+                                HandleOkxData(ExchangesHelper.Instance.GetOkxLatestData());
+                                break;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
                     }
                 }
 
@@ -322,6 +335,7 @@ namespace WindowsCryptoWidget.ViewModels
                 }
             }
         }
+
         private void HandleBitgetData(List<BitgetTicker> data)
         {
             foreach (var pair in PairsList)
@@ -342,6 +356,7 @@ namespace WindowsCryptoWidget.ViewModels
                 }
             }
         }
+
         private void HandleKucointData(List<KuTicker> data)
         {
             foreach (var pair in PairsList)

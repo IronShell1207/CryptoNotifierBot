@@ -19,224 +19,223 @@
     <d:Page.DataContext>
         <viewModels:PairsViewModel />
     </d:Page.DataContext>
-    <ScrollViewer HorizontalScrollBarVisibility="Auto"
-                  >
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" MinWidth="350" />
-            <ColumnDefinition Width="Auto" MinWidth="350" />
-            <ColumnDefinition Width="Auto" MinWidth="350" />
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+    <ScrollViewer HorizontalScrollBarVisibility="Auto">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" MinWidth="350" />
+                <ColumnDefinition Width="Auto" MinWidth="350" />
+                <ColumnDefinition Width="Auto" MinWidth="350" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <TextBlock
-            Margin="0,0,0,0"
-            HorizontalAlignment="Center"
-            FontSize="26"
-            Foreground="White"
-            Text="Widget settings" />
-        <ScrollViewer Grid.Row="1" Grid.RowSpan="3">
-            <StackPanel Margin="30,10" VerticalAlignment="Top">
-                <StackPanel>
-
-                    <controls:SliderControl
-                        x:Name="Slide_Transperency"
-                        Maximum="1.0"
-                        Minimum="0.1"
-                        Interval="0.025"
-                        Title="Transperency of widget"
-                        ValueTypeName="%"
-                        IsCurrentValueDisplayed="True"
-                        Value="{Binding BackgroundTransparency, Mode=TwoWay}" />
-                    <controls:SliderControl
-                        Maximum="1.0"
-                        Minimum="0.1"
-                        IsCurrentValueDisplayed="True"
-                        Interval="0.025"
-                        ValueTypeName="%"
-                        Title="Font opacity"
-                        Value="{Binding FontsTransparency, Mode=TwoWay}" />
-                    <controls:SliderControl
-                       Maximum="2.0"
-                        Minimum="0.4"
-                        Interval="0.05"
-                       IsCurrentValueDisplayed="True"
-                        Title="Widget scale"
-                       ValueTypeName="%"
-                        Value="{Binding WidgetScale, Mode=TwoWay}" />
-                    <controls:SliderControl
-                        x:Name="Slider_UpdateDelay"
-                        Maximum="60.0"
-                        Minimum="0.5"
-                        IsCurrentValueDisplayed="True"
-                        Interval="0.25"
-                        Title="Update prices delay"
-                        ValueTypeName="sec"
-                        Value="{Binding UpdateDelay, Mode=TwoWay}" />
-
-                    <ui:RadioButtons SelectedIndex="{Binding SelectedStyle, Mode=TwoWay}">
-                        <RadioButton Content="Default style" />
-                        <RadioButton Content="Simple style" />
-                        <RadioButton Content="Compact style" />
-                    </ui:RadioButtons>
-
-                    <TextBlock
-                        Margin="0,10"
-                        HorizontalAlignment="Center"
-                        FontSize="17"
-                        FontWeight="Light"
-                        Text="Exchange API" />
-                    <ComboBox
-                        Width="200"
-                        IsEditable="False"
-                        ItemsSource="{Binding ExchangeList}"
-                        SelectedItem="{Binding SelectedExchange}" />
-                </StackPanel>
-            </StackPanel>
-        </ScrollViewer>
-        <StackPanel Grid.Column="1">
             <TextBlock
-                Margin="10"
+                Margin="0,0,0,0"
                 HorizontalAlignment="Center"
-                FontSize="16"
-                Text="Crypto tracking list" />
-            <DockPanel
+                FontSize="26"
+                Foreground="White"
+                Text="Widget settings" />
+            <ScrollViewer Grid.Row="1" Grid.RowSpan="3">
+                <StackPanel Margin="30,10" VerticalAlignment="Top">
+                    <StackPanel>
+
+                        <controls:SliderControl
+                            x:Name="Slide_Transperency"
+                            Title="Transperency of widget"
+                            Interval="0.025"
+                            IsCurrentValueDisplayed="True"
+                            Maximum="1.0"
+                            Minimum="0.1"
+                            ValueTypeName="%"
+                            Value="{Binding BackgroundTransparency, Mode=TwoWay}" />
+                        <controls:SliderControl
+                            Title="Font opacity"
+                            Interval="0.025"
+                            IsCurrentValueDisplayed="True"
+                            Maximum="1.0"
+                            Minimum="0.1"
+                            ValueTypeName="%"
+                            Value="{Binding FontsTransparency, Mode=TwoWay}" />
+                        <controls:SliderControl
+                            Title="Widget scale"
+                            Interval="0.05"
+                            IsCurrentValueDisplayed="True"
+                            Maximum="2.0"
+                            Minimum="0.4"
+                            ValueTypeName="%"
+                            Value="{Binding WidgetScale, Mode=TwoWay}" />
+                        <controls:SliderControl
+                            x:Name="Slider_UpdateDelay"
+                            Title="Update prices delay"
+                            Interval="0.25"
+                            IsCurrentValueDisplayed="True"
+                            Maximum="60.0"
+                            Minimum="0.5"
+                            ValueTypeName="sec"
+                            Value="{Binding UpdateDelay, Mode=TwoWay}" />
+
+                        <ui:RadioButtons SelectedIndex="{Binding SelectedStyle, Mode=TwoWay}">
+                            <RadioButton Content="Default style" />
+                            <RadioButton Content="Simple style" />
+                            <RadioButton Content="Compact style" />
+                        </ui:RadioButtons>
+
+                        <TextBlock
+                            Margin="0,10"
+                            HorizontalAlignment="Center"
+                            FontSize="17"
+                            FontWeight="Light"
+                            Text="Exchange API" />
+                        <ComboBox
+                            Width="200"
+                            IsEditable="False"
+                            ItemsSource="{Binding ExchangeList}"
+                            SelectedItem="{Binding SelectedExchange}" />
+                    </StackPanel>
+                </StackPanel>
+            </ScrollViewer>
+            <StackPanel Grid.Column="1">
+                <TextBlock
+                    Margin="10"
+                    HorizontalAlignment="Center"
+                    FontSize="16"
+                    Text="Crypto tracking list" />
+                <DockPanel
+                    Grid.Row="1"
+                    Grid.ColumnSpan="4"
+                    Margin="8">
+                    <TextBox
+                        x:Name="TB_CurName"
+                        Width="270"
+                        Foreground="White"
+                        Text="{Binding NewPairName, Mode=TwoWay}" />
+                    <Button
+                        Width="100"
+                        Height="44"
+                        Margin="5,0"
+                        HorizontalAlignment="Right"
+                        BorderBrush="#99FFFFFF"
+                        BorderThickness="1"
+                        Command="{Binding AddPairCommand}">
+                        <DockPanel Margin="-5,0,0,0" HorizontalAlignment="Center">
+                            <Image
+                                Width="18"
+                                Height="18"
+                                Margin="5,0"
+                                Source="{StaticResource add_img}" />
+                            <TextBlock Foreground="White" Text="Add" />
+                        </DockPanel>
+                    </Button>
+                </DockPanel>
+            </StackPanel>
+            <ListView
                 Grid.Row="1"
-                Grid.ColumnSpan="4"
-                Margin="8">
-                <TextBox
-                    x:Name="TB_CurName"
-                    Width="270"
-                    Foreground="White"
-                    Text="{Binding NewPairName, Mode=TwoWay}" />
+                Grid.RowSpan="1"
+                Grid.Column="1"
+                MinHeight="55"
+                Margin="8,8,18,8"
+                VerticalAlignment="Stretch"
+                dd:DragDrop.IsDragSource="True"
+                dd:DragDrop.IsDropTarget="True"
+                Background="#53333333"
+                ItemsSource="{Binding PairsList}"
+                SelectionMode="Single">
+                <ListView.ItemTemplate>
+                    <DataTemplate DataType="viewModels:PairModel">
+                        <StackPanel Orientation="Horizontal">
+                            <Button
+                                x:Name="ButtonDown"
+                                Width="30"
+                                Height="30"
+                                Margin="5,0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Cursor="Hand"
+                                Style="{StaticResource FlatButtonStyle}">
+                                <Image
+                                    Width="20"
+                                    Height="20"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Opacity="1"
+                                    Source="{StaticResource arrowdown_img}" />
+                            </Button>
+                            <Button
+                                x:Name="ButtonUp"
+                                Width="30"
+                                Height="30"
+                                Margin="5,0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Cursor="Hand"
+                                Style="{StaticResource FlatButtonStyle}">
+                                <Image
+                                    Width="20"
+                                    Height="20"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Opacity="1"
+                                    Source="{StaticResource arrowup_img}" />
+                            </Button>
+                            <Button
+                                x:Name="ButtonRemove"
+                                Width="30"
+                                Height="30"
+                                Margin="5,0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                Cursor="Hand"
+                                Style="{StaticResource FlatButtonStyle}">
+                                <Image
+                                    Width="20"
+                                    Height="20"
+                                    HorizontalAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Opacity="1"
+                                    Source="{StaticResource trash_img}" />
+                            </Button>
+                            <TextBlock
+                                Margin="5,0"
+                                HorizontalAlignment="Center"
+                                VerticalAlignment="Center"
+                                FontSize="18"
+                                Text="{Binding Title}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <Grid
+                Grid.Row="2"
+                Grid.Column="1"
+                MinHeight="40">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
                 <Button
                     Width="100"
-                    Height="44"
-                    Margin="5,0"
-                    HorizontalAlignment="Right"
-                    BorderBrush="#99FFFFFF"
-                    BorderThickness="1"
-                    Command="{Binding AddPairCommand}">
-                    <DockPanel Margin="-5,0,0,0" HorizontalAlignment="Center">
-                        <Image
-                            Width="18"
-                            Height="18"
-                            Margin="5,0"
-                            Source="{StaticResource add_img}" />
-                        <TextBlock Foreground="White" Text="Add" />
-                    </DockPanel>
-                </Button>
-            </DockPanel>
-        </StackPanel>
-        <ListView
-            Grid.Row="1"
-            Grid.RowSpan="1"
-            Grid.Column="1"
-            MinHeight="55"
-            Margin="8,8,18,8"
-            VerticalAlignment="Stretch"
-            dd:DragDrop.IsDragSource="True"
-            dd:DragDrop.IsDropTarget="True"
-            Background="#53333333"
-            ItemsSource="{Binding PairsList}"
-            SelectionMode="Single">
-            <ListView.ItemTemplate>
-                <DataTemplate DataType="viewModels:PairModel">
-                    <StackPanel Orientation="Horizontal">
-                        <Button
-                            x:Name="ButtonDown"
-                            Width="30"
-                            Height="30"
-                            Margin="5,0"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Cursor="Hand"
-                            Style="{StaticResource FlatButtonStyle}">
-                            <Image
-                                Width="20"
-                                Height="20"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Opacity="1"
-                                Source="{StaticResource arrowdown_img}" />
-                        </Button>
-                        <Button
-                            x:Name="ButtonUp"
-                            Width="30"
-                            Height="30"
-                            Margin="5,0"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Cursor="Hand"
-                            Style="{StaticResource FlatButtonStyle}">
-                            <Image
-                                Width="20"
-                                Height="20"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Opacity="1"
-                                Source="{StaticResource arrowup_img}" />
-                        </Button>
-                        <Button
-                            x:Name="ButtonRemove"
-                            Width="30"
-                            Height="30"
-                            Margin="5,0"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            Cursor="Hand"
-                            Style="{StaticResource FlatButtonStyle}">
-                            <Image
-                                Width="20"
-                                Height="20"
-                                HorizontalAlignment="Center"
-                                VerticalAlignment="Center"
-                                Opacity="1"
-                                Source="{StaticResource trash_img}" />
-                        </Button>
-                        <TextBlock
-                            Margin="5,0"
-                            HorizontalAlignment="Center"
-                            VerticalAlignment="Center"
-                            FontSize="18"
-                            Text="{Binding Title}" />
-                    </StackPanel>
-                </DataTemplate>
-            </ListView.ItemTemplate>
-        </ListView>
-        <Grid
-            Grid.Row="2"
-            Grid.Column="1"
-            MinHeight="40">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Button
-                Width="100"
-                Margin="10,0"
-                Content="Delete" />
-        </Grid>
+                    Margin="10,0"
+                    Content="Delete" />
+            </Grid>
 
-        <TextBlock
-            Grid.Column="2"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            FontSize="20"
-            Foreground="White"
-            Text="LOG OUTPUT" />
-        <TextBox
-            Grid.Row="1"
-            Grid.RowSpan="2"
-            Grid.Column="2"
-            Margin="8"
-            BorderThickness="0"
-            MaxLines="100"
-            Text="{Binding ConsoleHelper.LogOutput}" />
-    </Grid>
+            <TextBlock
+                Grid.Column="2"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontSize="20"
+                Foreground="White"
+                Text="LOG OUTPUT" />
+            <TextBox
+                Grid.Row="1"
+                Grid.RowSpan="2"
+                Grid.Column="2"
+                Margin="8"
+                BorderThickness="0"
+                MaxLines="100"
+                Text="{Binding ConsoleHelper.LogOutput}" />
+        </Grid>
     </ScrollViewer>
 </Window>

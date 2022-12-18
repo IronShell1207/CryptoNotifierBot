@@ -48,8 +48,6 @@ namespace WindowsCryptoWidget.Helpers
             }
         }
 
-        private SemaphoreSlim _updateLocker = new SemaphoreSlim(1);
-
         public void StartLoop()
         {
             if (!_isAlive)
@@ -68,14 +66,14 @@ namespace WindowsCryptoWidget.Helpers
         {
             if (SettingsHelpers.SettingsConfig.UsedExchange == ExchangeEnum.Kucoin && _isAlive)
             {
-                _updateLocker.Wait();
-                KucoinData data =(KucoinData)LatestDataSet;
-                if (data != null)
+                if (LatestDataSet.GetType() == typeof(KucoinData))
                 {
-                    _updateLocker.Release(1);
-                    return data.data.ticker.ToList();
+                    KucoinData data = (KucoinData)LatestDataSet;
+                    if (data != null)
+                    {
+                        return data.data.ticker.ToList();
+                    }
                 }
-                
             }
 
             if (SettingsHelpers.SettingsConfig.UsedExchange != ExchangeEnum.Kucoin)
@@ -90,12 +88,13 @@ namespace WindowsCryptoWidget.Helpers
         {
             if (SettingsHelpers.SettingsConfig.UsedExchange == ExchangeEnum.Okx && _isAlive)
             {
-                _updateLocker.Wait();
-                OkxData data = (OkxData)LatestDataSet;
-                if (data != null)
+                if (LatestDataSet.GetType() == typeof(OkxData))
                 {
-                    _updateLocker.Release(1);
-                    return data.data.ToList();
+                    OkxData data = (OkxData)LatestDataSet;
+                    if (data != null)
+                    {
+                        return data.data.ToList();
+                    }
                 }
             }
 
@@ -111,12 +110,13 @@ namespace WindowsCryptoWidget.Helpers
         {
             if (SettingsHelpers.SettingsConfig.UsedExchange == ExchangeEnum.Binance && _isAlive)
             {
-                _updateLocker.Wait();
-                List<BinancePair> data = (List<BinancePair>)LatestDataSet;
-                if (data != null)
+                if (LatestDataSet.GetType() == typeof(List<BinancePair>))
                 {
-                    _updateLocker.Release(1);
-                    return data;
+                    List<BinancePair> data = (List<BinancePair>)LatestDataSet;
+                    if (data != null)
+                    {
+                        return data;
+                    }
                 }
             }
 
@@ -132,12 +132,13 @@ namespace WindowsCryptoWidget.Helpers
         {
             if (SettingsHelpers.SettingsConfig.UsedExchange == ExchangeEnum.Bitget && _isAlive)
             {
-                _updateLocker.Wait();
-                BitgetData data = (BitgetData)LatestDataSet;
-                if (data != null)
+                if (LatestDataSet.GetType() == typeof(BitgetData))
                 {
-                    _updateLocker.Release(1);
-                    return data.data.ToList();
+                    BitgetData data = (BitgetData)LatestDataSet;
+                    if (data != null)
+                    {
+                        return data.data.ToList();
+                    }
                 }
             }
 
@@ -153,12 +154,13 @@ namespace WindowsCryptoWidget.Helpers
         {
             if (SettingsHelpers.SettingsConfig.UsedExchange == ExchangeEnum.GateIO && _isAlive)
             {
-                _updateLocker.Wait();
-                List<GateIOTicker> data = (List<GateIOTicker>)LatestDataSet;
-                if (data != null)
+                if (LatestDataSet.GetType() == typeof(List<GateIOTicker>))
                 {
-                    _updateLocker.Release(1);
-                    return data;
+                    List<GateIOTicker> data = (List<GateIOTicker>)LatestDataSet;
+                    if (data != null)
+                    {
+                        return data;
+                    }
                 }
             }
 
@@ -191,25 +193,41 @@ namespace WindowsCryptoWidget.Helpers
         {
             while (_isAlive && !_cancellationTokenSource.IsCancellationRequested)
             {
-                while (_updateLocker.CurrentCount == 0)
-                {
-                    await Task.Delay(100);
-                }
+                //while (_updateLocker.CurrentCount == 0)
+                //{
+                //    await Task.Delay(20);
+                //}
 
                 object prevData = LatestDataSet;
-                LatestDataSet = SettingsHelpers.SettingsConfig.UsedExchange switch
+                try
                 {
-                    (ExchangeEnum.Okx) => await new ExchangeApi(Exchanges.Okx).GetDataFromExchange<OkxData>(_cancellationTokenSource.Token) ?? LatestDataSet,
-                    (ExchangeEnum.Binance) => await new ExchangeApi(Exchanges.Binance).GetDataFromExchange<BinanceSymbolsData>(_cancellationTokenSource.Token) ?? LatestDataSet,
-                    (ExchangeEnum.Kucoin) => await new ExchangeApi(Exchanges.Kucoin).GetDataFromExchange<KucoinData>(_cancellationTokenSource.Token) ?? LatestDataSet,
-                    (ExchangeEnum.Bitget) => await new ExchangeApi(Exchanges.Bitget).GetDataFromExchange<BitgetData>(_cancellationTokenSource.Token) ?? LatestDataSet,
-                    (ExchangeEnum.GateIO) => await new ExchangeApi(Exchanges.GateIO).GetDataFromExchange<List<GateIOTicker>>(_cancellationTokenSource.Token) ?? LatestDataSet,
-                    _ => await new ExchangeApi(Exchanges.Okx).GetDataFromExchange<OkxData>(_cancellationTokenSource.Token) ?? LatestDataSet
-                };
-                
+                    object newList = SettingsHelpers.SettingsConfig.UsedExchange switch
+                    {
+                        (ExchangeEnum.Okx) => await new ExchangeApi(Exchanges.Okx).GetDataFromExchange<OkxData>(
+                            _cancellationTokenSource.Token),
+                        (ExchangeEnum.Binance) => await new ExchangeApi(Exchanges.Binance)
+                            .GetDataFromExchange<List<BinancePair>>(_cancellationTokenSource.Token),
+                        (ExchangeEnum.Kucoin) =>
+                            await new ExchangeApi(Exchanges.Kucoin).GetDataFromExchange<KucoinData>(_cancellationTokenSource.Token),
+                        (ExchangeEnum.Bitget) => await new ExchangeApi(Exchanges.Bitget).GetDataFromExchange<BitgetData>(
+                                _cancellationTokenSource.Token),
+                        (ExchangeEnum.GateIO) => await new ExchangeApi(Exchanges.GateIO)
+                            .GetDataFromExchange<List<GateIOTicker>>(_cancellationTokenSource.Token),
+                        _ => await new ExchangeApi(Exchanges.Okx).GetDataFromExchange<OkxData>(_cancellationTokenSource
+                            .Token)
+                    };
+                    if (newList != null)
+                    {
+                        LatestDataSet = new object();
+                        LatestDataSet = newList;
+                    }
+                }
+                catch (Exception ex)
+                {
+                }
+
                 await Task.Delay(SettingsHelpers.SettingsConfig.DataUpdateInterval, _cancellationTokenSource.Token);
             }
         }
-        
     }
 }

@@ -30,14 +30,12 @@
                 InLineWidgetTemplate="{StaticResource InLineWidgetTemplate}"
                 SimpleWidgetTemplate="{StaticResource SimpleWidgetTemplate}" />
         </ResourceDictionary>
-
     </Window.Resources>
     <Viewbox>
         <Grid
             x:Name="MainGrid"
             Width="140"
             Height="45">
-
             <Grid>
                 <Rectangle
                     x:Name="MainBackground"
