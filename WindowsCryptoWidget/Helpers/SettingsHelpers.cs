@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using WindowsCryptoWidget.Models;
 
 namespace WindowsCryptoWidget.Helpers
 {
@@ -40,5 +41,12 @@ namespace WindowsCryptoWidget.Helpers
         public double WidgetFontsOpacity { get; set; } = 0.8;
         public double WidgetScale { get; set; } = 1.0;
         public int SelectedStyleIndex { get; set; } = 0;
+
+        /// <summary>
+        /// Выбранная сеть для получения данных.
+        /// </summary>
+        public ExchangeEnum UsedExchange { get; set; } = ExchangeEnum.Okx;
+
+        public TimeSpan DataUpdateInterval { get; set; } = TimeSpan.FromSeconds(10);
     }
 }

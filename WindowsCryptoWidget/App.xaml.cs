@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
-using System.Data;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
+﻿using System.Runtime.InteropServices;
 using System.Windows;
-using WindowsCryptoWidget.Helpers;
 
 namespace WindowsCryptoWidget
 {
@@ -19,8 +12,6 @@ namespace WindowsCryptoWidget
         {
             //NativeMethods.AllocConsole();
             base.OnStartup(e);
-            ExchangesHelper helper = new ExchangesHelper();
-            helper.StartLoop();
         }
     }
 

@@ -106,12 +106,12 @@ namespace CryptoApi.API
             return null;
         }
 
-        public async Task<T> GetTickerData<T>()
+        public async Task<T> GetTickerData<T>(CancellationToken cancelToken = default)
         {
             using (var restRequester = new RestRequester())
             {
                 var apiLink = ExchangesApiLinks.GetApiLink(ApiName);
-                RestResponse response = await restRequester.GetRequest(apiLink, ApiName);
+                RestResponse response = await restRequester.GetRequest(apiLink, ApiName, cancelToken);
                 if (response?.StatusCode == HttpStatusCode.OK)
                 {
                     JsonSerializer serializer = new JsonSerializer();
@@ -155,6 +155,11 @@ namespace CryptoApi.API
             var pairs = PairsListConverter(apiData);
             if (pairs != null) SavePairsToDb(ApiName, pairs, guid);
             return true;
+        }
+
+        public async Task<T> GetDataFromExchange<T>(CancellationToken cancelToken = default)
+        {
+            return await GetTickerData<T>(cancelToken);
         }
 
         public ExchangeApi(string apiName)

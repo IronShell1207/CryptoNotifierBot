@@ -42,4 +42,8 @@
     <Resource Include="Assets\settings_24px.png" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="NewFolder\" />
+  </ItemGroup>
+
 </Project>

@@ -67,42 +67,37 @@
                             HorizontalAlignment="Center"
                             FontSize="20"
                             Text="Widget settings" />
+
                         <controls:SliderControl
                             x:Name="Slide_Transperency"
-                            MaxText="100%"
-                            MaxValue="1.0"
-                            MinText="10%"
-                            MinValue="0.1"
-                            StepVal="0.001"
-                            TitleText="Transperency of widget"
+                            Maximum="1.0"
+                            Minimum="0.1"
+                            Interval="0.001"
+                            Title="Transperency of widget"
+                            IsCurrentValueDisplayed="True"
                             Value="{Binding BackgroundTransparency, Mode=TwoWay}" />
-
                         <controls:SliderControl
-                            MaxText="100%"
-                            MaxValue="1.0"
-                            TitleText="Font opacity"
-                            MinText="10%"
-                            MinValue="0.1"
-                            StepVal="0.01"
+                            Maximum="1.0"
+                            Minimum="0.1"
+                            IsCurrentValueDisplayed="True"
+                            Interval="0.01"
+                            Title="Font opacity"
                             Value="{Binding FontsTransparency, Mode=TwoWay}" />
                         <controls:SliderControl
-                            MaxText="200%"
-                            TitleText="Widget scale"
-                            MaxValue="2.0"
-                            MinText="40%"
-                            MinValue="0.4"
-                            StepVal="1"
+                            Maximum="2.0"
+                            Minimum="0.4"
+                            Interval="0.05"
+                            IsCurrentValueDisplayed="True"
+                            Title="Widget scale"
                             Value="{Binding WidgetScale, Mode=TwoWay}" />
-
                         <controls:SliderControl
                             x:Name="Slider_UpdateDelay"
-                            MaxText="250 sec"
-                            MaxValue="250"
-                            MinText="0.8 sec"
-                            MinValue="0.8"
-                            StepVal="1"
-                            TitleText="Update prices delay"
-                            Value="0.8" />
+                            Maximum="60.0"
+                            Minimum="0.5"
+                            IsCurrentValueDisplayed="True"
+                            Interval="0.25"
+                            Title="Update prices delay"
+                            Value="{Binding UpdateDelay, Mode=TwoWay}" />
                     </StackPanel>
                     <StackPanel Grid.Row="2" Grid.ColumnSpan="3">
                         <TextBlock

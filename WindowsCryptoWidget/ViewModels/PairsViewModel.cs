@@ -1,14 +1,17 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using ModernWpf.Controls;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Documents;
-using System.Windows.Threading;
-using CommunityToolkit.Mvvm.Input;
-using ModernWpf.Controls;
+using System.Windows.Media.Effects;
+using CryptoApi.Constants;
+using CryptoApi.Objects.ExchangesPairs;
 using WindowsCryptoWidget.Helpers;
 using WindowsCryptoWidget.Models;
 
@@ -16,8 +19,8 @@ namespace WindowsCryptoWidget.ViewModels
 {
     public class PairsViewModel : ObservableObject
     {
-
         #region Private Fields
+
 
         /// <inheritdoc cref="BackgroundTransparency"/>
         private double _backgroundTransparency = SettingsHelpers.SettingsConfig.WidgetOpacity;
@@ -44,12 +47,34 @@ namespace WindowsCryptoWidget.ViewModels
         private double _transparency = SettingsHelpers.SettingsConfig.WidgetOpacity;
 
         /// <inheritdoc cref="UpdateDelay"/>
-        private double _updateDelay;
+        private double _updateDelay = SettingsHelpers.SettingsConfig.DataUpdateInterval.TotalSeconds;
 
         /// <inheritdoc cref="WidgetScale"/>
         private double _widgetScale = SettingsHelpers.SettingsConfig.WidgetScale;
 
-        #endregion Private Fields
+        public List<ExchangeEnum> ExchangeList { get; set; }
+
+        private ExchangeEnum _selectedExchange = SettingsHelpers.SettingsConfig.UsedExchange;
+
+        public ExchangeEnum SelectedExchange
+        {
+            get
+            {
+                return _selectedExchange;
+            }
+            set
+            {
+                SetProperty(ref _selectedExchange, value);
+                if (value.GetType() == typeof(ExchangeEnum))
+                {
+                    SettingsHelpers.SettingsConfig.UsedExchange = _selectedExchange;
+                    JsonHelper.SaveJson(SettingsHelpers.SettingsConfig, SettingsHelpers.FavCursPath);
+                }
+
+            }
+        }
+
+    #endregion Private Fields
 
         #region Public Properties
 
@@ -109,6 +134,7 @@ namespace WindowsCryptoWidget.ViewModels
             get => _lastUpdateTime;
             set => SetProperty(ref _lastUpdateTime, value);
         }
+
         public CancellationTokenSource LoopCancellationTokenSource { get; }
 
         /// <summary>
@@ -154,6 +180,7 @@ namespace WindowsCryptoWidget.ViewModels
         }
 
         public event Action StyleChanged;
+
         /// <summary>
         /// Прозрачность виджета
         /// </summary>
@@ -173,7 +200,12 @@ namespace WindowsCryptoWidget.ViewModels
         public double UpdateDelay
         {
             get => _updateDelay;
-            set => SetProperty(ref _updateDelay, value);
+            set
+            {
+                SetProperty(ref _updateDelay, value);
+                SettingsHelpers.SettingsConfig.DataUpdateInterval = TimeSpan.FromSeconds(_updateDelay);
+                JsonHelper.SaveJson(SettingsHelpers.SettingsConfig, SettingsHelpers.FavCursPath);
+            }
         }
 
         /// <summary>
@@ -203,6 +235,11 @@ namespace WindowsCryptoWidget.ViewModels
 
         public PairsViewModel()
         {
+            ExchangeList = new List<ExchangeEnum>()
+            {
+                ExchangeEnum.Okx, ExchangeEnum.Kucoin, ExchangeEnum.Binance, ExchangeEnum.Bitget, ExchangeEnum.GateIO
+            };
+            ExchangesHelper.Instance.StartLoop();
             LoopCancellationTokenSource = new CancellationTokenSource();
             ConfigurePairsList();
             PairsList.CollectionChanged += (sender, args) => MoveToSettings();
@@ -218,28 +255,110 @@ namespace WindowsCryptoWidget.ViewModels
         {
             while (!LoopCancellationTokenSource.IsCancellationRequested)
             {
-                if (PairsList.Count > 0 && ExchangesHelper.LocalDataRequester.DataAvailable)
+                if (PairsList.Count > 0 && ExchangesHelper.Instance.LatestDataSet != null)
                 {
-                    foreach (var pair in PairsList)
+                    switch (SettingsHelpers.SettingsConfig.UsedExchange)
                     {
-                        string pairBase = pair.Title.Split("/").First();
-                        string pairQuote = pair.Title.Split("/").Last();
-                        var pairFromExchange = await ExchangesHelper.LocalDataRequester.GetOkxData(pairBase, pairQuote);
-                        if (pairFromExchange != null && pair.Price != double.Parse(pairFromExchange.Price))
-                        {
-                            double lastPrice = pair.Price;
-                            pair.Price = double.Parse(pairFromExchange.Price);
-                            pair.IsPumping = lastPrice < pair.Price;
-                            pair.ArrowSymbol = lastPrice < pair.Price ? "▲" : "▼";
-                            pair.Open24h = double.Parse(pairFromExchange.open24h);
-                            //pair.PriceChangingDouble = double.Parse(pairFromExchange.changePrice);
-                            //pair.ProcentDoubleChanging = Math.Round(double.Parse(pairFromExchange.changeRate) * 100, 3);
-                            Lastupdate = DateTime.Now;
-                        }
+                        case ExchangeEnum.Okx:
+                            HandleOkxData(ExchangesHelper.Instance.GetOkxLatestData());
+                            break;
+                        case ExchangeEnum.Binance:
+                            HandleBinanceData(ExchangesHelper.Instance.GetBinanceLatestData());
+                            break;
+                        case ExchangeEnum.Bitget:
+                            HandleBitgetData(ExchangesHelper.Instance.GetBitgetLatestData());
+                            break;
+                        case ExchangeEnum.Kucoin:
+                            HandleKucointData(ExchangesHelper.Instance.GetKucoinLatestData());
+                            break;
+                        default:    
+                            HandleOkxData(ExchangesHelper.Instance.GetOkxLatestData());
+                            break;
                     }
                 }
 
                 await Task.Delay(500);
+            }
+        }
+
+        private void HandleOkxData(List<OkxTicker> data)
+        {
+            foreach (var pair in PairsList)
+            {
+                string pairBase = pair.Title.Split("/").First();
+                string pairQuote = pair.Title.Split("/").Last();
+                var pairFromExchange = data.FirstOrDefault(x => x.Symbol == ExchangesSpotLinks.GetPairConverted(Exchanges.Okx, pairBase, pairQuote));
+                if (pairFromExchange != null && pair.Price != double.Parse(pairFromExchange.Price))
+                {
+                    double lastPrice = pair.Price;
+                    pair.Price = double.Parse(pairFromExchange.Price);
+                    pair.IsPumping = lastPrice < pair.Price;
+                    pair.ArrowSymbol = lastPrice < pair.Price ? "▲" : "▼";
+                    pair.Open24h = double.Parse(pairFromExchange.open24h);
+                    //pair.PriceChangingDouble = double.Parse(pairFromExchange.changePrice);
+                    //pair.ProcentDoubleChanging = Math.Round(double.Parse(pairFromExchange.changeRate) * 100, 3);
+                    Lastupdate = DateTime.Now;
+                }
+            }
+        }
+
+        private void HandleBinanceData(List<BinancePair> data)
+        {
+            foreach (var pair in PairsList)
+            {
+                string pairBase = pair.Title.Split("/").First();
+                string pairQuote = pair.Title.Split("/").Last();
+                var pairFromExchange = data.FirstOrDefault(x => x.Symbol == ExchangesSpotLinks.GetPairConverted(Exchanges.Binance, pairBase, pairQuote));
+                if (pairFromExchange != null && pair.Price != double.Parse(pairFromExchange.Price))
+                {
+                    double lastPrice = pair.Price;
+                    pair.Price = double.Parse(pairFromExchange.Price);
+                    pair.IsPumping = lastPrice < pair.Price;
+                    pair.ArrowSymbol = lastPrice < pair.Price ? "▲" : "▼";
+                    //pair.Open24h = double.Parse(pairFromExchange.open24h);
+                    //pair.PriceChangingDouble = double.Parse(pairFromExchange.changePrice);
+                    //pair.ProcentDoubleChanging = Math.Round(double.Parse(pairFromExchange.changeRate) * 100, 3);
+                    Lastupdate = DateTime.Now;
+                }
+            }
+        }
+        private void HandleBitgetData(List<BitgetTicker> data)
+        {
+            foreach (var pair in PairsList)
+            {
+                string pairBase = pair.Title.Split("/").First();
+                string pairQuote = pair.Title.Split("/").Last();
+                var pairFromExchange = data.FirstOrDefault(x => x.Symbol == ExchangesSpotLinks.GetPairConverted(Exchanges.Bitget, pairBase, pairQuote));
+                if (pairFromExchange != null && pair.Price != double.Parse(pairFromExchange.Price))
+                {
+                    double lastPrice = pair.Price;
+                    pair.Price = double.Parse(pairFromExchange.Price);
+                    pair.IsPumping = lastPrice < pair.Price;
+                    pair.ArrowSymbol = lastPrice < pair.Price ? "▲" : "▼";
+                    //pair.Open24h = double.Parse(pairFromExchange.open24h);
+                    //pair.PriceChangingDouble = double.Parse(pairFromExchange.changePrice);
+                    //pair.ProcentDoubleChanging = Math.Round(double.Parse(pairFromExchange.changeRate) * 100, 3);
+                    Lastupdate = DateTime.Now;
+                }
+            }
+        }
+        private void HandleKucointData(List<KuTicker> data)
+        {
+            foreach (var pair in PairsList)
+            {
+                string pairBase = pair.Title.Split("/").First();
+                string pairQuote = pair.Title.Split("/").Last();
+                var pairFromExchange = data.FirstOrDefault(x => x.Symbol == ExchangesSpotLinks.GetPairConverted(Exchanges.Kucoin, pairBase, pairQuote));
+                if (pairFromExchange != null && pair.Price != double.Parse(pairFromExchange.Price))
+                {
+                    double lastPrice = pair.Price;
+                    pair.Price = double.Parse(pairFromExchange.Price);
+                    pair.IsPumping = lastPrice < pair.Price;
+                    pair.ArrowSymbol = lastPrice < pair.Price ? "▲" : "▼";
+                    pair.PriceChangingDouble = double.Parse(pairFromExchange.changePrice);
+                    pair.ProcentDoubleChanging = Math.Round(double.Parse(pairFromExchange.changeRate) * 100, 3);
+                    Lastupdate = DateTime.Now;
+                }
             }
         }
 
@@ -284,6 +403,5 @@ namespace WindowsCryptoWidget.ViewModels
         }
 
         #endregion Private Methods
-
     }
 }

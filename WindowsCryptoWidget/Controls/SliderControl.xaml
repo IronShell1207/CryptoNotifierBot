@@ -5,27 +5,44 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:WindowsCryptoWidget.Controls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
     d:DesignHeight="100"
     d:DesignWidth="200"
     FontFamily="Segoe UI Light"
     Foreground="White"
+    ui:ThemeManager.RequestedTheme="Dark"
     mc:Ignorable="d">
     <StackPanel>
-        <TextBlock
-            x:Name="TitleTextBox"
-            Margin="5,0"
-            HorizontalAlignment="Center"
-            FontSize="16"
-            Text="Widget size" />
+        <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">
+            <TextBlock
+                x:Name="TitleTextBox"
+                Margin="5,0"
+                HorizontalAlignment="Center"
+                FontSize="16">
+                <Run Text="{Binding Title, RelativeSource={RelativeSource AncestorType=local:SliderControl}}" />
+            </TextBlock>
+            <TextBlock
+                HorizontalAlignment="Center"
+                FontSize="16"
+                Visibility="{Binding IsCurrentValueDisplayed, RelativeSource={RelativeSource AncestorType=local:SliderControl}}">
+                <Run Text="-" />
+                <Run Text="{Binding ElementName=Slider, Path=Value, StringFormat={}{0:##0.##}}" />
+                <Run Text="{Binding ValueTypeName, RelativeSource={RelativeSource AncestorType=local:SliderControl}}" />
+            </TextBlock>
+        </StackPanel>
+
         <Slider
             x:Name="Slider"
             Margin="5"
-            Maximum="100"
-            Minimum="45"
-            TickFrequency="5"
+            AutoToolTipPlacement="BottomRight"
+            Interval="{Binding Interval, RelativeSource={RelativeSource AncestorType=local:SliderControl}}"
+            IsMoveToPointEnabled="True"
+            Maximum="{Binding Maximum, RelativeSource={RelativeSource AncestorType=local:SliderControl}}"
+            Minimum="{Binding Minimum, RelativeSource={RelativeSource AncestorType=local:SliderControl}}"
+            TickFrequency="{Binding Interval, RelativeSource={RelativeSource AncestorType=local:SliderControl}}"
             TickPlacement="BottomRight"
-            Ticks="4"
-            Value="{Binding Value, RelativeSource={RelativeSource AncestorType=local:SliderControl}}" />
+            Ticks="{Binding Interval, RelativeSource={RelativeSource AncestorType=local:SliderControl}}"
+            Value="{Binding Value, RelativeSource={RelativeSource AncestorType=local:SliderControl}, Mode=TwoWay}" />
         <Grid>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="auto" />
@@ -35,12 +52,14 @@
             <TextBlock
                 x:Name="LeftText"
                 Grid.Column="0"
-                Margin="5,0,0,0"
-                Text="45%" />
-            <TextBlock
-                x:Name="RightText"
-                Grid.Column="2"
-                Text="100%" />
+                Margin="5,0,0,0">
+                <Run Text="{Binding Minimum, RelativeSource={RelativeSource AncestorType=local:SliderControl}}" />
+                <Run Text="{Binding ValueTypeName, RelativeSource={RelativeSource AncestorType=local:SliderControl}}" />
+            </TextBlock>
+            <TextBlock x:Name="RightText" Grid.Column="2">
+                <Run Text="{Binding Maximum, RelativeSource={RelativeSource AncestorType=local:SliderControl}}" />
+                <Run Text="{Binding ValueTypeName, RelativeSource={RelativeSource AncestorType=local:SliderControl}}" />
+            </TextBlock>
         </Grid>
     </StackPanel>
 </UserControl>

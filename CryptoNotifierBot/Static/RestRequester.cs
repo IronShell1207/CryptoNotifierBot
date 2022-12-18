@@ -1,22 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using CryptoApi.Constants;
+﻿using CryptoApi.Constants;
 using CryptoApi.Objects;
 using RestSharp;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Net.Http;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace CryptoApi.Static
 {
-    public class RestRequester : TheDisposable
+    internal class RestRequester : TheDisposable
     {
-        public async Task<RestResponse> GetRequest(Uri Link, string exchange)
+        public async Task<RestResponse> GetRequest(Uri Link, string exchange, CancellationToken cancelToken = default)
         {
             try
             {
@@ -25,14 +21,14 @@ namespace CryptoApi.Static
                 request.Timeout = 10000;
                 request.AddHeader("UserAgent", WebHeaders.UserAgent);
                 var client = new RestClient();
-                var result = await client.ExecuteAsync(request);
+                var result = await client.ExecuteAsync(request, cancelToken);
                 if (result.StatusCode == 0)
                 {
                     Diff.LogWrite($"No connection while requesting {exchange} ticker data. Status code: {result.StatusCode}. {result.Content}", ConsoleColor.DarkRed);
-                    client = new RestClient(ProxyClient(Link));
+                    client = new RestClient(await ProxyClient(Link, cancelToken));
                 }
 
-                result = await client.ExecuteAsync(request);
+                result = await client.ExecuteAsync(request, cancelToken);
                 return result;
             }
             catch (Exception ex)
@@ -41,7 +37,7 @@ namespace CryptoApi.Static
             }
         }
 
-        private HttpClient ProxyClient(Uri link)
+        private async Task<HttpClient> ProxyClient(Uri link, CancellationToken cancelToken = default)
         {
             List<Uri> ProxyList = new List<Uri>()
             {
@@ -64,9 +60,9 @@ namespace CryptoApi.Static
                 {
                     BaseAddress = link,
                     DefaultRequestHeaders = { { "User-agent", WebHeaders.UserAgent } },
-                    Timeout = TimeSpan.FromSeconds(10)
+                    Timeout = TimeSpan.FromSeconds(5)
                 };
-                if (CheckProxy(httpclient, uri).Result)
+                if (await CheckProxy(httpclient, uri, cancelToken))
                 {
                     return httpclient;
                 }
@@ -78,14 +74,14 @@ namespace CryptoApi.Static
             };
         }
 
-        private async Task<bool> CheckProxy(HttpClient client, Uri proxy)
+        private async Task<bool> CheckProxy(HttpClient client, Uri proxy, CancellationToken cancelToken = default)
         {
             bool isfirstry = true;
         start:
             try
             {
                 var msg = new HttpRequestMessage(HttpMethod.Get, "https://google.com");
-                var result = await client.SendAsync(msg);
+                var result = await client.SendAsync(msg, cancelToken);
                 if (result.IsSuccessStatusCode)
                 {
                     Diff.LogWrite($"Proxy connected: {proxy} {result}", ConsoleColor.Green);

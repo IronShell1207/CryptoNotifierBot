@@ -10,12 +10,17 @@
     xmlns:ui="http://schemas.modernwpf.com/2019"
     xmlns:viewModels="clr-namespace:WindowsCryptoWidget.ViewModels"
     Title="Widget settings"
-    Width="800"
-    Height="600"
+    Width="340"
+    Height="680"
     ui:ThemeManager.RequestedTheme="Dark"
     ui:WindowHelper.UseModernWindowStyle="True"
     Background="Black"
     mc:Ignorable="d">
+    <d:Page.DataContext>
+        <viewModels:PairsViewModel />
+    </d:Page.DataContext>
+    <ScrollViewer HorizontalScrollBarVisibility="Auto"
+                  >
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" MinWidth="350" />
@@ -34,55 +39,65 @@
             FontSize="26"
             Foreground="White"
             Text="Widget settings" />
-        <StackPanel
-            Grid.Row="1"
-            Grid.RowSpan="3"
-            Margin="30,10"
-            VerticalAlignment="Top">
-            <StackPanel>
+        <ScrollViewer Grid.Row="1" Grid.RowSpan="3">
+            <StackPanel Margin="30,10" VerticalAlignment="Top">
+                <StackPanel>
 
-                <controls:SliderControl
-                    x:Name="Slide_Transperency"
-                    MaxText="100%"
-                    MaxValue="1.0"
-                    MinText="10%"
-                    MinValue="0.1"
-                    StepVal="0.001"
-                    TitleText="Transperency of widget"
-                    Value="{Binding BackgroundTransparency, Mode=TwoWay}" />
-                <controls:SliderControl
-                    MaxText="100%"
-                    MaxValue="1.0"
-                    MinText="10%"
-                    MinValue="0.1"
-                    StepVal="0.01"
-                    TitleText="Font opacity"
-                    Value="{Binding FontsTransparency, Mode=TwoWay}" />
-                <controls:SliderControl
-                    MaxText="200%"
-                    MaxValue="2.0"
-                    MinText="40%"
-                    MinValue="0.4"
-                    StepVal="1"
-                    TitleText="Widget scale"
-                    Value="{Binding WidgetScale, Mode=TwoWay}" />
-                <controls:SliderControl
-                    x:Name="Slider_UpdateDelay"
-                    MaxText="250 sec"
-                    MaxValue="250"
-                    MinText="0.8 sec"
-                    MinValue="0.8"
-                    StepVal="1"
-                    TitleText="Update prices delay"
-                    Value="0.8" />
+                    <controls:SliderControl
+                        x:Name="Slide_Transperency"
+                        Maximum="1.0"
+                        Minimum="0.1"
+                        Interval="0.025"
+                        Title="Transperency of widget"
+                        ValueTypeName="%"
+                        IsCurrentValueDisplayed="True"
+                        Value="{Binding BackgroundTransparency, Mode=TwoWay}" />
+                    <controls:SliderControl
+                        Maximum="1.0"
+                        Minimum="0.1"
+                        IsCurrentValueDisplayed="True"
+                        Interval="0.025"
+                        ValueTypeName="%"
+                        Title="Font opacity"
+                        Value="{Binding FontsTransparency, Mode=TwoWay}" />
+                    <controls:SliderControl
+                       Maximum="2.0"
+                        Minimum="0.4"
+                        Interval="0.05"
+                       IsCurrentValueDisplayed="True"
+                        Title="Widget scale"
+                       ValueTypeName="%"
+                        Value="{Binding WidgetScale, Mode=TwoWay}" />
+                    <controls:SliderControl
+                        x:Name="Slider_UpdateDelay"
+                        Maximum="60.0"
+                        Minimum="0.5"
+                        IsCurrentValueDisplayed="True"
+                        Interval="0.25"
+                        Title="Update prices delay"
+                        ValueTypeName="sec"
+                        Value="{Binding UpdateDelay, Mode=TwoWay}" />
 
-                <ui:RadioButtons SelectedIndex="{Binding SelectedStyle, Mode=TwoWay}">
-                    <RadioButton Content="Default style" />
-                    <RadioButton Content="Simple style" />
-                    <RadioButton Content="Compact style" />
-                </ui:RadioButtons>
+                    <ui:RadioButtons SelectedIndex="{Binding SelectedStyle, Mode=TwoWay}">
+                        <RadioButton Content="Default style" />
+                        <RadioButton Content="Simple style" />
+                        <RadioButton Content="Compact style" />
+                    </ui:RadioButtons>
+
+                    <TextBlock
+                        Margin="0,10"
+                        HorizontalAlignment="Center"
+                        FontSize="17"
+                        FontWeight="Light"
+                        Text="Exchange API" />
+                    <ComboBox
+                        Width="200"
+                        IsEditable="False"
+                        ItemsSource="{Binding ExchangeList}"
+                        SelectedItem="{Binding SelectedExchange}" />
+                </StackPanel>
             </StackPanel>
-        </StackPanel>
+        </ScrollViewer>
         <StackPanel Grid.Column="1">
             <TextBlock
                 Margin="10"
@@ -223,4 +238,5 @@
             MaxLines="100"
             Text="{Binding ConsoleHelper.LogOutput}" />
     </Grid>
+    </ScrollViewer>
 </Window>

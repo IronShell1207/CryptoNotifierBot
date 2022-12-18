@@ -1,0 +1,74 @@
+﻿<ui:Page
+    x:Class="WindowsCryptoWidget.Windows.SettingsAreas.WidgetStyleSettings"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="clr-namespace:WindowsCryptoWidget.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:WindowsCryptoWidget.Windows.SettingsAreas"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ui="http://schemas.modernwpf.com/2019"
+    d:DesignHeight="450"
+    d:DesignWidth="800"
+    mc:Ignorable="d">
+    <Grid>
+        <ScrollViewer Grid.Row="1" Grid.RowSpan="3">
+            <StackPanel Margin="30,10" VerticalAlignment="Top">
+                <StackPanel>
+
+                    <controls:SliderControl
+                        x:Name="Slide_Transperency"
+                        Title="Transperency of widget"
+                        Interval="0.025"
+                        IsCurrentValueDisplayed="True"
+                        Maximum="1.0"
+                        Minimum="0.1"
+                        ValueTypeName="%"
+                        Value="{Binding BackgroundTransparency, Mode=TwoWay}" />
+                    <controls:SliderControl
+                        Title="Font opacity"
+                        Interval="0.025"
+                        IsCurrentValueDisplayed="True"
+                        Maximum="1.0"
+                        Minimum="0.1"
+                        ValueTypeName="%"
+                        Value="{Binding FontsTransparency, Mode=TwoWay}" />
+                    <controls:SliderControl
+                        Title="Widget scale"
+                        Interval="0.05"
+                        IsCurrentValueDisplayed="True"
+                        Maximum="2.0"
+                        Minimum="0.4"
+                        ValueTypeName="%"
+                        Value="{Binding WidgetScale, Mode=TwoWay}" />
+                    <controls:SliderControl
+                        x:Name="Slider_UpdateDelay"
+                        Title="Update prices delay"
+                        Interval="0.25"
+                        IsCurrentValueDisplayed="True"
+                        Maximum="60.0"
+                        Minimum="0.5"
+                        ValueTypeName="sec"
+                        Value="{Binding UpdateDelay, Mode=TwoWay}" />
+
+                    <ui:RadioButtons SelectedIndex="{Binding SelectedStyle, Mode=TwoWay}">
+                        <RadioButton Content="Default style" />
+                        <RadioButton Content="Simple style" />
+                        <RadioButton Content="Compact style" />
+                    </ui:RadioButtons>
+
+                    <TextBlock
+                        Margin="0,10"
+                        HorizontalAlignment="Center"
+                        FontSize="17"
+                        FontWeight="Light"
+                        Text="Exchange API" />
+                    <ComboBox
+                        Width="200"
+                        IsEditable="False"
+                        ItemsSource="{Binding ExchangeList}"
+                        SelectedItem="{Binding SelectedExchange}" />
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</ui:Page>

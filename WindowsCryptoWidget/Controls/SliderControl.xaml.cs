@@ -1,17 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace WindowsCryptoWidget.Controls
 {
@@ -39,77 +28,139 @@ namespace WindowsCryptoWidget.Controls
             set => SetValue(ValueProperty, value);
         }
 
-        public double MinValue
+        /// <inheritdoc cref="Minimum"/>
+        public static readonly DependencyProperty MinimumProperty =
+            DependencyProperty.Register
+            (
+                nameof(Minimum),
+                typeof(double),
+                typeof(SliderControl),
+                new PropertyMetadata(default(double))
+            );
+
+        /// <summary>
+        /// Минимальное значение.
+        /// </summary>
+        public double Minimum
         {
-            get
-            {
-                return Slider.Minimum;
-            }
-            set
-            {
-                Slider.Minimum = value;
-            }
+            get => (double) GetValue(MinimumProperty);
+            set => SetValue(MinimumProperty, value);
         }
 
-        public double MaxValue
+        /// <inheritdoc cref="Maximum"/>
+        public static readonly DependencyProperty MaximumProperty =
+            DependencyProperty.Register
+            (
+                nameof(Maximum),
+                typeof(double),
+                typeof(SliderControl),
+                new PropertyMetadata(default(double))
+            );
+
+        /// <summary>
+        /// Максимальное значение.
+        /// </summary>
+        public double Maximum
         {
-            get
-            {
-                return Slider.Maximum;
-            }
-            set
-            {
-                Slider.Maximum = value;
-            }
+            get => (double) GetValue(MaximumProperty);
+            set => SetValue(MaximumProperty, value);
         }
 
-        public string MinText
+        /// <inheritdoc cref="Title"/>
+        public static readonly DependencyProperty TitleProperty =
+            DependencyProperty.Register
+            (
+                nameof(Title),
+                typeof(string),
+                typeof(SliderControl),
+                new PropertyMetadata(default(string))
+            );
+
+        /// <summary>
+        /// Заголовок.
+        /// </summary>
+        public string Title
         {
-            get
-            {
-                return LeftText.Text;
-            }
-            set
-            {
-                LeftText.Text = value;
-            }
+            get => (string) GetValue(TitleProperty);
+            set => SetValue(TitleProperty, value);
         }
 
-        public string MaxText
+        /// <inheritdoc cref="ValueTypeName"/>
+        public static readonly DependencyProperty ValueTypeNameProperty =
+            DependencyProperty.Register
+            (
+                nameof(ValueTypeName),
+                typeof(string),
+                typeof(SliderControl),
+                new PropertyMetadata(default(string))
+            );
+
+        /// <summary>
+        /// Название величины.
+        /// </summary>
+        public string ValueTypeName
         {
-            get
-            {
-                return RightText.Text;
-            }
-            set
-            {
-                RightText.Text = value;
-            }
+            get => (string) GetValue(ValueTypeNameProperty);
+            set => SetValue(ValueTypeNameProperty, value);
         }
 
-        public string TitleText
+        /// <inheritdoc cref="IsCurrentValueDisplayed"/>
+        public static readonly DependencyProperty IsCurrentValueDisplayedProperty =
+            DependencyProperty.Register
+            (
+                nameof(IsCurrentValueDisplayed),
+                typeof(bool),
+                typeof(SliderControl),
+                new PropertyMetadata(default(bool))
+            );
+
+        /// <summary>
+        /// Отображается ли текущее значение в заголовке.
+        /// </summary>
+        public bool IsCurrentValueDisplayed
         {
-            get
-            {
-                return TitleTextBox.Text;
-            }
-            set
-            {
-                TitleTextBox.Text = value;
-            }
+            get => (bool) GetValue(IsCurrentValueDisplayedProperty);
+            set => SetValue(IsCurrentValueDisplayedProperty, value);
         }
 
-        public double StepVal
+        /// <inheritdoc cref="Interval"/>
+        public static readonly DependencyProperty IntervaProperty =
+            DependencyProperty.Register
+            (
+                nameof(Interval),
+                typeof(double),
+                typeof(SliderControl),
+                new PropertyMetadata(default(double))
+            );
+
+        /// <summary>
+        /// Интервал
+        /// </summary>
+        public double Interval
         {
-            get
-            {
-                return Slider.TickFrequency;
-            }
-            set
-            {
-                Slider.TickFrequency = value;
-            }
+            get => (double) GetValue(IntervaProperty);
+            set => SetValue(IntervaProperty, value);
         }
+
+        /// <inheritdoc cref="DisplayedMinumum"/>
+        public static readonly DependencyProperty DisplayedMinumumProperty =
+            DependencyProperty.Register
+            (
+                nameof(DisplayedMinumum),
+                typeof(string),
+                typeof(SliderControl),
+                new PropertyMetadata(default(string))
+            );
+
+        /// <summary>
+        /// Отображаемое минимальное значение.
+        /// </summary>
+        public string DisplayedMinumum
+        {
+            get => (string) GetValue(DisplayedMinumumProperty) ??  Minimum.ToString();
+            set => SetValue(DisplayedMinumumProperty, value);
+        }
+
 
         public SliderControl()
         {
