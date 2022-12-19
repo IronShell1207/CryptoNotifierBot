@@ -241,7 +241,7 @@ namespace WindowsCryptoWidget.ViewModels
             LoopCancellationTokenSource = new CancellationTokenSource();
             ConfigurePairsList();
             PairsList.CollectionChanged += (sender, args) => MoveToSettings();
-            Task.Run(async () => UpdateLoop());
+            Task.Run(UpdateLoop);
             AddPairCommand = new RelayCommand(AddPair, CanExecuteAddPairCommand);
         }
 
@@ -401,9 +401,16 @@ namespace WindowsCryptoWidget.ViewModels
         {
             foreach (string pair in SettingsHelpers.SettingsConfig.SavedPairs)
             {
-                _pairsList.Add(new PairModel(pair));
+                var pairModel = new PairModel(pair);
+                pairModel.RemoveRequested += OnPairModel_RemoveRequested;
+                _pairsList.Add(pairModel);
             }
             AppEventsHelper.PairsCountChanged?.Invoke(PairsList.Count);
+        }
+
+        private void OnPairModel_RemoveRequested(PairModel obj)
+        {
+            PairsList.Remove(obj);
         }
 
         private void MoveToSettings()

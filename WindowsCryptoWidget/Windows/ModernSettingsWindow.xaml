@@ -20,16 +20,20 @@
         <viewModels:PairsViewModel />
     </d:Page.DataContext>
     <Grid>
-        <ui:NavigationView IsBackButtonVisible="Collapsed"
-                           x:Name="SettingsNavigator"
-                           SelectedItem="{Binding SelectedNavMenu, RelativeSource={RelativeSource AncestorType=local:ModernSettingsWindow}, Mode=TwoWay}"
-                           MenuItemsSource="{Binding NavigationItems, RelativeSource={RelativeSource AncestorType=local:ModernSettingsWindow}}"
-                          SelectionChanged="SettingsNavigator_OnSelectionChanged"
-                           IsSettingsVisible="False">
+        <ui:NavigationView
+            x:Name="SettingsNavigator"
+            IsBackButtonVisible="Collapsed"
+            IsSettingsVisible="False"
+            MenuItemsSource="{Binding NavigationItems, RelativeSource={RelativeSource AncestorType=local:ModernSettingsWindow}}"
+            SelectedItem="{Binding SelectedNavMenu, RelativeSource={RelativeSource AncestorType=local:ModernSettingsWindow}, Mode=TwoWay}"
+            SelectionChanged="SettingsNavigator_OnSelectionChanged">
             <ui:NavigationView.Content>
-                <ui:Frame x:Name="ContentFrame"/>
+                <Grid>
+                    
+                    <ui:Frame x:Name="ContentFrame" />
+                </Grid>
             </ui:NavigationView.Content>
         </ui:NavigationView>
-        
+
     </Grid>
 </Window>

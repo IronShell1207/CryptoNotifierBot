@@ -1,5 +1,6 @@
 ﻿using System;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 
 namespace WindowsCryptoWidget.ViewModels
 {
@@ -25,6 +26,21 @@ namespace WindowsCryptoWidget.ViewModels
         private double _procentDoubleChanging;
 
         private string _title = "BTCUSDT";
+
+        /// <inheritdoc cref="Delete"/>
+        public RelayCommand DeleteCommand { get; }
+
+        public event Action<PairModel> RemoveRequested;
+
+
+        /// <summary>
+        /// Удаляет
+        /// </summary>
+        private void Delete()
+        {
+            RemoveRequested?.Invoke(this);
+
+        }
 
         #endregion Private Fields
 
@@ -116,10 +132,12 @@ namespace WindowsCryptoWidget.ViewModels
         public PairModel(string title)
         {
             Title = title;
+            DeleteCommand = new RelayCommand(Delete);
         }
 
         public PairModel()
         {
+            DeleteCommand = new RelayCommand(Delete);
         }
 
         #endregion Public Constructors
