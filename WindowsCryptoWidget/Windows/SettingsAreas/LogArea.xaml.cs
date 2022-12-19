@@ -4,11 +4,11 @@ using Page = ModernWpf.Controls.Page;
 namespace WindowsCryptoWidget.Windows.SettingsAreas
 {
     /// <summary>
-    /// Interaction logic for PairsAreaSettigs.xaml
+    /// Interaction logic for LogArea.xaml
     /// </summary>
-    public partial class PairsAreaSettigs : Page
+    public partial class LogArea : Page
     {
-        public PairsAreaSettigs()
+        public LogArea()
         {
             InitializeComponent();
         }

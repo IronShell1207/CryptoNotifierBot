@@ -8,11 +8,17 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ui="http://schemas.modernwpf.com/2019"
     d:DesignHeight="450"
-    d:DesignWidth="800"
+    d:DesignWidth="400"
     mc:Ignorable="d">
     <Grid>
         <ScrollViewer Grid.Row="1" Grid.RowSpan="3">
             <StackPanel Margin="30,10" VerticalAlignment="Top">
+                <TextBlock
+                    Margin="0,10"
+                    HorizontalAlignment="Center"
+                    FontSize="20"
+                    FontWeight="Bold"
+                    Text="Widget settings" />
                 <StackPanel>
 
                     <controls:SliderControl
@@ -40,33 +46,13 @@
                         Minimum="0.4"
                         ValueTypeName="%"
                         Value="{Binding WidgetScale, Mode=TwoWay}" />
-                    <controls:SliderControl
-                        x:Name="Slider_UpdateDelay"
-                        Title="Update prices delay"
-                        Interval="0.25"
-                        IsCurrentValueDisplayed="True"
-                        Maximum="60.0"
-                        Minimum="0.5"
-                        ValueTypeName="sec"
-                        Value="{Binding UpdateDelay, Mode=TwoWay}" />
-
+                    <TextBlock Text="Widget style" Margin=" 5" FontWeight="SemiBold" FontSize="16"></TextBlock>
                     <ui:RadioButtons SelectedIndex="{Binding SelectedStyle, Mode=TwoWay}">
                         <RadioButton Content="Default style" />
                         <RadioButton Content="Simple style" />
                         <RadioButton Content="Compact style" />
                     </ui:RadioButtons>
 
-                    <TextBlock
-                        Margin="0,10"
-                        HorizontalAlignment="Center"
-                        FontSize="17"
-                        FontWeight="Light"
-                        Text="Exchange API" />
-                    <ComboBox
-                        Width="200"
-                        IsEditable="False"
-                        ItemsSource="{Binding ExchangeList}"
-                        SelectedItem="{Binding SelectedExchange}" />
                 </StackPanel>
             </StackPanel>
         </ScrollViewer>
