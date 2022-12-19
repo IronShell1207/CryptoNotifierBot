@@ -26,9 +26,8 @@ namespace CryptoApi.Static
                 {
                     Diff.LogWrite($"No connection while requesting {exchange} ticker data. Status code: {result.StatusCode}. {result.Content}", ConsoleColor.DarkRed);
                     client = new RestClient(await ProxyClient(Link, cancelToken));
+                    result = await client.ExecuteAsync(request, cancelToken);
                 }
-
-                result = await client.ExecuteAsync(request, cancelToken);
                 return result;
             }
             catch (Exception ex)

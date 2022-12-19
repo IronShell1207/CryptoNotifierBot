@@ -1,5 +1,4 @@
-﻿
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace WindowsCryptoWidget.Models
 {
@@ -13,21 +12,22 @@ namespace WindowsCryptoWidget.Models
 
     public static class WidgetStyles
     {
-        
         public static WidgetStyle InLineWidgetTemplate = new WidgetStyle()
         {
             StyleResourceName = "InLineWidgetTemplate",
             DataWidth = 300,
             DataHeight = 48,
             Index = 2
-        };  
+        };
+
         public static WidgetStyle DefaultWidgetStyle = new WidgetStyle()
         {
             StyleResourceName = "DefaultWidgetStyle",
-            DataWidth = 170,
+            DataWidth = 150,
             Index = 0,
-            DataHeight = 84
+            DataHeight = 90
         };
+
         public static WidgetStyle SimpleWidgetTemplate = new WidgetStyle()
         {
             StyleResourceName = "SimpleWidgetTemplate",

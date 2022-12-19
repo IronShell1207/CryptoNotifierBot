@@ -8,9 +8,9 @@
     xmlns:ui="http://schemas.modernwpf.com/2019"
     d:DesignHeight="100"
     d:DesignWidth="200"
+    ui:ThemeManager.RequestedTheme="Dark"
     FontFamily="Segoe UI Light"
     Foreground="White"
-    ui:ThemeManager.RequestedTheme="Dark"
     mc:Ignorable="d">
     <StackPanel>
         <StackPanel HorizontalAlignment="Center" Orientation="Horizontal">

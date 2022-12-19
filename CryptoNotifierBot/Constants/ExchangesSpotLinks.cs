@@ -13,18 +13,22 @@ namespace CryptoApi.Constants
         /// Okx spot page, pair pattern base-quote
         /// </summary>
         public const string OkxSpot = "https://www.okx.com/ru/trade-spot/{0}";
+
         /// <summary>
         /// Binance spot page, pair pattern BASE_QUOTE
         /// </summary>
         public const string BinanceSpot = "https://www.binance.com/ru/trade/{0}?layout=pro";
+
         /// <summary>
         /// GateIO spot page, pair pattern BASE_QUOTE
         /// </summary>
         public const string GateIoSpot = "https://www.gate.io/trade/{0}";
+
         /// <summary>
         /// GateIO spot page, pair pattern BASE-QUOTE
         /// </summary>
         public const string KucoinSpot = "https://www.kucoin.com/ru/trade/{0}";
+
         public const string BitGetSpot = "https://www.bitget.com/en/spot/{0}_SPBL";
 
         public static string GetSpotLink(string exchange)
@@ -42,15 +46,28 @@ namespace CryptoApi.Constants
         public static string GetPairLink(string exchange, string Base, string Quote)
         {
             var spotlink = GetSpotLink(exchange);
-            var pairConverted = GetPairConverted(exchange, Base, Quote);
+            var pairConverted = GetPairLinkConverted(exchange, Base, Quote);
             return string.Format(spotlink, pairConverted);
         }
+
+        public static string GetPairLinkConverted(string exchange, string Base, string Quote)
+        {
+            if (exchange == null)
+                throw new ArgumentNullException(nameof(exchange));
+            if (exchange == Exchanges.Binance) return $"{Base}_{Quote}";
+            else if (exchange == Exchanges.Okx) return $"{Base}-{Quote}";
+            else if (exchange == Exchanges.GateIO) return $"{Base}_{Quote}";
+            else if (exchange == Exchanges.Kucoin) return $"{Base}_{Quote}";
+            else if (exchange == Exchanges.Bitget) return $"{Base}{Quote}";
+            return null;
+        }
+
         public static string GetPairConverted(string exchange, string Base, string Quote)
         {
             if (exchange == null)
                 throw new ArgumentNullException(nameof(exchange));
-            if    (exchange == Exchanges.Binance)  return $"{Base}_{Quote}";
-            else if (exchange == Exchanges.Okx)    return $"{Base}-{Quote}";
+            if (exchange == Exchanges.Binance) return $"{Base}{Quote}";
+            else if (exchange == Exchanges.Okx) return $"{Base}-{Quote}";
             else if (exchange == Exchanges.GateIO) return $"{Base}_{Quote}";
             else if (exchange == Exchanges.Kucoin) return $"{Base}-{Quote}";
             else if (exchange == Exchanges.Bitget) return $"{Base}{Quote}";

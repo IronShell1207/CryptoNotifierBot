@@ -2,7 +2,12 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="clr-namespace:WindowsCryptoWidget"
-    xmlns:viewModels="clr-namespace:WindowsCryptoWidget.ViewModels">
+    xmlns:viewModels="clr-namespace:WindowsCryptoWidget.ViewModels"
+    xmlns:converters="clr-namespace:WindowsCryptoWidget.Converters">
+    <converters:PriceConverter x:Key="PriceConverter" />
+    <converters:PriceFontSizeConverter DefaultFontSize="18" LowedFontSize="14" x:Key="InlinePriceFontSizeConverter" />
+    <converters:PriceFontSizeConverter DefaultFontSize="20" LowedFontSize="14" x:Key="DefaultPriceFontSizeConverter" />
+    <converters:PriceForegroundConverter x:Key="PriceForegroundConverter" />
 
     <DataTemplate x:Key="DefaultWidgetTemplate" DataType="viewModels:PairModel">
         <Viewbox>
@@ -28,10 +33,10 @@
                     <TextBlock
                         Margin="0,0,14,0"
                         FontFamily="Segoe UI"
-                        FontSize="20"
-                        Foreground="White"
+                        FontSize="{Binding Price, Converter={StaticResource DefaultPriceFontSizeConverter}}"
+                        Foreground="{Binding Price, Converter={StaticResource PriceForegroundConverter}}"
                         Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
-                        Text="{Binding Price}"
+                        Text="{Binding Price, Converter={StaticResource PriceConverter}}"
                         TextAlignment="Center" />
                 </StackPanel>
                 <TextBlock
@@ -74,10 +79,10 @@
                     <TextBlock
                         Margin="0,0,14,0"
                         FontFamily="Segoe UI"
-                        FontSize="20"
-                        Foreground="White"
+                        FontSize="{Binding Price, Converter={StaticResource DefaultPriceFontSizeConverter}}"
+                        Foreground="{Binding Price, Converter={StaticResource PriceForegroundConverter}}"
                         Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
-                        Text="{Binding Price}"
+                        Text="{Binding Price, Converter={StaticResource PriceConverter}}"
                         TextAlignment="Center" />
                 </StackPanel>
             </StackPanel>
@@ -110,10 +115,10 @@
                     Margin="5,0"
                     HorizontalAlignment="Right"
                     FontFamily="Segoe UI"
-                    FontSize="18"
-                    Foreground="White"
+                    FontSize="{Binding Price, Converter={StaticResource InlinePriceFontSizeConverter}}"
+                    Foreground="{Binding Price, Converter={StaticResource PriceForegroundConverter}}"
                     Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
-                    Text="{Binding Price}"
+                    Text="{Binding Price, Converter={StaticResource PriceConverter}}"
                     TextAlignment="Center" />
                 <TextBlock
                     Grid.Column="2"
@@ -123,7 +128,6 @@
                     Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
                     Text="{Binding ArrowSymbol}"
                     TextAlignment="Center" />
-
             </Grid>
         </Viewbox>
     </DataTemplate>
