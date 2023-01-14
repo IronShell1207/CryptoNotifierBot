@@ -9,7 +9,7 @@ namespace UsersDatabaseService.Services
         /// <summary>
         /// Получает юзера по ид.
         /// </summary>
-        public async Task AddNewPair(UserModel user, CryptoPairModel pair)
+        public async Task AddNewPair(UserModel user, MonitoringPair pair)
         {
             using (UsersDatabaseContext dbContext = new UsersDatabaseContext())
             {
@@ -43,6 +43,23 @@ namespace UsersDatabaseService.Services
                 else
                 {
                     throw new SqlNullValueException("User not found!");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Обновляет данные.
+        /// </summary>
+        /// <param name="pair">Пара.</param>
+        public async Task ModifyNewPair(MonitoringPair pair)
+        {
+            using (UsersDatabaseContext dbContext = new UsersDatabaseContext())
+            {
+                MonitoringPair? pairFromDb = await dbContext.MonitoringPairs.FirstOrDefaultAsync(x => x.Id == pair.Id);
+                if (pairFromDb != null)
+                {
+                    dbContext.MonitoringPairs.Entry(pairFromDb).CurrentValues.SetValues(pair);
+                    await dbContext.SaveChangesAsync();
                 }
             }
         }
