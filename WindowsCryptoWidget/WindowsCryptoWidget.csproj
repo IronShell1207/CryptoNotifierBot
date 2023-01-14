@@ -8,6 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="NewFolder\**" />
+    <EmbeddedResource Remove="NewFolder\**" />
+    <None Remove="NewFolder\**" />
+    <Page Remove="NewFolder\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Remove="Assets\iconadd.png" />
     <None Remove="Assets\icons8_close_pane_50px.png" />
     <None Remove="Assets\icons8_collapse_arrow_24px.png" />
@@ -40,10 +47,6 @@
     <Resource Include="Assets\icons8_remove_24px.png" />
     <Resource Include="Assets\ico_close.png" />
     <Resource Include="Assets\settings_24px.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="NewFolder\" />
   </ItemGroup>
 
 </Project>

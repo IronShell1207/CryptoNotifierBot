@@ -57,6 +57,11 @@ namespace TelegramBot.Static
             return true;
         }
 
+        /// <summary>
+        /// TODO: Переделать.
+        /// </summary>
+        /// <param name="update"></param>
+        /// <returns></returns>
         private static async Task SaveUserMsg(Update update)
         {
             using (AppDbContext dbContext = new AppDbContext())
@@ -78,42 +83,49 @@ namespace TelegramBot.Static
 
         public static async Task UpdateHandler(ITelegramBotClient bot, Update update, CancellationToken canceltoken)
         {
-            if (IsUserBanned(update))
-                return;
+            //if (IsUserBanned(update))
+            //    return;
             var user = await GetUserSettings(update);
-            await SaveUserMsg(update);
+            // await SaveUserMsg(update);
 
-            if (!string.IsNullOrWhiteSpace(update.Message?.ReplyToMessage?.Text))
-            {
-                using (RepliedMessagesHandler msgHandler = new RepliedMessagesHandler())
-                {
-                    await msgHandler.HandleMessage(update);
-                }
-            }
-            else if (update.Type == UpdateType.CallbackQuery)
-                CallbackHandlerAsync(bot, update, canceltoken);
-            else if (update.Type == UpdateType.EditedMessage)
-            {
-                update.Message = new Message();
-                update.Message.Text = update.EditedMessage.Text;
-                await MessageTextHandler(bot, update, canceltoken, user);
-            }
-            else if (update.Type == UpdateType.Message && update.Message != null)
+            /* if (!string.IsNullOrWhiteSpace(update.Message?.ReplyToMessage?.Text))
+             {
+                 using (RepliedMessagesHandler msgHandler = new RepliedMessagesHandler())
+                 {
+                     await msgHandler.HandleMessage(update);
+                 }
+             }*/
+            /*else if (update.Type == UpdateType.CallbackQuery)
+                CallbackHandlerAsync(bot, update, canceltoken);*/
+            /* else if (update.Type == UpdateType.EditedMessage)
+             {
+                 update.Message = new Message();
+                 update.Message.Text = update.EditedMessage.Text;
+                 await MessageTextHandler(bot, update, canceltoken, user);
+             }*/
+            if (update.Type == UpdateType.Message && update.Message != null)
                 await MessageTextHandler(bot, update, canceltoken, user);
         }
 
         public static async Task MessageTextHandler(ITelegramBotClient bot, Update update, CancellationToken token,
             UserConfig user)
         {
+            // Обработка команды подписки. /subscribe
             if (update.Message?.Text == BreakoutCommands.Subscribe)
                 using (BreakoutPairsMsgHandler msghandler = new BreakoutPairsMsgHandler())
                     await msghandler.SubNewUserBreakouts(update);
+
+            // Обработка команды создания пары.
             else if (update.Message.Text == "/create")
                 using (CryptoPairsMsgHandler msghandler = new CryptoPairsMsgHandler())
                     await msghandler.CreateTaskFirstStage(update, user);
+
+            // Обработка команды включения ночного режима.
             else if (SettingsCommands.SetEnableNight.IsMatch(update.Message.Text))
                 using (UserSettingsMsgHandler msgHandler = new())
                     await msgHandler.SetEnableNightMode(update);
+
+            // Обработка команды включения
             else if (update.Message.Text == SimpleCommands.RemoveAllFromBlackList)
                 using (BreakoutPairsMsgHandler brkMsgHandler = new BreakoutPairsMsgHandler())
                 {
@@ -206,8 +218,7 @@ namespace TelegramBot.Static
         public static async Task ErrorHandler(ITelegramBotClient botClient, Exception ex, CancellationToken csToken)
         {
             ConsoleCommandsHandler.LogWrite(ex.Message);
-            //throw ex;
-            return;
+            throw ex;
         }
 
         public static async Task AddUserToBanList(ChatId chatid, string banReason)

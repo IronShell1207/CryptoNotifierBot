@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CryptoBotWebPortal", "Crypt
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApiPortal", "WebApiPortal\WebApiPortal.csproj", "{C1C20880-2C52-4FA8-8E90-20DC02C3A7D4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WindowsCryptoWidget", "WindowsCryptoWidget\WindowsCryptoWidget.csproj", "{19200892-924C-4848-A9E5-9B3C7B1FE558}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WindowsCryptoWidget", "WindowsCryptoWidget\WindowsCryptoWidget.csproj", "{19200892-924C-4848-A9E5-9B3C7B1FE558}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UsersDatabaseService", "UsersDatabaseService\UsersDatabaseService.csproj", "{43B0B9BF-C581-45F4-94A3-C6E389DD72F2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,6 +60,12 @@ Global
 		{19200892-924C-4848-A9E5-9B3C7B1FE558}.Release|Any CPU.Build.0 = Release|Any CPU
 		{19200892-924C-4848-A9E5-9B3C7B1FE558}.ttt|Any CPU.ActiveCfg = Debug|Any CPU
 		{19200892-924C-4848-A9E5-9B3C7B1FE558}.ttt|Any CPU.Build.0 = Debug|Any CPU
+		{43B0B9BF-C581-45F4-94A3-C6E389DD72F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43B0B9BF-C581-45F4-94A3-C6E389DD72F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43B0B9BF-C581-45F4-94A3-C6E389DD72F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43B0B9BF-C581-45F4-94A3-C6E389DD72F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43B0B9BF-C581-45F4-94A3-C6E389DD72F2}.ttt|Any CPU.ActiveCfg = Debug|Any CPU
+		{43B0B9BF-C581-45F4-94A3-C6E389DD72F2}.ttt|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
