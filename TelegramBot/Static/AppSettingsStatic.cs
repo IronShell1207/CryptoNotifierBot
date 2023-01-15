@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using TelegramBot.Helpers;
 using TelegramBot.Objects;
 
 namespace TelegramBot.Static
@@ -10,6 +6,7 @@ namespace TelegramBot.Static
     public class AppSettingsStatic
     {
         private static AppSettings _settings;
+
         public static string SettsPath
         {
             get
@@ -17,9 +14,10 @@ namespace TelegramBot.Static
                 var path = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + @"\Tcryptobot\";
                 if (!Directory.Exists(path))
                     Directory.CreateDirectory(path);
-                return path+"config.json";
+                return path + "config.json";
             }
         }
+
         public static AppSettings Settings
         {
             get

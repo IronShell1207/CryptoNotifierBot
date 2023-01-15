@@ -10,9 +10,9 @@ using TelegramBot.Helpers;
 
 namespace TelegramBot.Static.MessageHandlers
 {
-    public class UserSettingsMsgHandler : IDisposable
+    public class UserSettingsMsgHandler
     {
-        private bool disposed = false;
+        /*private bool disposed = false;
 
         public void Dispose()
         {
@@ -101,6 +101,6 @@ namespace TelegramBot.Static.MessageHandlers
                     await BotApi.SendMessage(userCfg.TelegramId, $"Last message cleaning status: {userCfg.RemoveLatestNotifyBeforeNew}");
                 }
             }
-        }
+        }*/
     }
 }

@@ -15,6 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Telegram.Bot.Types;
 using TelegramBot.Constants;
 using TelegramBot.Constants.Commands;
+using TelegramBot.Helpers;
 using TelegramBot.Objects;
 
 namespace TelegramBot.Static.MessageHandlers
@@ -24,7 +25,7 @@ namespace TelegramBot.Static.MessageHandlers
         /// <summary>
         /// Остановить подписку.
         /// </summary>
-        public async Task StopNotify(Update update)
+        /*public async Task StopNotify(Update update)
         {
             using (AppDbContext db = new AppDbContext())
             {
@@ -285,6 +286,6 @@ namespace TelegramBot.Static.MessageHandlers
                     else await BotApi.SendMessage(update.Message.From.Id, "You're not subscribed!");
                 }
             }
-        }
+        }*/
     }
 }

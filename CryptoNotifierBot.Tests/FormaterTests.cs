@@ -8,11 +8,12 @@ using CryptoApi.Static;
 using NUnit.Framework;
 using TelegramBot;
 using TelegramBot.Constants.Commands;
+using TelegramBot.Helpers;
 using TelegramBot.Objects;
 
 namespace CryptoNotifierBot.Tests
 {
-    
+
     public class FormaterTests
     {
         [Test]
@@ -48,7 +49,7 @@ namespace CryptoNotifierBot.Tests
         [Test]
         public void ResxTester()
         {
-            var test1= TelegramBot.Static.CultureTextRequest.GetMessageString("newPairWrongPrice", "en");
+            var test1= CultureTextRequest.GetMessageString("newPairWrongPrice", "en");
             if (test1== "Wrong price. Try again") Assert.Pass(test1);
             
         }
@@ -56,7 +57,7 @@ namespace CryptoNotifierBot.Tests
         [Test]
         public void Resx2Tester()
         {
-            var test2 = TelegramBot.Static.CultureTextRequest.GetMessageString("newPairWrongPrice", "ru");
+            var test2 = CultureTextRequest.GetMessageString("newPairWrongPrice", "ru");
             if (test2 == "Неверная цена. Попробуйте снова") Assert.Pass(test2);
         }
 

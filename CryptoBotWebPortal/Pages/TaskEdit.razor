@@ -23,7 +23,7 @@
     <h5>User id: @user.Id</h5>
     <h5>User telegram id: @user.TelegramId</h5>
     <h5>Pair info</h5>
-    <p>Pair base: <input type="text" name="symbol" @bind="pair.PairBase"/></p>
+   <p>Pair base: <input type="text" name="symbol" @bind="pair.PairBase"/></p>
     <p>Pair quote: <input type="text" name="symbol" @bind="pair.PairQuote"/></p>
 
     <h5>Price trigger: <input type="text" @bind="pair.Price"/></h5>
@@ -60,15 +60,15 @@
     public string taskID { get; set; }
     protected override async Task OnInitializedAsync()
     {
-        pair = await ForecastService.GetUserCPSetts(int.Parse(taskID));
-        user = pair.User;
+       // pair = await ForecastService.GetUserCPSetts(int.Parse(taskID));
+       //user = pair.User;
     }
 
     private async Task SaveSettings()
     {
-        var result = await ForecastService.SaveTaskSettings(pair);
-        AlertVisible = true;
-        AlertMessage = result.Item2;
+       //var result = await ForecastService.SaveTaskSettings(pair);
+       // AlertVisible = true;
+       //AlertMessage = result.Item2;
 
     }
     private MarkupString StringToHtml(string line)

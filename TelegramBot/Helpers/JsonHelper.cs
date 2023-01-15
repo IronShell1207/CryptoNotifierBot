@@ -1,25 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using TelegramBot.Objects;
 
-namespace TelegramBot.Static
+namespace TelegramBot.Helpers
 {
     public class JsonHelper
     {
-        public static AppSettings LoadSettings(string path)
+        public static T LoadSettings<T>(string path)
         {
             using (StreamReader jsReader = new StreamReader(path))
             {
                 JsonReader json = new JsonTextReader(jsReader);
                 JsonSerializer jsonSerializer = new JsonSerializer();
-                var list = jsonSerializer.Deserialize<AppSettings>(json);
+                var list = jsonSerializer.Deserialize<T>(json);
                 return list;
             }
         }
+
         public static void SaveJson(object listSet, string path)
         {
             using (StreamWriter sw = new StreamWriter(path, false))
@@ -32,4 +28,3 @@ namespace TelegramBot.Static
         }
     }
 }
-

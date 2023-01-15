@@ -13,7 +13,7 @@ using TelegramBot.Objects;
 
 namespace TelegramBot.Static
 {
-    public class BreakoutMonitor
+    /*public class BreakoutMonitor
     {
         private static DateTime br5MinLastDateTime { get; set; } = DateTime.Now;
         private static DateTime br2MinLastDateTime { get; set; } = DateTime.Now;
@@ -44,6 +44,7 @@ namespace TelegramBot.Static
         };
 
         private static List<double> procentsDifference = new() { 2.5, 3, 4, 5, 5, 5, 5, 5, 6, 6, 8 };
+
         public static async void BreakoutLoop()
         {
             while (true)
@@ -80,7 +81,7 @@ namespace TelegramBot.Static
                     }
                 }
                 if (sb.Length > 0)
-                    ConsoleCommandsHandler.LogWrite("Breakouts: " + sb.ToString());
+                    Console.WriteLine("Breakouts: " + sb.ToString());
                 Thread.Sleep(10000);
             }
         }
@@ -150,6 +151,7 @@ namespace TelegramBot.Static
             }
             await BotApi.SendMessage(sub.TelegramId, sb.ToString());
         }
+
         private static List<BreakoutPair> CompairedPairs(CryDbSet oldExchangeData, CryDbSet freshExchangeData, double procent, double time = 0, string exchange = "Binance")
         {
             List<BreakoutPair> changedData = new List<BreakoutPair>() { };
@@ -178,6 +180,5 @@ namespace TelegramBot.Static
             }
 
             return changedData;
-        }
-    }
+        }*/
 }

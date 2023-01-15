@@ -116,8 +116,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        if (!string.IsNullOrWhiteSpace(userid))
-            USERTasks = await ForecastService.UsersTasks(int.Parse(userid));
+       // if (!string.IsNullOrWhiteSpace(userid))
+        //    USERTasks = await ForecastService.UsersTasks(int.Parse(userid));
     }
 
     private MarkupString StringToHtml(string line)
@@ -126,14 +126,14 @@ else
     }
     private async Task SaveChanges()
     {
-        foreach (CryptoPair cp in USERTasks)
+        /*foreach (CryptoPair cp in USERTasks)
         {
             await ForecastService.SaveTaskSettings(cp);
         }
         AlertVisible = true;
         AlertMessage = "Complete";
         NavigationManager.NavigateTo("/userconfig/"+userid);
-        
+        */
 
     }
 }

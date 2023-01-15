@@ -12,7 +12,7 @@ namespace TelegramBot.Static
 {
     public class SettingsManager : IMyDisposable
     {
-        public async Task SetNotifyDelay(Update update)
+        /*public async Task SetNotifyDelay(Update update)
         {
             var match = SettingsCommands.ChangeDelay.Match(update.Message.Text);
             if (match.Success)
@@ -30,6 +30,6 @@ namespace TelegramBot.Static
                     }
                 }
             }
-        }
+        }*/
     }
 }

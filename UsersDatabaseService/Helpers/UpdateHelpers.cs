@@ -4,9 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TelegramBot.Static
+namespace UsersDatabaseService.Helpers
 {
-    internal class PositionManager
+    public static class UpdateHelpers
     {
+        //public static
     }
 }

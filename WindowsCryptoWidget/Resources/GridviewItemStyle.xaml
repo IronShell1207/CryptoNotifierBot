@@ -1,8 +1,9 @@
-﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:ui="http://schemas.modernwpf.com/2019">
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:ui="http://schemas.modernwpf.com/2019">
 
-    <Style TargetType="ui:GridViewItem" x:Key="GridViewItemStyle">
+    <Style x:Key="GridViewItemStyle" TargetType="ui:GridViewItem">
         <Setter Property="FontFamily" Value="{DynamicResource ContentControlThemeFontFamily}" />
         <Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
         <Setter Property="Background" Value="Transparent" />
@@ -33,6 +34,37 @@
                         <VisualStateManager.CustomVisualStateManager>
                             <ui:SimpleVisualStateManager />
                         </VisualStateManager.CustomVisualStateManager>
+                        <Grid>
+                            <ContentPresenter
+                                x:Name="ContentPresenter"
+                                Margin="{TemplateBinding Padding}"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                            <Rectangle
+                                x:Name="BorderRectangle"
+                                IsHitTestVisible="False"
+                                Opacity="0"
+                                Stroke="{DynamicResource SystemControlHighlightListAccentLowBrush}"
+                                StrokeThickness="0" />
+                            <Border
+                                x:Name="MultiSelectSquare"
+                                Width="20"
+                                Height="20"
+                                Margin="0,2,2,0"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Top"
+                                Background="Transparent"
+                                Visibility="Collapsed">
+                                <ui:FontIconFallback
+                                    x:Name="MultiSelectCheck"
+                                    Data="{StaticResource CheckMark}"
+                                    FontFamily="{DynamicResource SymbolThemeFontFamily}"
+                                    FontSize="16"
+                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
+                                    Opacity="0" />
+                            </Border>
+                        </Grid>
                         <VisualStateManager.VisualStateGroups>
                             <VisualStateGroup x:Name="MultiSelectStates">
                                 <VisualStateGroup.Transitions>
@@ -57,44 +89,13 @@
                                 </VisualState>
                             </VisualStateGroup>
                         </VisualStateManager.VisualStateGroups>
-                        <Grid>
-                            <ContentPresenter
-                                x:Name="ContentPresenter"
-                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
-                                Margin="{TemplateBinding Padding}"
-                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
-                            <Rectangle
-                                x:Name="BorderRectangle"
-                                IsHitTestVisible="False"
-                                Stroke="{DynamicResource SystemControlHighlightListAccentLowBrush}"
-                                StrokeThickness="0"
-                                Opacity="0" />
-                            <Border
-                                x:Name="MultiSelectSquare"
-                                Background="Transparent"
-                                Width="20"
-                                Height="20"
-                                Margin="0,2,2,0"
-                                VerticalAlignment="Top"
-                                HorizontalAlignment="Right"
-                                Visibility="Collapsed">
-                                <ui:FontIconFallback
-                                    x:Name="MultiSelectCheck"
-                                    FontFamily="{DynamicResource SymbolThemeFontFamily}"
-                                    Data="{StaticResource CheckMark}"
-                                    FontSize="16"
-                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
-                                    Opacity="0" />
-                            </Border>
-                        </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
-                        <!-- Focused -->
+                        <!--  Focused  -->
                         <Trigger Property="ui:FocusVisualHelper.ShowFocusVisual" Value="True">
                             <Setter TargetName="BorderRectangle" Property="Visibility" Value="Collapsed" />
                         </Trigger>
-                        <!-- PointerOver -->
+                        <!--  PointerOver  -->
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsMouseOver" Value="True" />
@@ -106,7 +107,7 @@
                             <Setter Property="ui:FocusVisualHelper.FocusVisualSecondaryBrush" Value="{DynamicResource SystemControlHighlightListLowBrush}" />
                             <Setter Property="ui:FocusVisualHelper.FocusVisualSecondaryThickness" Value="2" />
                         </MultiTrigger>
-                        <!-- Selected -->
+                        <!--  Selected  -->
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsMouseOver" Value="False" />
@@ -120,7 +121,7 @@
                             <Setter Property="ui:FocusVisualHelper.FocusVisualSecondaryThickness" Value="2" />
                             <Setter TargetName="MultiSelectSquare" Property="Background" Value="{DynamicResource SystemControlHighlightAccentBrush}" />
                         </MultiTrigger>
-                        <!-- PointerOverSelected -->
+                        <!--  PointerOverSelected  -->
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsMouseOver" Value="True" />
@@ -134,7 +135,7 @@
                             <Setter Property="ui:FocusVisualHelper.FocusVisualSecondaryThickness" Value="2" />
                             <Setter TargetName="MultiSelectSquare" Property="Background" Value="{DynamicResource SystemControlHighlightAccentBrush}" />
                         </MultiTrigger>
-                        <!-- Disabled -->
+                        <!--  Disabled  -->
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="ContentBorder" Property="Opacity" Value="{DynamicResource ListViewItemDisabledThemeOpacity}" />
                         </Trigger>

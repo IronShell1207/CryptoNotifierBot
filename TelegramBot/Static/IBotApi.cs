@@ -10,7 +10,6 @@ using Telegram.Bot.Extensions;
 using Telegram.Bot.Args;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types.ReplyMarkups;
-using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types.Enums;
 using System.Threading.Tasks;
 using CryptoApi.Constants;
@@ -26,7 +25,7 @@ using TelegramBot.Services.MessageHandlers;
 
 namespace TelegramBot.Static
 {
-    public class BotApi
+    /*public class BotApi
     {
         public static bool IsBotStarted;
         public static TelegramBotClient BotClient { get; set; }
@@ -94,16 +93,16 @@ namespace TelegramBot.Static
                  {
                      await msgHandler.HandleMessage(update);
                  }
-             }*/
-            /*else if (update.Type == UpdateType.CallbackQuery)
-                CallbackHandlerAsync(bot, update, canceltoken);*/
+             }
+            if (update.Type == UpdateType.CallbackQuery)
+                CallbackHandlerAsync(bot, update, canceltoken);
             /* else if (update.Type == UpdateType.EditedMessage)
              {
                  update.Message = new Message();
                  update.Message.Text = update.EditedMessage.Text;
                  await MessageTextHandler(bot, update, canceltoken, user);
-             }*/
-            if (update.Type == UpdateType.Message && update.Message != null)
+             }
+            else if (update.Type == UpdateType.Message && update.Message != null)
                 await MessageTextHandler(bot, update, canceltoken, user);
         }
 
@@ -217,7 +216,7 @@ namespace TelegramBot.Static
 
         public static async Task ErrorHandler(ITelegramBotClient botClient, Exception ex, CancellationToken csToken)
         {
-            ConsoleCommandsHandler.LogWrite(ex.Message);
+            Console.WriteLine(ex.Message);
             throw ex;
         }
 
@@ -232,7 +231,7 @@ namespace TelegramBot.Static
                     BanReason = banReason
                 });
                 await dbContext.SaveChangesAsync();
-                ConsoleCommandsHandler.LogWrite($"User {chatid.Identifier} banned with reason: {banReason}");
+                Console.WriteLine($"User {chatid.Identifier} banned with reason: {banReason}");
             }
         }
 
@@ -508,7 +507,7 @@ namespace TelegramBot.Static
                 {
                     var baduser = dbContext.Users.FirstOrDefault(x => x.TelegramId == chatId.Identifier);
                     if (baduser != null) dbContext.Users.Remove(baduser);
-                    ConsoleCommandsHandler.LogWrite($"Bad user {chatId.Identifier}. Removed from the database");
+                    Console.WriteLine($"Bad user {chatId.Identifier}. Removed from the database");
                 }
             }
             else if (ex.Message == "Forbidden: bot was blocked by the user")
@@ -562,5 +561,5 @@ namespace TelegramBot.Static
         }
 
         #endregion UsersStuff
-    }
+    }*/
 }

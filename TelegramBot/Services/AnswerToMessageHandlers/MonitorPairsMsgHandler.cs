@@ -12,6 +12,7 @@ namespace TelegramBot.Static.MessageHandlers
 {
     public class MonitorPairsMsgHandler : IMyDisposable
     {
+        /*
         public async Task AddToMon(Update update, Match match)
         {
             using (AppDbContext dbContext = new AppDbContext())
@@ -37,6 +38,6 @@ namespace TelegramBot.Static.MessageHandlers
                 await dbContext.SaveChangesAsync();
                 await BotApi.SendMessage(update.Message.Chat.Id, $"Removed {pairBase} pair from mon");
             }
-        }
+        }*/
     }
 }

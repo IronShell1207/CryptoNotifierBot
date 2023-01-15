@@ -21,7 +21,7 @@ namespace TelegramBot.Static.MessageHandlers
 {
     public class CryptoPairsMsgHandler : IMyDisposable
     {
-        private async Task<CryptoPair> GetTempUserTask(Update update)
+        /*private async Task<CryptoPair> GetTempUserTask(Update update)
         {
             var user = await BotApi.GetUserSettings(update);
             CryptoPair pair = PairsManager.TempObjects?.FirstOrDefault(x => x.OwnerId == user.Id);
@@ -636,5 +636,6 @@ namespace TelegramBot.Static.MessageHandlers
         }
 
         #endregion MultiTasksOperations
+    }*/
     }
 }

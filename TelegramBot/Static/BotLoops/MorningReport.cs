@@ -14,11 +14,13 @@ namespace TelegramBot.Static
     {
         private static List<UserConfig> NotifiedUsers = new List<UserConfig>();
         public static bool MorningPool { get; set; } = true;
+
         private static List<TradingPair> MorningPairs = new List<TradingPair>()
         {
-            new("BTC","USDT"), 
+            new("BTC","USDT"),
             new("ETH", "USDT")
         };
+
         public static void MorningSpread()
         {
             while (MorningPool)
@@ -30,8 +32,8 @@ namespace TelegramBot.Static
                     Thread.Sleep(TimeSpan.FromMinutes(1));
                     Console.WriteLine($"[{dateNow.ToString()}] Morning report notified users list cleared");
                 }
-                var users = new AppDbContext().Users?.Where(x => x.MorningReport != null).ToList();
-                foreach (var userCfg in users)
+                //var users = new AppDbContext().Users?.Where(x => x.MorningReport != null).ToList();
+                /*foreach (var userCfg in users)
                 {
                     if (NotifiedUsers.Contains(userCfg))
                         users.Remove(userCfg);
@@ -52,7 +54,7 @@ namespace TelegramBot.Static
                         //var prices24hAgo = ExchangesCheckerForUpdates.MarketData.Where(
                         //    x => x[0].CreationTime + TimeSpan.FromMinutes(((23 * 60) + 58)) < dateNow &&
                         //         dateNow < x[0].CreationTime + TimeSpan.FromMinutes(((24 * 60) + 1))).FirstOrDefault();
-                       
+
                         //foreach (TradingPair pair in MorningPairs)
                         //{
                         //    var priceNow = pricesNow[0].Pairs.First(x => x.Symbol == pair);
@@ -70,10 +72,9 @@ namespace TelegramBot.Static
                         //NotifiedUsers.Add(user);
                         //BotApi.SendMessage(user.TelegramId, mReport.ToString());
                     }
-                    
                 }
                 Thread.Sleep(TimeSpan.FromSeconds(25));
-
+            }*/
             }
         }
     }

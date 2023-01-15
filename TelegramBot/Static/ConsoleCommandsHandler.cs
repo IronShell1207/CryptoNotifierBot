@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Update;
 using Telegram.Bot;
 using TelegramBot.Constants;
+using TelegramBot.Helpers;
 
 namespace TelegramBot.Static
 {
@@ -15,48 +16,48 @@ namespace TelegramBot.Static
     {
         public static async Task ChangeTokenAsync()
         {
-            setbottoken:
-            LogWrite("Set telegram bot token: ");
+        setbottoken:
+            Console.WriteLine("Set telegram bot token: ");
             var reader = Console.ReadLine();
             var token = RegexCombins.TelegramBotToken.Match(reader);
             if (token.Success)
             {
                 AppSettingsStatic.Settings.TelegramBotToken = token.Value;
-                LogWrite("Bot token saved!");
+                Console.WriteLine("Bot token saved!");
                 JsonHelper.SaveJson(AppSettingsStatic.Settings, AppSettingsStatic.SettsPath);
-                LogWrite("You need to restart program to apply changes!");
+                Console.WriteLine("You need to restart program to apply changes!");
             }
             else
             {
-                ConsoleCommandsHandler.LogWrite("Token invalid. Try again");
+                Console.WriteLine("Token invalid. Try again");
                 goto setbottoken;
             }
         }
 
         public static async Task StartBotAsync()
         {
-            LogWrite("Starting telegram bot...");
-            LogWrite("Connecting to telegram api...");
-            await Task.Run(BotApi.StartBot);
-            var botInfo = await BotApi.BotClient.GetMeAsync();
-            LogWrite($"Bot connected! Bot info: {botInfo}");
+            Console.WriteLine("Starting telegram bot...");
+            Console.WriteLine("Connecting to telegram api...");
+            //await Task.Run(BotApi.StartBot);
+            //var botInfo = await BotApi.BotClient.GetMeAsync();
+            // Console.WriteLine($"Bot connected! Bot info: {botInfo}");
         }
 
         public static async Task SetAdminId()
         {
         setid:
-            ConsoleCommandsHandler.LogWrite("Set admin telegram id: ");
+            Console.WriteLine("Set admin telegram id: ");
             var id = Console.ReadLine();
             try
             {
-                await Task.Run(() => BotApi.SendMessage(id, "Bot has been configured! Admin rights granted"));
+                //await Task.Run(() => BotApi.SendMessage(id, "Bot has been configured! Admin rights granted"));
                 AppSettingsStatic.Settings.AdminTelegramId = id;
-                LogWrite("Admin set success");
+                Console.WriteLine("Admin set success");
                 JsonHelper.SaveJson(AppSettingsStatic.Settings, AppSettingsStatic.SettsPath);
             }
             catch (Exception ex)
             {
-                LogWrite($"{ex.Message} Try to start chat with bot or check your blacklist!");
+                Console.WriteLine($"{ex.Message} Try to start chat with bot or check your blacklist!");
                 goto setid;
             }
         }
@@ -71,34 +72,8 @@ namespace TelegramBot.Static
                 return path;
             }
         }
-
-
-        public async static void LogWrite(string line)
-        {
-
-            DateTime dt = DateTime.Now;
-            var logFile = DataDir + "log.txt";
-            var lineS = $"[{dt.ToString()}] {line}";
-            start:
-            try
-            {
-                File.AppendAllText(logFile, lineS + "\n");
-
-            }
-            catch (IOException ex)
-            {
-                if (ex.HResult == -2147024864)
-                {
-                    Thread.Sleep(300);
-                    goto start;
-                }
-
-            }
-            Console.WriteLine(lineS);
-
-
-        }
     }
+
     internal class ConsoleSpinner
     {
         private int _currentAnimationFrame;

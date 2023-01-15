@@ -152,35 +152,35 @@
 
     protected override async Task OnInitializedAsync()
     {
-        user = await ForecastService.userconfigGET(int.Parse(userid));
+    // user = await ForecastService.userconfigGET(int.Parse(userid));
     }
 
     private async Task SaveChanges()
     {
-        var result = await ForecastService.SaveUserSettings(user.Item1, user.Item2);
-        AlertMessage = result.Item2;
-        AlertVisible = true;
-        await Task.Delay(1500);
+       // var result = await ForecastService.SaveUserSettings(user.Item1, user.Item2);
+       // AlertMessage = result.Item2;
+       // AlertVisible = true;
+       // await Task.Delay(1500);
        
-        AlertVisible = false;
+       // AlertVisible = false;
     }
 
     private async Task RemoveFromList(BlackListedPairs pair)
     {
-        var result = await ForecastService.RemovePairFromBL(user.Item2, pair);
-        user.Item2?.BlackListedPairsList?.Remove(pair);
-        AlertMessage = result.Item2;
-        AlertVisible = true;
-        await Task.Delay(1500);
-        AlertVisible = false;
+      //  var result = await ForecastService.RemovePairFromBL(user.Item2, pair);
+       // user.Item2?.BlackListedPairsList?.Remove(pair);
+      //  AlertMessage = result.Item2;
+       // AlertVisible = true;
+       // await Task.Delay(1500);
+       // AlertVisible = false;
     }
 
     private async Task RemoveMonTask(MonObj mon)
     {
-        var result = await ForecastService.RemoveMonPair(mon);
-        AlertMessage = "Pair removed";
-        AlertVisible = true;
-        await Task.Delay(1500);
-        AlertVisible = false;
+       // var result = await ForecastService.RemoveMonPair(mon);
+       // AlertMessage = "Pair removed";
+      //  AlertVisible = true;
+//await Task.Delay(1500);
+     //   AlertVisible = false;
     }
 }

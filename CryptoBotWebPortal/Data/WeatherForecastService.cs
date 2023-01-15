@@ -12,7 +12,7 @@ namespace CryptoBotWebPortal.Data
 {
     public class WeatherForecastService
     {
-        public async Task<List<PricedTradingPair>> GetLatest100Pairs()
+        /*public async Task<List<PricedTradingPair>> GetLatest100Pairs()
         {
             using (var dbcontext = new DataRequester())
             {
@@ -174,5 +174,6 @@ namespace CryptoBotWebPortal.Data
                 return (false, ex.Message);
             }
         }
+    }*/
     }
 }
