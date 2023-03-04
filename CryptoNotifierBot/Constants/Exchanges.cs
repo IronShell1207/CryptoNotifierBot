@@ -14,6 +14,7 @@ namespace CryptoApi.Constants
         public const string Binance = "Binance";
         public const string Kucoin = "Kucoin";
         public const string Bitget = "Bitget";
+        public const string Mexc = "Mexc";
         private const string CoinEx = "CoinEx";
         public static bool Contains(string name)
         {
@@ -27,15 +28,17 @@ namespace CryptoApi.Constants
             switch (name)
             {
                 case GateIO:
+                case Mexc:
                     return "_";
+
                 case Okx:
-                    return "-";
-                case Binance:
-                    return null;
-                case Bitget:
-                    return null;
                 case Kucoin:
                     return "-";
+
+                case Binance:
+                case Bitget:
+                    return null;
+                
                 default: return "_";
             }
         }
@@ -54,13 +57,15 @@ namespace CryptoApi.Constants
                     return typeof(BitgetData);
                 case Kucoin:
                     return typeof(KucoinData);
+                case Mexc:
+                    return typeof(MexcData);
                 default: return null;
             }
         }
 
         public static List<string> ExchangeList = new List<string>()
         {
-            GateIO,Okx,Bitget,Binance,Kucoin
+            GateIO,Okx,Bitget,Binance,Kucoin, Mexc
         };
     }
 }

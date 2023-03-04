@@ -23,7 +23,7 @@ namespace TelegramBot.Static
             get
             {
                 if (_settings != null) return _settings;
-                _settings = File.Exists(SettsPath) ? JsonHelper.LoadSettings(SettsPath) : new AppSettings();
+                _settings = File.Exists(SettsPath) ? JsonHelper.LoadSettings<AppSettings>(SettsPath) : new AppSettings();
                 return _settings;
             }
         }
