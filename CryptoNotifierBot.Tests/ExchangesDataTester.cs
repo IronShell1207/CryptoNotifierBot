@@ -161,6 +161,16 @@ namespace CryptoApi.Tests
         }
 
         [Test]
+        public async Task NewMexcTest()
+        {
+            using (CryptoApi.API.ExchangeApi api = new ExchangeApi(Exchanges.Mexc))
+            {
+                await api.GetExchangeData<MexcData>(NewGuid);
+                Assert.Pass(await GetBtcPrice(Exchanges.Mexc));
+            }
+        }
+
+        [Test]
         public async Task NewKucoinTest()
         {
             using (CryptoApi.API.ExchangeApi api = new ExchangeApi(Exchanges.Kucoin))
