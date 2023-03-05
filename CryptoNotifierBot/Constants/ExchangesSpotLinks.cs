@@ -69,6 +69,7 @@ namespace CryptoApi.Constants
             if (exchange == Exchanges.Binance) return $"{Base}{Quote}";
             else if (exchange == Exchanges.Okx) return $"{Base}-{Quote}";
             else if (exchange == Exchanges.GateIO) return $"{Base}_{Quote}";
+            else if (exchange == Exchanges.Mexc) return $"{Base}_{Quote}";
             else if (exchange == Exchanges.Kucoin) return $"{Base}-{Quote}";
             else if (exchange == Exchanges.Bitget) return $"{Base}{Quote}";
             return null;

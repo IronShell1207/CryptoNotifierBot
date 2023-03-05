@@ -6,6 +6,7 @@
         Okx = 1,
         Kucoin = 2,
         GateIO = 3,
-        Bitget = 4
+        Bitget = 4,
+        Mexc = 5
     }
 }

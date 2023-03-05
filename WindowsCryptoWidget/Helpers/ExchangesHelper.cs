@@ -84,6 +84,28 @@ namespace WindowsCryptoWidget.Helpers
             return new List<KuTicker>();
         }
 
+        public List<MexcPair> GetMexcLatestData()
+        {
+            if (SettingsHelpers.SettingsConfig.UsedExchange == ExchangeEnum.Mexc && _isAlive)
+            {
+                if (LatestDataSet.GetType() == typeof(MexcData))
+                {
+                    MexcData data = (MexcData)LatestDataSet;
+                    if (data != null)
+                    {
+                        return data.data.ToList();
+                    }
+                }
+            }
+
+            if (SettingsHelpers.SettingsConfig.UsedExchange != ExchangeEnum.Kucoin)
+                throw new InvalidCastException(
+                    $"Current exchange is not Kucoin, its: {SettingsHelpers.SettingsConfig.UsedExchange.ToString()}");
+            if (!_isAlive)
+                throw new InvalidCastException("Loop was not started!");
+            return new List<MexcPair>();
+        }
+
         public List<OkxTicker> GetOkxLatestData()
         {
             if (SettingsHelpers.SettingsConfig.UsedExchange == ExchangeEnum.Okx && _isAlive)
@@ -207,6 +229,7 @@ namespace WindowsCryptoWidget.Helpers
                             _cancellationTokenSource.Token),
                         (ExchangeEnum.Binance) => await new ExchangeApi(Exchanges.Binance)
                             .GetDataFromExchange<List<BinancePair>>(_cancellationTokenSource.Token),
+                        (ExchangeEnum.Mexc) => await new ExchangeApi(Exchanges.Mexc).GetDataFromExchange<MexcData>(_cancellationTokenSource.Token),
                         (ExchangeEnum.Kucoin) =>
                             await new ExchangeApi(Exchanges.Kucoin).GetDataFromExchange<KucoinData>(_cancellationTokenSource.Token),
                         (ExchangeEnum.Bitget) => await new ExchangeApi(Exchanges.Bitget).GetDataFromExchange<BitgetData>(
