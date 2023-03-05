@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "CryptoMonWidgets (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "CryptoMonWidgets (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
