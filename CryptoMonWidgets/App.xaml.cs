@@ -35,6 +35,7 @@ namespace CryptoMonWidgets
         {
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddSingleton<MainViewModel>();
+            serviceCollection.AddSingleton<WidgetWindowsService>();
             serviceCollection.AddSingleton<INavigationService, MainNavigationService>();
 
             ServiceProvider = serviceCollection.BuildServiceProvider();

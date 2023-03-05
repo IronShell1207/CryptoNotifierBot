@@ -1,12 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using System.Collections.ObjectModel;
 
 namespace CryptoMonWidgets.ViewModels
 {
-    internal class MainViewModel
+    public class MainViewModel : ObservableObject
     {
+        public ObservableCollection<WidgetViewModel> Widgets { get; set; } =
+            new ObservableCollection<WidgetViewModel>();
+
+        public RelayCommand AddWidgetCommand { get; }
+
+        public void OnAddWidget()
+        {
+            Widgets.Add(new WidgetViewModel());
+        }
+
+        public MainViewModel()
+        {
+            AddWidgetCommand = new RelayCommand(OnAddWidget);
+        }
     }
 }
