@@ -235,7 +235,7 @@ namespace WindowsCryptoWidget.ViewModels
         {
             ExchangeList = new List<ExchangeEnum>()
             {
-                ExchangeEnum.Okx, ExchangeEnum.Kucoin, ExchangeEnum.Binance, ExchangeEnum.Bitget, ExchangeEnum.GateIO
+                ExchangeEnum.Okx, ExchangeEnum.Kucoin, ExchangeEnum.Binance, ExchangeEnum.Bitget, ExchangeEnum.GateIO, ExchangeEnum.Mexc
             };
             ExchangesHelper.Instance.StartLoop();
             LoopCancellationTokenSource = new CancellationTokenSource();
@@ -280,10 +280,16 @@ namespace WindowsCryptoWidget.ViewModels
                                 HandleKucointData(ExchangesHelper.Instance.GetKucoinLatestData());
                                 break;
 
+                            case ExchangeEnum.Mexc:
+                                HandleMexcData(ExchangesHelper.Instance.GetMexcLatestData());
+                                break;
+
                             default:
                                 HandleOkxData(ExchangesHelper.Instance.GetOkxLatestData());
                                 break;
                         }
+
+                        OnPropertyChanged(string.Empty);
                     }
                     catch (Exception ex)
                     {
@@ -372,6 +378,26 @@ namespace WindowsCryptoWidget.ViewModels
                     pair.ArrowSymbol = lastPrice < pair.Price ? "▲" : "▼";
                     pair.PriceChangingDouble = double.Parse(pairFromExchange.changePrice);
                     pair.ProcentDoubleChanging = Math.Round(double.Parse(pairFromExchange.changeRate) * 100, 3);
+                    Lastupdate = DateTime.Now;
+                }
+            }
+        }
+
+        private void HandleMexcData(List<MexcPair> data)
+        {
+            foreach (var pair in PairsList)
+            {
+                string pairBase = pair.Title.Split("/").First();
+                string pairQuote = pair.Title.Split("/").Last();
+                var pairFromExchange = data.FirstOrDefault(x => x.Symbol == ExchangesSpotLinks.GetPairConverted(Exchanges.Mexc, pairBase, pairQuote));
+                if (pairFromExchange != null && pair.Price != double.Parse(pairFromExchange.Price))
+                {
+                    double lastPrice = pair.Price;
+                    pair.Price = double.Parse(pairFromExchange.Price);
+                    pair.IsPumping = lastPrice < pair.Price;
+                    pair.ArrowSymbol = lastPrice < pair.Price ? "▲" : "▼";
+                    pair.PriceChangingDouble = Math.Round(pair.Price - double.Parse(pairFromExchange.open), 4);
+                    pair.ProcentDoubleChanging = Math.Round(double.Parse(pairFromExchange.change_rate) * 100, 3);
                     Lastupdate = DateTime.Now;
                 }
             }
