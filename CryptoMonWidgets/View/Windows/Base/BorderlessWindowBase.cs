@@ -13,7 +13,7 @@ using static GDIPlus.GDIPlusTools;
 
 namespace CryptoMonWidgets.View.Windows.Base
 {
-    public sealed partial class BorderlessWindow : Window
+    public partial class BorderlessWindow : Window
     {
         #region Private Fields
 
