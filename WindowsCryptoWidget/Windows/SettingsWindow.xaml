@@ -32,7 +32,7 @@
                 BorderBrush="#121212"
                 BorderThickness="15"
                 CornerRadius="15">
-                <Grid Background="#121212" >
+                <Grid Background="#121212">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="auto" />
                         <ColumnDefinition Width="*" />
@@ -48,8 +48,8 @@
                         <Button
                             Width="25"
                             Height="25"
-                            Click="CloseButtonOnClick"
                             BorderThickness="0"
+                            Click="CloseButtonOnClick"
                             Style="{StaticResource FlatButtonStyle}">
                             <Button.Content>
                                 <Image
@@ -70,33 +70,33 @@
 
                         <controls:SliderControl
                             x:Name="Slide_Transperency"
+                            Title="Transperency of widget"
+                            Interval="0.001"
+                            IsCurrentValueDisplayed="True"
                             Maximum="1.0"
                             Minimum="0.1"
-                            Interval="0.001"
-                            Title="Transperency of widget"
-                            IsCurrentValueDisplayed="True"
                             Value="{Binding BackgroundTransparency, Mode=TwoWay}" />
                         <controls:SliderControl
+                            Title="Font opacity"
+                            Interval="0.01"
+                            IsCurrentValueDisplayed="True"
                             Maximum="1.0"
                             Minimum="0.1"
-                            IsCurrentValueDisplayed="True"
-                            Interval="0.01"
-                            Title="Font opacity"
                             Value="{Binding FontsTransparency, Mode=TwoWay}" />
                         <controls:SliderControl
-                            Maximum="2.0"
-                            Minimum="0.4"
+                            Title="Widget scale"
                             Interval="0.05"
                             IsCurrentValueDisplayed="True"
-                            Title="Widget scale"
+                            Maximum="2.0"
+                            Minimum="0.4"
                             Value="{Binding WidgetScale, Mode=TwoWay}" />
                         <controls:SliderControl
                             x:Name="Slider_UpdateDelay"
+                            Title="Update prices delay"
+                            Interval="0.25"
+                            IsCurrentValueDisplayed="True"
                             Maximum="60.0"
                             Minimum="0.5"
-                            IsCurrentValueDisplayed="True"
-                            Interval="0.25"
-                            Title="Update prices delay"
                             Value="{Binding UpdateDelay, Mode=TwoWay}" />
                     </StackPanel>
                     <StackPanel Grid.Row="2" Grid.ColumnSpan="3">
@@ -204,7 +204,6 @@
                         </ListView>
                         <TextBox
                             MaxHeight="100"
-                            
                             MaxLines="100"
                             Text="{Binding ConsoleHelper.LogOutput}" />
                     </StackPanel>
