@@ -1,13 +1,18 @@
-﻿<Window
+﻿<winUiEx:WindowEx
     x:Class="CryptoMonWidgets.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:CryptoMonWidgets"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:CryptoMonWidgets"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:winUiEx="using:WinUIEx"
+    MinWidth="600"
+    MinHeight="380"
+    MaxWidth="1200"
+    MaxHeight="800"
     mc:Ignorable="d">
-
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-        <Button x:Name="myButton" Click="myButton_Click">Click Me</Button>
-    </StackPanel>
-</Window>
+    <winUiEx:WindowEx.Backdrop>
+        <winUiEx:MicaSystemBackdrop/>
+    </winUiEx:WindowEx.Backdrop>
+    
+</winUiEx:WindowEx>

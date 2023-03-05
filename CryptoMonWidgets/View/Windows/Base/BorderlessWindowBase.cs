@@ -355,8 +355,8 @@ namespace CryptoMonWidgets.View.Windows.Base
             }
             else if (properties.IsRightButtonPressed)
             {
-                System.Threading.Thread.Sleep(200);
-                Application.Current.Exit();
+                // System.Threading.Thread.Sleep(200);
+                // Application.Current.Exit();
             }
         }
 
