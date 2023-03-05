@@ -1,5 +1,8 @@
 ﻿using System.Runtime.InteropServices;
 using System.Windows;
+using Microsoft.AppCenter;
+using Microsoft.AppCenter.Analytics;
+using Microsoft.AppCenter.Crashes;
 
 namespace WindowsCryptoWidget
 {
@@ -11,6 +14,8 @@ namespace WindowsCryptoWidget
         protected override void OnStartup(StartupEventArgs e)
         {
             //NativeMethods.AllocConsole();
+            AppCenter.Start("6bc45cfa-c83c-4b08-a1bb-fb66a5ff9e87",
+                typeof(Analytics), typeof(Crashes));
             base.OnStartup(e);
         }
     }

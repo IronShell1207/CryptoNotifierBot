@@ -58,12 +58,15 @@ namespace CryptoApi.Static.DataHandler
         {
             Stopwatch timer = new Stopwatch();
             timer.Start();
+            try
+            {
+                using var api = new ExchangeApi(Exchanges.Kucoin);
+                var result = api.GetExchangeData<KucoinData>(guid).Result;
 
-            using var api = new ExchangeApi(Exchanges.Kucoin);
-            var result = api.GetExchangeData<KucoinData>(guid).Result;
-
-            timer.Stop();
-            Console.WriteLine($"{api.ApiName}: {api.PairsCount} in {timer.Elapsed} secs.");
+                timer.Stop();
+                Console.WriteLine($"{api.ApiName}: {api.PairsCount} in {timer.Elapsed} secs.");
+            }
+            catch (Exception ex) { }
         }
 
         public void GetKucoinFullData(Guid guid)
@@ -166,6 +169,7 @@ namespace CryptoApi.Static.DataHandler
                 if (method.ReturnType.Name == "Void" && method.Name == "GetKucoinFullData")
                     method.Invoke(new DataLoader(), parfams.ToArray());
         }
+
         public void UpdateOkcData()
         {
             Guid guid = Guid.NewGuid();
@@ -230,6 +234,7 @@ namespace CryptoApi.Static.DataHandler
                 await Task.Delay(UpdateDelay);
             }
         }
+
         public async Task UpdateOkxLoop()
         {
             while (UpdaterLive)
@@ -240,7 +245,6 @@ namespace CryptoApi.Static.DataHandler
                 await Task.Delay(UpdateDelay);
             }
         }
-
 
         public async Task<List<PricedTradingPair>> GetLatestDataByExchangeName(string exchange, int limit = 9999)
         {
@@ -263,6 +267,7 @@ namespace CryptoApi.Static.DataHandler
                 return dbData;
             }
         }
+
         public async Task<OkxTickerDB> GetOkxData(string name, string quote)
         {
             using (DataBaseContext dbContext = new DataBaseContext())
