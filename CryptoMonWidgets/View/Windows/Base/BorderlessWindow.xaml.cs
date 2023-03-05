@@ -15,7 +15,7 @@ namespace CryptoMonWidgets.View.Windows.Base
     /// <summary>
     /// An empty window that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class BorderlessWindow : Window
+    public partial class BorderlessWindow : Window
     {
         #region Public Constructors
 

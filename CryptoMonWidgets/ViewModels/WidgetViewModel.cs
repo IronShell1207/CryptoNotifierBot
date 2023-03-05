@@ -20,18 +20,66 @@ namespace CryptoMonWidgets.ViewModels
             get => _styleEnum;
             set => SetProperty(ref _styleEnum, value);
         }
-        
-        public ObservableCollection<PairViewModel> Pairs { get; set; }
+
+        public ObservableCollection<PairViewModel> Pairs { get; set; } = new ObservableCollection<PairViewModel>();
 
         public RelayCommand AddPairCommand { get; }
+
+        /// <inheritdoc cref="Scale"/>
+        private double _scale = 0.5;
+
+        /// <summary>
+        /// Масштаб
+        /// </summary>
+        public double Scale
+        {
+            get => _scale;
+            set
+            {
+                SetProperty(ref _scale, value);
+                ScaleChanged?.Invoke();
+            }
+        }
 
         public void OnAddPair()
         {
         }
 
+        public event Action ScaleChanged;
+
         public WidgetViewModel()
         {
             AddPairCommand = new RelayCommand(OnAddPair);
+            Pairs.Add(new PairViewModel()
+            {
+                PairBaseName = "Btc",
+                PairQuoteName = "usdt",
+                Price = 30000
+            });
+            Pairs.Add(new PairViewModel()
+            {
+                PairBaseName = "Btc",
+                PairQuoteName = "usdt",
+                Price = 30000
+            });
+            Pairs.Add(new PairViewModel()
+            {
+                PairBaseName = "Btc",
+                PairQuoteName = "usdt",
+                Price = 30000
+            });
+            Pairs.Add(new PairViewModel()
+            {
+                PairBaseName = "Btc",
+                PairQuoteName = "usdt",
+                Price = 30000
+            });
+            Pairs.Add(new PairViewModel()
+            {
+                PairBaseName = "Btc",
+                PairQuoteName = "usdt",
+                Price = 30000
+            });
         }
 
     }

@@ -54,6 +54,7 @@
                     Padding="20,8"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Stretch"
+                    Command="{Binding AddWidgetCommand}"
                     Content="Create widget"
                     CornerRadius="10"
                     FontSize="12" />
@@ -72,7 +73,8 @@
                 BorderBrush="#88454545"
                 BorderThickness="1"
                 CornerRadius="10"
-                ItemsSource="{Binding Widgets}">
+                ItemsSource="{Binding Widgets}"
+                SelectedItem="{Binding SelectedWidgetSettings, Mode=TwoWay}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid Margin="0,5">
@@ -115,6 +117,7 @@
             <Grid
                 Grid.Row="1"
                 Grid.Column="1"
+                DataContext="{Binding SelectedWidgetSettings}"
                 Margin="10">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />

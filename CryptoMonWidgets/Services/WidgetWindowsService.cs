@@ -1,12 +1,19 @@
-﻿using System;
+﻿using CryptoMonWidgets.View.Pages;
+using CryptoMonWidgets.View.Windows.Base;
+using CryptoMonWidgets.ViewModels;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CryptoMonWidgets.View.Windows;
 
 namespace CryptoMonWidgets.Services
 {
-    internal class WidgetWindowsService
+    public class WidgetWindowsService
     {
+        public List<object> CreatedWidgets { get; private set; } = new List<object>();
+
+        public void CreateWidget(WidgetViewModel viewModel)
+        {
+            WidgetWindow widgetWindow = new WidgetWindow(viewModel);
+            widgetWindow.Activate();
+        }
     }
 }

@@ -19,6 +19,7 @@
     <None Remove="View\Controls\Components\Widgets\InlinePairView.xaml" />
     <None Remove="View\Pages\MainPage.xaml" />
     <None Remove="View\Pages\RootView.xaml" />
+    <None Remove="View\Pages\WidgetWindowContentPage.xaml" />
     <None Remove="View\Windows\Base\BorderlessWindow.xaml" />
   </ItemGroup>
 
@@ -64,6 +65,11 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CryptoNotifierBot\CryptoApi.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="View\Pages\WidgetWindowContentPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="View\Controls\Components\Widgets\InlinePairView.xaml">
