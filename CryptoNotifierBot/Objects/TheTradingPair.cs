@@ -8,7 +8,7 @@ namespace CryptoApi.Objects
 {
     public class TheTradingPair
     {
-        public virtual string Symbol { get; }
-        public virtual string Price { get; }
+        public virtual string Symbol { get; set; }
+        public virtual string Price { get; set; }
     }
 }

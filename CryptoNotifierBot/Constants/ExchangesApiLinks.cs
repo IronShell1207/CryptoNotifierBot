@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics.Metrics;
 
 namespace CryptoApi.Constants
 {
@@ -12,6 +13,8 @@ namespace CryptoApi.Constants
         public static string KucoinSpotTicker = "https://api.kucoin.com/api/v1/market/allTickers";
         public static string BitgetSpotTicker = "https://capi.bitgetapi.com/api/spot/v1/market/tickers";
         private static string CoinExSpotTicker = "https://api.coinex.com/v1/market/ticker";
+        public static string MexcSpotTicker = "https://www.mexc.com/open/api/v2/market/ticker";  //?symbol=BTC_USDT
+        // https://mxcdevelop.github.io/apidocs/spot_v2_en/#ticker-information
 
         public static Uri GetApiLink(string exchange)
         {
@@ -21,6 +24,7 @@ namespace CryptoApi.Constants
                 case Exchanges.Bitget: return new Uri(BitgetSpotTicker);
                 case Exchanges.Kucoin: return new Uri(KucoinSpotTicker);
                 case Exchanges.GateIO: return new Uri(GateIOSpotTicker);
+                case Exchanges.Mexc: return new Uri(MexcSpotTicker);
                 case Exchanges.Okx: return new Uri(OkxSpotTicker);
                 default: return null;
             }

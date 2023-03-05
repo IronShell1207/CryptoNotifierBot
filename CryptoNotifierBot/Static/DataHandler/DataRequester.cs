@@ -42,6 +42,18 @@ namespace CryptoApi.Static.DataHandler
             Console.WriteLine($"{api.ApiName}: {api.PairsCount} in {timer.Elapsed} secs.");
         }
 
+        public void GetMexcData(Guid guid)
+        {
+            Stopwatch timer = new Stopwatch();
+            timer.Start();
+
+            using var api = new ExchangeApi(Exchanges.Mexc);
+            var result = api.GetExchangeData<MexcData>(guid).Result;
+
+            timer.Stop();
+            Console.WriteLine($"{api.ApiName}: {api.PairsCount} in {timer.Elapsed} secs.");
+        }
+
         public void GetGateIOData(Guid guid)
         {
             Stopwatch timer = new Stopwatch();
