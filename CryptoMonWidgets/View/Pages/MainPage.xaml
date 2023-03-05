@@ -10,8 +10,11 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:CryptoMonWidgets.View.Pages"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModels="using:CryptoMonWidgets.ViewModels"
     xmlns:widgets="using:CryptoMonWidgets.View.Controls.Components.Widgets"
+    d:DataContext="{d:DesignInstance viewModels:MainViewModel}"
     mc:Ignorable="d">
+
     <Grid
         Margin="10"
         ColumnSpacing="10"
@@ -68,7 +71,8 @@
                 Background="#38000000"
                 BorderBrush="#88454545"
                 BorderThickness="1"
-                CornerRadius="10">
+                CornerRadius="10"
+                ItemsSource="{Binding Widgets}">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <Grid Margin="0,5">
