@@ -14,6 +14,7 @@ using CryptoApi.Constants;
 using CryptoApi.Objects.ExchangesPairs;
 using WindowsCryptoWidget.Helpers;
 using WindowsCryptoWidget.Models;
+using System.Xml.Serialization;
 
 namespace WindowsCryptoWidget.ViewModels
 {
@@ -34,7 +35,7 @@ namespace WindowsCryptoWidget.ViewModels
         private string _lastUpdateTime;
 
         /// <inheritdoc cref="NewPairName"/>
-        private string _newPairName;
+        private string _newPairName ="";
 
         /// <inheritdoc cref="PairsList"/>
         private ObservableCollection<PairModel> _pairsList = new ObservableCollection<PairModel>();
@@ -138,6 +139,7 @@ namespace WindowsCryptoWidget.ViewModels
         /// <summary>
         /// Текст для новой пары.
         /// </summary>
+        [XmlIgnore]
         public string NewPairName
         {
             get => _newPairName;
@@ -289,7 +291,6 @@ namespace WindowsCryptoWidget.ViewModels
                                 break;
                         }
 
-                        OnPropertyChanged(string.Empty);
                     }
                     catch (Exception ex)
                     {

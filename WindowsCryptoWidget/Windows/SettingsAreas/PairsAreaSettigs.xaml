@@ -69,8 +69,8 @@
                     <TextBox
                         x:Name="TB_CurName"
                         Width="270"
-                        Foreground="White"
-                        Text="{Binding NewPairName, Mode=TwoWay}" />
+                        Foreground="White"  Text="{Binding NewPairName, Mode=TwoWay}"
+                        />
                     <Button
                         Height="44"
                         Grid.Column="1"

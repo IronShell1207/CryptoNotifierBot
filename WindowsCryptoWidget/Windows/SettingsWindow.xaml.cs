@@ -21,10 +21,6 @@ namespace WindowsCryptoWidget.Windows
 
         private void TB_CurName_KeyUp(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Enter)
-            {
-                //ButtonAdd.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-            }
         }
 
         private void SettingsWindow_OnMouseDown(object sender, MouseButtonEventArgs e)
