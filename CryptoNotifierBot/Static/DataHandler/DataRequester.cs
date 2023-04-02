@@ -325,6 +325,9 @@ namespace CryptoApi.Static.DataHandler
                     pairname.Exchange = exchanges.FirstOrDefault();
                 }
                 var dbSet = dbContext.DataSet.OrderBy(x => x.Id).LastOrDefault(x => x.Exchange == pairname.Exchange);
+                if (dbSet == null) 
+                    return null;
+                
                 var pair = dbContext.TradingPairs.FirstOrDefault(x =>
                     x.CryDbSetId == dbSet.Id &&
                     x.Exchange == pairname.Exchange &&
@@ -340,6 +343,7 @@ namespace CryptoApi.Static.DataHandler
             var dataSets = await GetLatestDataSets();
             using (DataBaseContext dbContext = new DataBaseContext())
             {
+                if (dataSets == null) return exchanges;
                 foreach (var dbSet in dataSets)
                 {
                     if (dbContext.TradingPairs.OrderByDescending(x => x.Id).FirstOrDefault(

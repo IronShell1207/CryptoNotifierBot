@@ -1,15 +1,7 @@
-﻿using System;
+﻿using CryptoApi.Static.DataHandler;
 using System.Globalization;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using CryptoApi.Static.DataHandler;
-using Telegram.Bot;
-using TelegramBot;
 using TelegramBot.Constants;
-using TelegramBot.Objects;
 using TelegramBot.Static;
-using Microsoft.EntityFrameworkCore;
-using Telegram.Bot.Types;
 
 namespace TelegramBot
 {

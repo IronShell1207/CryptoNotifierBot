@@ -18,7 +18,7 @@ namespace CryptoApi.Static
             {
                 var request = new RestRequest(Link);
                 request.Method = Method.Get;
-                request.Timeout = 10000;
+                request.Timeout = 25000;
                 request.AddHeader("UserAgent", WebHeaders.UserAgent);
                 var client = new RestClient();
                 var result = await client.ExecuteAsync(request, cancelToken);

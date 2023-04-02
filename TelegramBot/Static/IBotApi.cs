@@ -10,7 +10,6 @@ using Telegram.Bot.Extensions;
 using Telegram.Bot.Args;
 using Telegram.Bot.Exceptions;
 using Telegram.Bot.Types.ReplyMarkups;
-using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types.Enums;
 using System.Threading.Tasks;
 using CryptoApi.Constants;
@@ -20,6 +19,7 @@ using TelegramBot.Constants;
 using TelegramBot.Objects;
 using TelegramBot.Static.MessageHandlers;
 using System.Text.RegularExpressions;
+using Telegram.Bot.Polling;
 using TelegramBot.Helpers;
 using TelegramBot.Constants.Commands;
 using TelegramBot.Services.MessageHandlers;
@@ -88,15 +88,15 @@ namespace TelegramBot.Static
             var user = await GetUserSettings(update);
             // await SaveUserMsg(update);
 
-            /* if (!string.IsNullOrWhiteSpace(update.Message?.ReplyToMessage?.Text))
+             if (!string.IsNullOrWhiteSpace(update.Message?.ReplyToMessage?.Text))
              {
                  using (RepliedMessagesHandler msgHandler = new RepliedMessagesHandler())
                  {
                      await msgHandler.HandleMessage(update);
                  }
-             }*/
-            /*else if (update.Type == UpdateType.CallbackQuery)
-                CallbackHandlerAsync(bot, update, canceltoken);*/
+             }
+            else if (update.Type == UpdateType.CallbackQuery)
+                CallbackHandlerAsync(bot, update, canceltoken);
             /* else if (update.Type == UpdateType.EditedMessage)
              {
                  update.Message = new Message();
@@ -218,7 +218,7 @@ namespace TelegramBot.Static
         public static async Task ErrorHandler(ITelegramBotClient botClient, Exception ex, CancellationToken csToken)
         {
             ConsoleCommandsHandler.LogWrite(ex.Message);
-            throw ex;
+            
         }
 
         public static async Task AddUserToBanList(ChatId chatid, string banReason)
@@ -519,7 +519,7 @@ namespace TelegramBot.Static
             {
                 return;
             }
-            else throw ex;
+           
         }
 
         #endregion Send or edit
