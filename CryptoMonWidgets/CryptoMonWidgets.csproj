@@ -13,6 +13,25 @@
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Assets\Fonts\Mont\Montserrat-Black.ttf" />
+    <None Remove="Assets\Fonts\Mont\Montserrat-BlackItalic.ttf" />
+    <None Remove="Assets\Fonts\Mont\Montserrat-Bold.ttf" />
+    <None Remove="Assets\Fonts\Mont\Montserrat-BoldItalic.ttf" />
+    <None Remove="Assets\Fonts\Mont\Montserrat-ExtraBold.ttf" />
+    <None Remove="Assets\Fonts\Mont\Montserrat-ExtraBoldItalic.ttf" />
+    <None Remove="Assets\Fonts\Mont\Montserrat-ExtraLight.ttf" />
+    <None Remove="Assets\Fonts\Mont\Montserrat-ExtraLightItalic.ttf" />
+    <None Remove="Assets\Fonts\Mont\Montserrat-Italic.ttf" />
+    <None Remove="Assets\Fonts\Mont\Montserrat-Light.ttf" />
+    <None Remove="Assets\Fonts\Mont\Montserrat-LightItalic.ttf" />
+    <None Remove="Assets\Fonts\Mont\Montserrat-Medium.ttf" />
+    <None Remove="Assets\Fonts\Mont\Montserrat-MediumItalic.ttf" />
+    <None Remove="Assets\Fonts\Mont\Montserrat-Regular.ttf" />
+    <None Remove="Assets\Fonts\Mont\Montserrat-SemiBold.ttf" />
+    <None Remove="Assets\Fonts\Mont\Montserrat-SemiBoldItalic.ttf" />
+    <None Remove="Assets\Fonts\Mont\Montserrat-Thin.ttf" />
+    <None Remove="Assets\Fonts\Mont\Montserrat-ThinItalic.ttf" />
+    <None Remove="Resources\FontDictionary.xaml" />
     <None Remove="Styles\SimpleToggleSwitch.xaml" />
     <None Remove="View\Controls\BtcViewControl.xaml" />
     <None Remove="View\Controls\Components\WidgetPreferenciesPanel.xaml" />
@@ -58,13 +77,73 @@
     <ProjectCapability Include="Msix" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Collections\NewFolder\" />
     <Folder Include="Helpers\" />
-    <Folder Include="Collections\" />
-    <Folder Include="Resources\" />
     <Folder Include="ViewModels\Base\" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\CryptoNotifierBot\CryptoApi.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Update="Assets\Fonts\Mont\Montserrat-Black.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Fonts\Mont\Montserrat-BlackItalic.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Fonts\Mont\Montserrat-Bold.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Fonts\Mont\Montserrat-BoldItalic.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Fonts\Mont\Montserrat-ExtraBold.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Fonts\Mont\Montserrat-ExtraBoldItalic.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Fonts\Mont\Montserrat-ExtraLight.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Fonts\Mont\Montserrat-ExtraLightItalic.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Fonts\Mont\Montserrat-Italic.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Fonts\Mont\Montserrat-Light.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Fonts\Mont\Montserrat-LightItalic.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Fonts\Mont\Montserrat-Medium.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Fonts\Mont\Montserrat-MediumItalic.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Fonts\Mont\Montserrat-Regular.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Fonts\Mont\Montserrat-SemiBold.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Fonts\Mont\Montserrat-SemiBoldItalic.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Fonts\Mont\Montserrat-Thin.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Update="Assets\Fonts\Mont\Montserrat-ThinItalic.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Resources\FontDictionary.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <Page Update="View\Pages\WidgetWindowContentPage.xaml">
