@@ -89,7 +89,7 @@
                     <TextBlock
                         FontSize="12"
                         VerticalAlignment="Center"
-                        Margin="-7 0 0 0"
+
                         Foreground="{Binding ProcentDoubleChanging, Converter={StaticResource DoubleToRedGreenConverter}}"
                         Opacity="{Binding Path=DataContext.FontsTransparency, RelativeSource={RelativeSource AncestorType={x:Type local:MainWindow}}}"
                         Text="{Binding ProcentChanging}"

@@ -1,29 +1,9 @@
-// Copyright (c) Microsoft Corporation and Contributors.
-// Licensed under the MIT License.
-
+using CryptoMonWidgets.Models;
+using CryptoMonWidgets.Services.Interface;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.System;
-using CryptoMonWidgets.Models;
-using Microsoft.Extensions.DependencyInjection;
-using WinUIEx;
-using CryptoMonWidgets.Services;
-using CryptoMonWidgets.Services.Interface;
-
-// To learn more about WinUI, the WinUI project structure,
-// and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace CryptoMonWidgets.View.Pages
 {
@@ -54,6 +34,7 @@ namespace CryptoMonWidgets.View.Pages
 
             AppTitleBarText.Foreground = (SolidColorBrush)App.Current.Resources[resource];
         }
+
         private void NavigationViewControl_DisplayModeChanged(NavigationView sender, NavigationViewDisplayModeChangedEventArgs args)
         {
             AppTitleBar.Margin = new Thickness()
@@ -64,6 +45,5 @@ namespace CryptoMonWidgets.View.Pages
                 Bottom = AppTitleBar.Margin.Bottom
             };
         }
-
     }
 }

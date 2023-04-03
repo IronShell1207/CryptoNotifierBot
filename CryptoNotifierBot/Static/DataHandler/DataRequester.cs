@@ -121,18 +121,23 @@ namespace CryptoApi.Static.DataHandler
                     using (DataBaseContext dbContext = new DataBaseContext())
                     {
                         var rows = dbContext.OkxPairs.Where(x => x.Id > -1);
-                        Diff.LogWrite($"Rows deleted {rows.Count()} in OkxPairs", ConsoleColor.DarkYellow);
-                        dbContext.RemoveRange(rows);
-
-                        //var rows = dbContext.Database.ExecuteSqlRaw($"DELETE FROM OkxPairs");
-
-                        for (var index = 0; index < result.Length; index++)
+                        if (rows.Any())
                         {
-                            var tickData = result[index];
-                            dbContext.OkxPairs.Add(new OkxTickerDB(tickData));
+                            Diff.LogWrite($"Rows deleted {rows.Count()} in OkxPairs", ConsoleColor.DarkYellow);
+                            dbContext.RemoveRange(rows);
+
+                            //var rows = dbContext.Database.ExecuteSqlRaw($"DELETE FROM OkxPairs");
+
+                            for (var index = 0; index < result.Length; index++)
+                            {
+                                var tickData = result[index];
+                                dbContext.OkxPairs.Add(new OkxTickerDB(tickData));
+                            }
+
+                            dbContext.SaveChanges();
                         }
-                        dbContext.SaveChanges();
                     }
+
                 Diff.LogWrite($"{api.ApiName} data saved: {result?.Length}", ConsoleColor.DarkGreen);
             }
         }
